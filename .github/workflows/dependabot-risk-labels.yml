@@ -1,0 +1,102 @@
+name: Dependabot Risk Labels
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  label:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply risk and group labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const text = `${pr.title}\n${pr.body || ''}`.toLowerCase();
+
+            const desiredLabels = new Set(['dependencies']);
+
+            const hasAny = (...tokens) => tokens.some((t) => text.includes(t));
+
+            // Security grouped updates
+            if (hasAny('gradle-security', 'actions-security', 'security-updates')) {
+              desiredLabels.add('deps:security');
+            }
+
+            // Risk/group labels from Dependabot groups
+            if (hasAny('gradle-build-tooling', 'gradle-wrapper', 'com.android.application')) {
+              desiredLabels.add('deps:risk-high');
+              desiredLabels.add('deps:build-tooling');
+            }
+
+            if (hasAny('gradle-ui-charting', 'androidx.compose:compose-bom', 'com.patrykandpatrick.vico')) {
+              desiredLabels.add('deps:risk-high');
+              desiredLabels.add('deps:ui-charting');
+            }
+
+            if (hasAny('gradle-androidx-runtime', 'androidx.core:', 'androidx.lifecycle:', 'androidx.activity:', 'androidx.navigation:', 'androidx.work:', 'androidx.datastore:', 'androidx.room:', 'androidx.hilt:')) {
+              desiredLabels.add('deps:risk-medium');
+              desiredLabels.add('deps:androidx-runtime');
+            }
+
+            if (hasAny('gradle-test-utils', 'app.cash.turbine:', 'com.google.truth:', 'org.robolectric:', 'androidx.test:', 'junit:')) {
+              desiredLabels.add('deps:risk-low');
+              desiredLabels.add('deps:test-utils');
+            }
+
+            if (hasAny('actions-minor-patch', 'github-actions')) {
+              desiredLabels.add('deps:risk-low');
+              desiredLabels.add('deps:github-actions');
+              desiredLabels.add('ci');
+            }
+
+            const labelPalette = {
+              'dependencies': { color: '0366d6', description: 'Dependency updates' },
+              'ci': { color: '5319e7', description: 'CI and automation changes' },
+              'deps:security': { color: 'b60205', description: 'Security-related dependency updates' },
+              'deps:risk-high': { color: 'd93f0b', description: 'High-risk dependency update batch' },
+              'deps:risk-medium': { color: 'fbca04', description: 'Medium-risk dependency update batch' },
+              'deps:risk-low': { color: '0e8a16', description: 'Low-risk dependency update batch' },
+              'deps:build-tooling': { color: '1d76db', description: 'Gradle/AGP/build tooling updates' },
+              'deps:ui-charting': { color: '0052cc', description: 'Compose/UI/charting dependency updates' },
+              'deps:androidx-runtime': { color: 'bfdadc', description: 'AndroidX runtime/platform updates' },
+              'deps:test-utils': { color: 'c2e0c6', description: 'Testing and utility dependency updates' },
+              'deps:github-actions': { color: '7057ff', description: 'GitHub Actions dependency updates' },
+            };
+
+            for (const label of desiredLabels) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label,
+                });
+              } catch (error) {
+                if (error.status === 404) {
+                  const info = labelPalette[label] || { color: 'ededed', description: 'Auto-generated label' };
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label,
+                    color: info.color,
+                    description: info.description,
+                  });
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: Array.from(desiredLabels),
+            });

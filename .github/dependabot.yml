@@ -1,0 +1,108 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "security"
+    assignees:
+      - "woliveiras"
+    groups:
+      gradle-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
+      # Group C (high risk): build tooling updates must stay isolated.
+      gradle-build-tooling:
+        applies-to: "version-updates"
+        patterns:
+          - "gradle-wrapper"
+          - "com.android.application"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group C (high risk): UI/charting stack in a dedicated PR.
+      gradle-ui-charting:
+        applies-to: "version-updates"
+        patterns:
+          - "androidx.compose:compose-bom"
+          - "com.patrykandpatrick.vico:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group B (medium risk): AndroidX runtime and platform libraries.
+      gradle-androidx-runtime:
+        applies-to: "version-updates"
+        patterns:
+          - "androidx.core:*"
+          - "androidx.lifecycle:*"
+          - "androidx.activity:*"
+          - "androidx.navigation:*"
+          - "androidx.work:*"
+          - "androidx.datastore:*"
+          - "androidx.room:*"
+          - "androidx.hilt:*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group A (low risk): testing and utility libraries.
+      gradle-test-utils:
+        applies-to: "version-updates"
+        patterns:
+          - "app.cash.turbine:*"
+          - "com.google.truth:*"
+          - "org.robolectric:*"
+          - "androidx.test:*"
+          - "junit:*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "ci"
+      - "security"
+    assignees:
+      - "woliveiras"
+    groups:
+      actions-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
+      actions-minor-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+    commit-message:
+      prefix: "chore(ci-deps)"
+      include: "scope"

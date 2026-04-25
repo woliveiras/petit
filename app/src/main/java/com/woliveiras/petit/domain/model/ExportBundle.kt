@@ -1,0 +1,395 @@
+package com.woliveiras.petit.domain.model
+
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import org.json.JSONArray
+import org.json.JSONObject
+
+/** Data class representing the complete exportable bundle. */
+data class ExportBundle(
+  val metadata: ExportMetadata,
+  val pets: List<Pet>,
+  val weightEntries: List<WeightEntry>,
+  val vaccinationEntries: List<VaccinationEntry>,
+  val dewormingEntries: List<DewormingEntry>,
+  val tasks: List<Task>,
+) {
+  fun toJson(): JSONObject {
+    return JSONObject().apply {
+      put("metadata", metadata.toJson())
+      put("pets", JSONArray(pets.map { it.toExportJson() }))
+      put("weightEntries", JSONArray(weightEntries.map { it.toExportJson() }))
+      put("vaccinationEntries", JSONArray(vaccinationEntries.map { it.toExportJson() }))
+      put("dewormingEntries", JSONArray(dewormingEntries.map { it.toExportJson() }))
+      put("tasks", JSONArray(tasks.map { it.toExportJson() }))
+    }
+  }
+
+  companion object {
+    private const val MAX_ENTRIES_PER_LIST = 10_000
+
+    fun fromJson(json: JSONObject): ExportBundle {
+      val metadata = ExportMetadata.fromJson(json.getJSONObject("metadata"))
+
+      val pets =
+        if (json.has("pets")) {
+          json.getJSONArray("pets").let { array ->
+            (0 until array.length()).map { Pet.fromExportJson(array.getJSONObject(it)) }
+          }
+        } else {
+          emptyList()
+        }
+
+      val weightEntries =
+        json.getJSONArray("weightEntries").let { array ->
+          if (array.length() > MAX_ENTRIES_PER_LIST)
+            throw IllegalArgumentException("Too many weight entries (max $MAX_ENTRIES_PER_LIST)")
+          (0 until array.length()).map { WeightEntry.fromExportJson(array.getJSONObject(it)) }
+        }
+
+      val vaccinationEntries =
+        json.getJSONArray("vaccinationEntries").let { array ->
+          if (array.length() > MAX_ENTRIES_PER_LIST)
+            throw IllegalArgumentException(
+              "Too many vaccination entries (max $MAX_ENTRIES_PER_LIST)"
+            )
+          (0 until array.length()).map { VaccinationEntry.fromExportJson(array.getJSONObject(it)) }
+        }
+
+      val dewormingEntries =
+        json.getJSONArray("dewormingEntries").let { array ->
+          if (array.length() > MAX_ENTRIES_PER_LIST)
+            throw IllegalArgumentException("Too many deworming entries (max $MAX_ENTRIES_PER_LIST)")
+          (0 until array.length()).map { DewormingEntry.fromExportJson(array.getJSONObject(it)) }
+        }
+
+      val tasks =
+        if (json.has("tasks")) {
+          json.getJSONArray("tasks").let { array ->
+            (0 until array.length()).map { Task.fromExportJson(array.getJSONObject(it)) }
+          }
+        } else {
+          emptyList()
+        }
+
+      return ExportBundle(
+        metadata = metadata,
+        pets = pets,
+        weightEntries = weightEntries,
+        vaccinationEntries = vaccinationEntries,
+        dewormingEntries = dewormingEntries,
+        tasks = tasks,
+      )
+    }
+
+    /** Validate imported data fields. Returns list of validation error messages. */
+    fun validate(bundle: ExportBundle): List<String> {
+      val errors = mutableListOf<String>()
+
+      bundle.pets.forEach { pet ->
+        if (pet.name.isBlank()) errors.add("Pet com nome vazio (id: ${pet.id})")
+        if (pet.name.length > 50) errors.add("Nome do pet muito longo: '${pet.name.take(20)}...'")
+        if (pet.notes != null && pet.notes.length > 500)
+          errors.add("Notas do pet '${pet.name}' excedem 500 caracteres")
+        if (pet.microchipNumber != null && pet.microchipNumber.length > 50)
+          errors.add("Microchip do pet '${pet.name}' excede 50 caracteres")
+        if (pet.passportNumber != null && pet.passportNumber.length > 50)
+          errors.add("Passaporte do pet '${pet.name}' excede 50 caracteres")
+      }
+
+      val petIds = bundle.pets.map { it.id }.toSet()
+
+      bundle.weightEntries.forEach { entry ->
+        if (entry.weightGrams <= 0)
+          errors.add("Peso inválido: ${entry.weightGrams}g (id: ${entry.id})")
+        if (entry.weightGrams > 100000)
+          errors.add("Peso excede 100kg: ${entry.weightGrams}g (id: ${entry.id})")
+        if (entry.petId !in petIds)
+          errors.add("Entrada de peso referencia pet inexistente (petId: ${entry.petId})")
+      }
+
+      bundle.vaccinationEntries.forEach { entry ->
+        if (entry.petId !in petIds)
+          errors.add("Vacinação referencia pet inexistente (petId: ${entry.petId})")
+        if (entry.customVaccineTypeName != null && entry.customVaccineTypeName.length > 100)
+          errors.add("Nome de vacina personalizada muito longo para vacinação (id: ${entry.id})")
+      }
+
+      bundle.dewormingEntries.forEach { entry ->
+        if (entry.medication != null && entry.medication.length > 100)
+          errors.add("Nome de medicamento muito longo na vermifugação (id: ${entry.id})")
+        if (entry.petId !in petIds)
+          errors.add("Vermifugação referencia pet inexistente (petId: ${entry.petId})")
+      }
+
+      bundle.tasks.forEach { entry ->
+        if (entry.title.isBlank()) errors.add("Tarefa sem título (id: ${entry.id})")
+        if (entry.title.length > 100)
+          errors.add("Título de tarefa muito longo: '${entry.title.take(20)}...' (id: ${entry.id})")
+        if (entry.description != null && entry.description.length > 500)
+          errors.add("Descrição de tarefa muito longa (id: ${entry.id})")
+      }
+
+      return errors
+    }
+  }
+}
+
+/** Metadata included in export files. */
+data class ExportMetadata(
+  val appVersion: String,
+  val exportDate: String,
+  val schemaVersion: Int = 1,
+) {
+  fun toJson(): JSONObject {
+    return JSONObject().apply {
+      put("appVersion", appVersion)
+      put("exportDate", exportDate)
+      put("schemaVersion", schemaVersion)
+    }
+  }
+
+  companion object {
+    fun fromJson(json: JSONObject): ExportMetadata {
+      return ExportMetadata(
+        appVersion = json.getString("appVersion"),
+        exportDate = json.getString("exportDate"),
+        schemaVersion = json.optInt("schemaVersion", 1),
+      )
+    }
+  }
+}
+
+/** Analysis of an import bundle. */
+data class ImportAnalysis(
+  val totalPets: Int,
+  val totalWeightEntries: Int,
+  val totalVaccinationEntries: Int,
+  val totalDewormingEntries: Int,
+  val totalTasks: Int,
+  val conflictingPetNames: List<String>,
+  val schemaVersion: Int,
+  val exportDate: String,
+) {
+  val hasConflicts: Boolean
+    get() = conflictingPetNames.isNotEmpty()
+}
+
+/** Conflict resolution strategy for imports. */
+enum class ConflictResolution {
+  REPLACE, // Backup data replaces local
+  KEEP, // Local data is kept
+  MERGE, // Last-write-wins by updatedAt
+}
+
+// Extension functions for JSON serialization
+
+private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+private val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+fun Pet.toExportJson(): JSONObject {
+  return JSONObject().apply {
+    put("id", id)
+    put("name", name)
+    put("petType", petType.name)
+    put("birthDate", birthDate?.format(dateFormatter))
+    put("sex", sex.name)
+    put("breed", breed)
+    put("color", color)
+    put("microchipNumber", microchipNumber)
+    put("passportNumber", passportNumber)
+    put("photoUri", photoUri)
+    put("notes", notes)
+    put("createdAt", createdAt)
+    put("updatedAt", updatedAt)
+  }
+}
+
+fun Pet.Companion.fromExportJson(json: JSONObject): Pet {
+  return Pet(
+    id = json.getString("id"),
+    name = json.getString("name"),
+    petType =
+      try {
+        PetType.valueOf(json.optString("petType", "OTHER"))
+      } catch (_: Exception) {
+        PetType.OTHER
+      },
+    birthDate =
+      json
+        .optString("birthDate", null)
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { LocalDate.parse(it, dateFormatter) },
+    sex =
+      try {
+        Sex.valueOf(json.optString("sex", "UNKNOWN"))
+      } catch (_: Exception) {
+        Sex.UNKNOWN
+      },
+    breed = json.optStringOrNull("breed"),
+    color = json.optStringOrNull("color"),
+    microchipNumber = json.optStringOrNull("microchipNumber"),
+    passportNumber = json.optStringOrNull("passportNumber"),
+    photoUri = json.optStringOrNull("photoUri"),
+    notes = json.optStringOrNull("notes"),
+    createdAt = json.getLong("createdAt"),
+    updatedAt = json.getLong("updatedAt"),
+    syncStatus = SyncStatus.LOCAL_ONLY,
+  )
+}
+
+fun WeightEntry.toExportJson(): JSONObject {
+  return JSONObject().apply {
+    put("id", id)
+    put("petId", petId)
+    put("date", date.format(dateFormatter))
+    put("weightGrams", weightGrams)
+    put("note", note)
+    put("createdAt", createdAt)
+    put("updatedAt", updatedAt)
+  }
+}
+
+fun WeightEntry.Companion.fromExportJson(json: JSONObject): WeightEntry {
+  return WeightEntry(
+    id = json.getString("id"),
+    petId = json.getString("petId"),
+    date = LocalDate.parse(json.getString("date"), dateFormatter),
+    weightGrams = json.getInt("weightGrams"),
+    note = json.optStringOrNull("note"),
+    createdAt = json.getLong("createdAt"),
+    updatedAt = json.getLong("updatedAt"),
+    syncStatus = SyncStatus.LOCAL_ONLY,
+  )
+}
+
+fun VaccinationEntry.toExportJson(): JSONObject {
+  return JSONObject().apply {
+    put("id", id)
+    put("petId", petId)
+    put("vaccineType", vaccineType.name)
+    put("customVaccineTypeName", customVaccineTypeName)
+    put("applicationDate", applicationDate.format(dateFormatter))
+    put("nextDueDate", nextDueDate?.format(dateFormatter))
+    put("veterinarian", veterinarian)
+    put("clinic", clinic)
+    put("batchNumber", batchNumber)
+    put("note", note)
+    put("createdAt", createdAt)
+    put("updatedAt", updatedAt)
+  }
+}
+
+fun VaccinationEntry.Companion.fromExportJson(json: JSONObject): VaccinationEntry {
+  val vaccineTypeStr = json.getString("vaccineType")
+  val vaccineType =
+    try {
+      VaccineType.valueOf(vaccineTypeStr)
+    } catch (_: Exception) {
+      VaccineType.OTHER
+    }
+  return VaccinationEntry(
+    id = json.getString("id"),
+    petId = json.getString("petId"),
+    vaccineType = vaccineType,
+    customVaccineTypeName =
+      json.optStringOrNull("customVaccineTypeName")
+        ?: if (vaccineType == VaccineType.OTHER) vaccineTypeStr else null,
+    applicationDate = LocalDate.parse(json.getString("applicationDate"), dateFormatter),
+    nextDueDate =
+      json
+        .optString("nextDueDate", null)
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { LocalDate.parse(it, dateFormatter) },
+    veterinarian = json.optStringOrNull("veterinarian"),
+    clinic = json.optStringOrNull("clinic"),
+    batchNumber = json.optStringOrNull("batchNumber"),
+    note = json.optStringOrNull("note"),
+    createdAt = json.getLong("createdAt"),
+    updatedAt = json.getLong("updatedAt"),
+    syncStatus = SyncStatus.LOCAL_ONLY,
+  )
+}
+
+fun DewormingEntry.toExportJson(): JSONObject {
+  return JSONObject().apply {
+    put("id", id)
+    put("petId", petId)
+    put("type", type.name)
+    put("medication", medication)
+    put("applicationDate", applicationDate.format(dateFormatter))
+    put("nextDueDate", nextDueDate?.format(dateFormatter))
+    put("note", note)
+    put("createdAt", createdAt)
+    put("updatedAt", updatedAt)
+  }
+}
+
+fun DewormingEntry.Companion.fromExportJson(json: JSONObject): DewormingEntry {
+  return DewormingEntry(
+    id = json.getString("id"),
+    petId = json.getString("petId"),
+    type = DewormingType.valueOf(json.getString("type")),
+    medication = json.optStringOrNull("medication"),
+    applicationDate = LocalDate.parse(json.getString("applicationDate"), dateFormatter),
+    nextDueDate =
+      json
+        .optString("nextDueDate", null)
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { LocalDate.parse(it, dateFormatter) },
+    note = json.optStringOrNull("note"),
+    createdAt = json.getLong("createdAt"),
+    updatedAt = json.getLong("updatedAt"),
+    syncStatus = SyncStatus.LOCAL_ONLY,
+  )
+}
+
+fun Task.toExportJson(): JSONObject {
+  return JSONObject().apply {
+    put("id", id)
+    put("petId", petId)
+    put("kind", kind.name)
+    put("referenceEntityId", referenceEntityId)
+    put("title", title)
+    put("description", description)
+    put("scheduledFor", scheduledFor.format(dateTimeFormatter))
+    put("status", status.name)
+    put("createdAt", createdAt)
+    put("updatedAt", updatedAt)
+  }
+}
+
+fun Task.Companion.fromExportJson(json: JSONObject): Task {
+  val kind =
+    try {
+      TaskKind.valueOf(json.getString("kind"))
+    } catch (_: IllegalArgumentException) {
+      TaskKind.CUSTOM
+    }
+
+  val status =
+    try {
+      TaskStatus.valueOf(json.optString("status", "PENDING"))
+    } catch (_: IllegalArgumentException) {
+      TaskStatus.PENDING
+    }
+
+  return Task(
+    id = json.getString("id"),
+    petId = json.optStringOrNull("petId"),
+    kind = kind,
+    referenceEntityId = json.optStringOrNull("referenceEntityId"),
+    title = json.getString("title"),
+    description = json.optStringOrNull("description"),
+    scheduledFor = LocalDateTime.parse(json.getString("scheduledFor"), dateTimeFormatter),
+    status = status,
+    createdAt = json.getLong("createdAt"),
+    updatedAt = json.getLong("updatedAt"),
+  )
+}
+
+// Helper extension functions
+private fun JSONObject.optStringOrNull(key: String): String? {
+  return if (isNull(key)) null else optString(key, null)?.takeIf { it.isNotEmpty() && it != "null" }
+}

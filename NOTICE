@@ -1,0 +1,56 @@
+Required Notice: Copyright (c) woliveiras
+
+The source code is licensed under AGPL-3.0.
+The Petit name, logo, and brand assets are protected by trademark policy.
+
+---
+
+## Third-Party Dependencies
+
+This application includes the following open-source components:
+
+### Kotlin & Kotlinx
+
+- **Kotlin Standard Library** — JetBrains s.r.o. — Apache License 2.0
+  https://kotlinlang.org/
+- **Kotlinx Coroutines** — JetBrains s.r.o. — Apache License 2.0
+  https://github.com/Kotlin/kotlinx.coroutines
+
+### AndroidX / Jetpack
+
+- **AndroidX Core KTX** — The Android Open Source Project — Apache License 2.0
+- **AndroidX Lifecycle** (ViewModel, Runtime KTX, Runtime Compose) — The Android Open Source Project — Apache License 2.0
+- **AndroidX Activity Compose** — The Android Open Source Project — Apache License 2.0
+- **Jetpack Compose BOM** — The Android Open Source Project — Apache License 2.0
+  (includes: UI, UI-Graphics, Material 3, Material Icons Extended)
+- **AndroidX Navigation Compose** — The Android Open Source Project — Apache License 2.0
+- **AndroidX Room** (Runtime, KTX) — The Android Open Source Project — Apache License 2.0
+  https://developer.android.com/jetpack/androidx/releases/room
+- **AndroidX DataStore Preferences** — The Android Open Source Project — Apache License 2.0
+- **AndroidX WorkManager** (work-runtime-ktx) — The Android Open Source Project — Apache License 2.0
+  https://developer.android.com/jetpack/androidx/releases/work
+
+All AndroidX / Jetpack sources: https://android.googlesource.com/
+Apache License 2.0 full text: https://www.apache.org/licenses/LICENSE-2.0
+
+### Hilt (Dependency Injection)
+
+- **Hilt Android** — Google LLC — Apache License 2.0
+- **AndroidX Hilt Navigation Compose** — The Android Open Source Project — Apache License 2.0
+- **AndroidX Hilt Work** — The Android Open Source Project — Apache License 2.0
+  https://dagger.dev/hilt/
+
+### Image Loading
+
+- **Coil** (coil-compose) — Coil Contributors — Apache License 2.0
+  https://github.com/coil-kt/coil
+
+### Charts
+
+- **Vico** (compose-m3) — Patryk Goworowski and Małgorzata Procner — Apache License 2.0
+  https://github.com/patrykandpatrick/vico
+
+### Device Sync
+
+- **Google Nearby Connections** — Google LLC — Apache License 2.0
+  https://developers.google.com/nearby/connections/overview

@@ -1,0 +1,46 @@
+# Agents
+PLAN.md
+REQUIREMENTS.md
+
+# Built application files
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration
+local.properties
+
+# Android Studio
+*.iml
+.idea/
+.navigation/
+captures/
+
+# Keystore files
+*.jks
+*.keystore
+keystore.properties
+
+# External native build folder
+.cxx/
+
+# Google Services (sensitive)
+google-services.json
+
+# macOS
+.DS_Store
+
+# Compiler
+*.log
+kotlin-compiler-*

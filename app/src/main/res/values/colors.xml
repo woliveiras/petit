@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="primary">#FFFF8C42</color>
+    <color name="primary_dark">#FFC65D00</color>
+    <color name="secondary">#FF00BFA5</color>
+    <color name="secondary_dark">#FF008E76</color>
+
+    <!-- Status Colors -->
+    <color name="status_ok">#FF4CAF50</color>
+    <color name="status_warning">#FFFF9800</color>
+    <color name="status_error">#FFF44336</color>
+
+    <!-- Surface Colors -->
+    <color name="background_light">#FFFFFBFE</color>
+    <color name="background_dark">#FF1C1B1F</color>
+    <color name="surface_light">#FFFFFBFE</color>
+    <color name="surface_dark">#FF1C1B1F</color>
+
+    <!-- Legacy colors (for compatibility) -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

@@ -1,0 +1,757 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- App -->
+  <string name="app_name">Petit</string>
+  <string name="app_name_full">Petit - Cuidado com Pets</string>
+
+  <!-- Notification Channels -->
+  <string name="notification_channel_reminders">Lembretes</string>
+  <string name="notification_channel_reminders_description">Notificações para lembretes agendados</string>
+  <string name="notification_reminder_action_complete">Concluir</string>
+  <string name="notification_reminder_action_snooze">Adiar</string>
+
+  <!-- Auto Reminders -->
+  <string name="reminder_next_dose_description">Próxima dose em %1$d dias</string>
+  <string name="reminder_weight_title">%1$s - Pesar</string>
+  <string name="reminder_weight_description">Lembrete para verificar o peso</string>
+  <string name="default_pet_name">Pet</string>
+
+  <!-- Common Actions -->
+  <string name="action_save">Salvar</string>
+  <string name="action_cancel">Cancelar</string>
+  <string name="action_confirm">Confirmar</string>
+  <string name="action_delete">Excluir</string>
+  <string name="action_edit">Editar</string>
+  <string name="action_apply">Aplicar</string>
+  <string name="action_back">Voltar</string>
+  <string name="action_add">Adicionar</string>
+  <string name="action_ok">OK</string>
+  <string name="action_close">Fechar</string>
+  <string name="action_retry">Tentar novamente</string>
+  <string name="action_settings">Configurações</string>
+  <string name="action_more_options">Mais opções</string>
+  <string name="action_select_date">Selecionar data</string>
+  <string name="action_see_all">Ver todos</string>
+
+  <!-- Home Screen -->
+  <string name="home_title">Petit</string>
+  <string name="home_welcome_title">Bem-vindo ao Petit!</string>
+  <string name="home_welcome_message">Cadastre seu primeiro pet para começar</string>
+  <string name="home_register_pet">Cadastrar Pet</string>
+  <string name="home_section_alerts">ATENÇÃO NECESSÁRIA</string>
+  <string name="home_section_pets">MEUS PETS</string>
+  <string name="home_section_upcoming">PRÓXIMOS</string>
+
+  <!-- Pet List Screen -->
+  <string name="pet_list_title">Meus Pets</string>
+  <string name="pet_list_empty_title">Nenhum pet cadastrado</string>
+  <string name="pet_list_empty_message">Adicione seu primeiro pet para começar</string>
+  <string name="pet_list_add_button">Adicionar pet</string>
+  <string name="pet_list_add">Adicionar pet</string>
+  <string name="pet_list_age_label">Idade</string>
+  <string name="pet_list_weight_label">Peso</string>
+
+  <!-- Pet Card -->
+  <string name="pet_card_weight">Peso</string>
+  <string name="pet_card_vaccine">Vacina</string>
+  <string name="pet_card_deworming">Vermífugo</string>
+  <string name="pet_card_no_data">-</string>
+
+  <!-- Pet Form Screen -->
+  <string name="pet_form_title_new">Novo Pet</string>
+  <string name="pet_form_title_edit">Editar Pet</string>
+  <string name="pet_form_photo">Foto</string>
+  <string name="pet_form_add_photo">Adicionar foto</string>
+  <string name="pet_form_name">Nome *</string>
+  <string name="pet_form_name_placeholder">Ex: Luna</string>
+  <string name="pet_form_name_error_required">Nome é obrigatório</string>
+  <string name="pet_form_name_error_max_length">Nome deve ter no máximo 50 caracteres</string>
+  <string name="pet_form_birth_date">Data de nascimento</string>
+  <string name="pet_form_birth_date_placeholder">Selecione a data</string>
+  <string name="pet_form_sex">Sexo</string>
+  <string name="pet_form_breed">Raça</string>
+  <string name="pet_form_breed_placeholder">Ex: Persa, Siamês, SRD</string>
+  <string name="pet_form_breed_select">Selecione a raça</string>
+  <string name="pet_form_breed_custom">Digite o nome da raça</string>
+  <string name="pet_form_color">Cor</string>
+  <string name="pet_form_color_placeholder">Ex: Laranja, Preto, Rajado</string>
+  <string name="pet_form_color_select">Selecione a cor</string>
+  <string name="pet_form_color_custom">Digite a cor</string>
+  <string name="pet_form_microchip">Número do microchip</string>
+
+  <!-- Common option -->
+  <string name="option_other">Outro</string>
+
+  <!-- Pet Breeds -->
+  <string name="breed_mixed">Sem Raça Definida (SRD)</string>
+  <string name="breed_persian">Persa</string>
+  <string name="breed_siamese">Siamês</string>
+  <string name="breed_maine_coon">Maine Coon</string>
+  <string name="breed_ragdoll">Ragdoll</string>
+  <string name="breed_british_shorthair">British Shorthair</string>
+  <string name="breed_bengal">Bengal</string>
+  <string name="breed_abyssinian">Abissínio</string>
+  <string name="breed_sphynx">Sphynx</string>
+  <string name="breed_scottish_fold">Scottish Fold</string>
+  <string name="breed_burmese">Birmanês</string>
+  <string name="breed_russian_blue">Azul Russo</string>
+  <string name="breed_norwegian_forest">Floresta Norueguesa</string>
+  <string name="breed_turkish_angora">Angorá Turco</string>
+
+  <!-- Pet Colors -->
+  <string name="color_black">Preto</string>
+  <string name="color_white">Branco</string>
+  <string name="color_orange">Laranja</string>
+  <string name="color_gray">Cinza</string>
+  <string name="color_tabby">Rajado</string>
+  <string name="color_calico">Escaminha</string>
+  <string name="color_tuxedo">Frajola</string>
+  <string name="color_tortoiseshell">Tartaruga</string>
+  <string name="color_cream">Creme</string>
+  <string name="color_brown">Marrom</string>
+  <string name="color_blue">Azul</string>
+  <string name="color_silver">Prata</string>
+  <string name="pet_form_passport">Número do passaporte</string>
+  <string name="pet_form_notes">Observações</string>
+
+  <!-- Pet Detail Screen -->
+  <string name="pet_detail_loading">Carregando...</string>
+  <string name="pet_detail_not_found">Pet não encontrado</string>
+  <string name="pet_detail_delete_title">Excluir %1$s?</string>
+  <string name="pet_detail_delete_message">Esta ação não pode ser desfeita. Todos os registros do pet serão removidos.</string>
+  <string name="pet_detail_section_weight">Peso</string>
+  <string name="pet_detail_section_vaccinations">Vacinações</string>
+  <string name="pet_detail_section_deworming">Desparasitação</string>
+  <string name="pet_detail_no_record">Sem registro</string>
+  <string name="pet_detail_additional_info">Informações Adicionais</string>
+  <string name="pet_detail_microchip_label">Microchip</string>
+  <string name="pet_detail_passport_label">Passaporte</string>
+  <string name="pet_detail_notes_label">Observações:</string>
+  <string name="pet_detail_sex_label">Sexo</string>
+  <string name="pet_detail_color_label">Cor</string>
+  <string name="pet_detail_chip_label">Chip</string>
+  <string name="pet_detail_section_management">Gestão</string>
+  <string name="pet_detail_section_share_profile">Compartilhar ficha</string>
+  <string name="pet_detail_weight_ideal_range">Faixa ideal</string>
+  <string name="pet_detail_records_count">%d registros</string>
+  <string name="pet_detail_record_count_singular">%d registro</string>
+
+  <!-- Pet Delete Confirmation -->
+  <string name="pet_delete_title">Excluir Pet</string>
+  <string name="pet_delete_warning_title">Esta ação é permanente</string>
+  <string name="pet_delete_warning_message">Todos os dados deste pet serão excluídos permanentemente e não poderão ser recuperados.</string>
+  <string name="pet_delete_records_title">Registros que serão perdidos</string>
+  <string name="pet_delete_weight_records">Registros de peso</string>
+  <string name="pet_delete_vaccination_records">Registros de vacinação</string>
+  <string name="pet_delete_deworming_records">Registros de vermífugo</string>
+  <string name="pet_delete_total_records">Total de registros</string>
+  <string name="pet_delete_confirm_button">Excluir permanentemente</string>
+  <string name="pet_delete_success_title">%1$s foi excluído</string>
+  <string name="pet_delete_success_message">Todos os registros foram removidos</string>
+  <string name="pet_delete_go_home">Ir para o Início</string>
+
+  <!-- Sex -->
+  <string name="sex_male">Macho</string>
+  <string name="sex_female">Fêmea</string>
+  <string name="sex_unknown">Indefinido</string>
+
+  <!-- Health Status -->
+  <string name="health_status_ok">Em dia</string>
+  <string name="health_status_scheduled">Agendado</string>
+  <string name="health_status_overdue">Atrasado</string>
+  <string name="health_status_today">Hoje</string>
+  <string name="health_status_tomorrow">Amanhã</string>
+  <string name="health_status_days">%1$dd</string>
+
+  <!-- Vaccine Types -->
+  <string name="vaccine_v3">V3 - Trivalente</string>
+  <string name="vaccine_v4">V4 - Tetravalente</string>
+  <string name="vaccine_v5">V5 - Pentavalente</string>
+  <string name="vaccine_rabies">Antirrábica</string>
+  <string name="vaccine_felv">Leucemia Felina (FeLV)</string>
+  <string name="vaccine_fiv">Imunodeficiência Felina (FIV)</string>
+  <string name="vaccine_other">Outra</string>
+
+  <!-- Deworming Types -->
+  <string name="deworming_internal">Vermífugo interno</string>
+  <string name="deworming_external">Antipulgas/carrapatos</string>
+  <string name="deworming_both">Combo (interno + externo)</string>
+
+  <!-- Age -->
+  <string name="age_young">Filhote</string>
+  <string name="age_months_singular">%1$d mês</string>
+  <string name="age_months_plural">%1$d meses</string>
+  <string name="age_years_singular">%1$d ano</string>
+  <string name="age_years_plural">%1$d anos</string>
+
+  <!-- Weight -->
+  <string name="weight_format">%1$.1f kg</string>
+
+  <!-- Weight Screen -->
+  <string name="weight_screen_title">Peso</string>
+  <string name="weight_add">Adicionar peso</string>
+  <string name="weight_add_title">Adicionar Peso</string>
+  <string name="weight_edit_title">Editar Peso</string>
+  <string name="weight_field_weight">Peso *</string>
+  <string name="weight_field_weight_placeholder">Ex: 4.5</string>
+  <string name="weight_field_date">Data</string>
+  <string name="weight_field_note">Observação</string>
+  <string name="weight_field_note_placeholder">Observação opcional</string>
+  <string name="weight_field_unit">Unidade</string>
+  <string name="weight_current_label">Peso Atual</string>
+  <string name="weight_evolution_title">Evolução</string>
+  <string name="weight_chart_description">Evolução de peso: de %1$s kg em %2$s para %3$s kg em %4$s</string>
+  <string name="weight_empty_title">Nenhum registro de peso</string>
+  <string name="weight_empty_message">Toque no botão de balança para adicionar a primeira medição</string>
+  <string name="weight_no_history">Nenhum registro de peso encontrado</string>
+  <string name="weight_history_title">HISTÓRICO</string>
+  <string name="weight_chart_title">Evolução do Peso</string>
+  <string name="weight_select_pet_title">Selecione um pet</string>
+  <string name="weight_select_pet_message">Para qual pet você quer registrar o peso?</string>
+  <string name="vaccination_select_pet_title">Selecione um pet</string>
+  <string name="vaccination_select_pet_message">Para qual pet você quer registrar a vacinação?</string>
+  <string name="deworming_select_pet_title">Selecione um pet</string>
+  <string name="deworming_select_pet_message">Para qual pet você quer registrar a vermifugação?</string>
+
+  <!-- Speed Dial Actions -->
+  <string name="speed_dial_add_pet">Adicionar pet</string>
+  <string name="speed_dial_add_weight">Adicionar peso</string>
+  <string name="speed_dial_add_vaccine">Adicionar vacina</string>
+  <string name="speed_dial_add_deworming">Adicionar vermífugo</string>
+
+  <!-- Alerts -->
+  <string name="alert_vaccine_overdue">Vacina %1$s atrasada</string>
+  <string name="alert_vaccine_due">Vacina %1$s %2$s</string>
+  <string name="alert_deworming_overdue">Vermífugo atrasado</string>
+  <string name="alert_deworming_due">Vermífugo %1$s</string>
+
+  <!-- Errors -->
+  <string name="error_loading">Erro ao carregar dados</string>
+  <string name="error_saving">Erro ao salvar</string>
+  <string name="error_deleting">Erro ao excluir</string>
+  <string name="error_generic">Ocorreu um erro</string>
+
+  <!-- Settings -->
+  <string name="settings_title">Configurações</string>
+  <string name="settings_section_appearance">Aparência</string>
+  <string name="settings_section_about">Sobre</string>
+  <string name="settings_theme">Tema</string>
+  <string name="settings_theme_system">Padrão do sistema</string>
+  <string name="settings_theme_light">Claro</string>
+  <string name="settings_theme_dark">Escuro</string>
+  <string name="settings_language">Idioma</string>
+  <string name="settings_language_system">Padrão do sistema</string>
+  <string name="settings_language_english">Inglês</string>
+  <string name="settings_language_portuguese_br">Português (Brasil)</string>
+  <string name="settings_version">Versão</string>
+  <string name="settings_language_restart_message">Reinicie o app para aplicar as alterações de idioma</string>
+
+  <!-- Navigation -->
+  <string name="nav_home">Início</string>
+  <string name="nav_pets">Pets</string>
+  <string name="nav_add">Adicionar</string>
+  <string name="nav_reminders">Lembretes</string>
+  <string name="nav_profile">Perfil</string>
+
+  <!-- Notifications -->
+  <string name="notifications_empty_title">Nenhuma notificação</string>
+  <string name="notifications_empty_message">Seus alertas e lembretes aparecerão aqui</string>
+
+  <!-- Reminders -->
+  <string name="reminders_title">Lembretes</string>
+  <string name="reminders_add">Novo lembrete</string>
+  <string name="reminders_add_title">Novo Lembrete</string>
+  <string name="reminders_edit_title">Editar Lembrete</string>
+  <string name="reminders_section_upcoming">PRÓXIMOS</string>
+  <string name="reminders_section_snoozed">ADIADOS</string>
+  <string name="reminders_section_completed">CONCLUÍDOS</string>
+  <string name="reminders_in_days">Em %1$d dias</string>
+  <string name="reminders_today">Hoje</string>
+  <string name="reminders_tomorrow">Amanhã</string>
+  <string name="reminders_overdue">Atrasado</string>
+  <string name="reminders_snoozed_until">Adiado até %1$s</string>
+  <string name="reminders_field_title">Título *</string>
+  <string name="reminders_field_title_placeholder">Ex: Consulta veterinária</string>
+  <string name="reminders_field_description">Descrição</string>
+  <string name="reminders_field_description_placeholder">Detalhes opcionais</string>
+  <string name="reminders_field_pet">Pet</string>
+  <string name="reminders_field_pet_general">Geral (sem pet)</string>
+  <string name="reminders_field_date">Data e hora *</string>
+  <string name="reminders_field_repeat">Repetir</string>
+  <string name="reminders_action_complete">Concluir</string>
+  <string name="reminders_action_snooze">Adiar</string>
+  <string name="reminders_snooze_1h">1 hora</string>
+  <string name="reminders_snooze_3h">3 horas</string>
+  <string name="reminders_snooze_tomorrow">Amanhã</string>
+  <string name="reminders_repeat_none">Não repetir</string>
+  <string name="reminders_repeat_daily">Diariamente</string>
+  <string name="reminders_repeat_weekly">Semanalmente</string>
+  <string name="reminders_repeat_monthly">Mensalmente</string>
+  <string name="reminders_repeat_yearly">Anualmente</string>
+  <string name="reminders_kind_custom">Personalizado</string>
+  <string name="reminders_kind_weight">Pesagem</string>
+  <string name="reminders_kind_vaccination">Vacinação</string>
+  <string name="reminders_kind_deworming">Vermífugo</string>
+  <string name="reminders_kind_medication">Medicação</string>
+  <string name="reminders_delete_title">Excluir lembrete?</string>
+  <string name="reminders_delete_message">Esta ação não pode ser desfeita.</string>
+
+  <!-- Reminder Settings -->
+  <string name="reminder_settings_title">Configurações de Lembretes</string>
+  <string name="reminder_settings_section_general">Geral</string>
+  <string name="reminder_settings_section_vaccination">Lembretes de Vacinação</string>
+  <string name="reminder_settings_section_deworming">Lembretes de Vermífugo</string>
+  <string name="reminder_settings_section_weight">Lembretes de Pesagem</string>
+  <string name="reminder_settings_notification_time">Horário padrão de notificação</string>
+  <string name="reminder_settings_vaccination_title">Lembretes de vacinação</string>
+  <string name="reminder_settings_vaccination_description">Lembretes automáticos antes das datas de vacinas</string>
+  <string name="reminder_settings_deworming_title">Lembretes de vermífugo</string>
+  <string name="reminder_settings_deworming_description">Lembretes automáticos antes das datas de vermífugo</string>
+  <string name="reminder_settings_weight_title">Lembretes de pesagem</string>
+  <string name="reminder_settings_weight_description">Lembretes periódicos para pesar seus pets</string>
+  <string name="reminder_settings_days_before">Dias antes</string>
+  <string name="reminder_settings_interval_days">Intervalo</string>
+  <plurals name="reminder_settings_days">
+    <item quantity="one">%d dia</item>
+    <item quantity="other">%d dias</item>
+  </plurals>
+
+  <!-- Quick Add -->
+  <string name="quick_add_title">Adicionar Registro</string>
+  <string name="quick_add_subtitle">O que você gostaria de adicionar?</string>
+  <string name="quick_add_weight">Peso</string>
+  <string name="quick_add_weight_desc">Acompanhe o peso do seu pet</string>
+  <string name="quick_add_vaccination">Vacinação</string>
+  <string name="quick_add_vaccination_desc">Registre uma aplicação de vacina</string>
+  <string name="quick_add_deworming">Vermífugo</string>
+  <string name="quick_add_deworming_desc">Registre um tratamento vermífugo</string>
+  <string name="quick_add_reminder">Lembrete</string>
+  <string name="quick_add_reminder_desc">Crie um lembrete personalizado</string>
+  <string name="quick_add_new_pet">Novo Pet</string>
+  <string name="quick_add_new_pet_desc">Cadastre um novo pet</string>
+
+  <!-- Feature Titles -->
+  <string name="vaccination_title">Vacinação</string>
+  <string name="deworming_title">Vermífugo</string>
+  <string name="coming_soon">Em breve</string>
+
+  <!-- Vaccination Screen -->
+  <string name="vaccination_add">Adicionar vacinação</string>
+  <string name="vaccination_add_title">Adicionar Vacinação</string>
+  <string name="vaccination_edit_title">Editar Vacinação</string>
+  <string name="vaccination_empty_title">Nenhum registro de vacinação</string>
+  <string name="vaccination_empty_message">Toque em + para adicionar a primeira vacinação</string>
+  <string name="vaccination_last_date">Última: %1$s</string>
+  <string name="vaccination_next_date">Próxima: %1$s</string>
+  <string name="vaccination_history_count">%1$d doses registradas</string>
+  <string name="vaccination_status_ok">Em dia</string>
+  <string name="vaccination_status_ok_days">%1$d dias restantes</string>
+  <string name="vaccination_status_scheduled">Em %1$d dias</string>
+  <string name="vaccination_status_overdue">Atrasada há %1$d dias</string>
+  <string name="vaccination_status_today">Para hoje</string>
+  <string name="vaccination_field_type">Tipo de vacina *</string>
+  <string name="vaccination_field_custom_name">Nome da vacina</string>
+  <string name="vaccination_field_custom_name_placeholder">Ex: Vacina FIV</string>
+  <string name="vaccination_field_application_date">Data de aplicação *</string>
+  <string name="vaccination_field_next_due_date">Data da próxima dose</string>
+  <string name="vaccination_field_next_due_date_placeholder">Opcional</string>
+  <string name="vaccination_field_veterinarian">Veterinário</string>
+  <string name="vaccination_field_veterinarian_placeholder">Dr(a). Nome</string>
+  <string name="vaccination_field_clinic">Clínica</string>
+  <string name="vaccination_field_clinic_placeholder">Nome da clínica</string>
+  <string name="vaccination_field_batch">Número do lote</string>
+  <string name="vaccination_field_batch_placeholder">Ex: LOT123456</string>
+  <string name="vaccination_field_note">Observação</string>
+  <string name="vaccination_field_note_placeholder">Observação opcional</string>
+  <string name="vaccination_detail_next_dose">Próxima dose:</string>
+  <string name="vaccination_detail_veterinarian">Veterinário:</string>
+  <string name="vaccination_detail_clinic">Clínica:</string>
+  <string name="vaccination_detail_batch">Lote:</string>
+  <string name="action_clear">Limpar</string>
+
+  <!-- Deworming Screen -->
+  <string name="deworming_add">Adicionar vermífugo</string>
+  <string name="deworming_add_title">Adicionar Vermífugo</string>
+  <string name="deworming_edit_title">Editar Vermífugo</string>
+  <string name="deworming_empty_title">Nenhum registro de vermífugo</string>
+  <string name="deworming_empty_message">Toque em + para adicionar o primeiro tratamento</string>
+  <string name="deworming_last_date">Último: %1$s</string>
+  <string name="deworming_next_date">Próximo: %1$s</string>
+  <string name="deworming_field_type">Tipo de tratamento *</string>
+  <string name="deworming_field_type_select">Selecione o tipo de tratamento</string>
+  <string name="deworming_field_medication">Medicamento *</string>
+  <string name="deworming_field_medication_placeholder">Ex: Milbemax, Frontline</string>
+  <string name="deworming_field_medication_select">Selecione o medicamento</string>
+  <string name="deworming_field_medication_select_type_first">Selecione o tipo de tratamento primeiro</string>
+  <string name="deworming_field_medication_custom">Digite o nome do medicamento</string>
+  <string name="deworming_field_application_date">Data de aplicação *</string>
+
+  <!-- Deworming Medications - Internal (parasitas intestinais) -->
+  <string name="medication_milbemax">Milbemax</string>
+  <string name="medication_drontal">Drontal</string>
+  <string name="medication_panacur">Panacur</string>
+  <string name="medication_profender">Profender</string>
+  <string name="medication_cazitel">Cazitel</string>
+  <string name="medication_droncit">Droncit</string>
+
+  <!-- Deworming Medications - External (pulgas, carrapatos, ácaros) -->
+  <string name="medication_frontline">Frontline</string>
+  <string name="medication_advantage">Advantage</string>
+  <string name="medication_revolution">Revolution</string>
+  <string name="medication_seresto">Seresto</string>
+  <string name="medication_bravecto">Bravecto</string>
+  <string name="medication_nexgard">NexGard</string>
+  <string name="medication_stronghold">Stronghold</string>
+  <string name="medication_fipronil">Fipronil</string>
+
+  <!-- Deworming Medications - Combined (interno e externo) -->
+  <string name="medication_advocate">Advocate</string>
+  <string name="medication_broadline">Broadline</string>
+  <string name="medication_stronghold_plus">Stronghold Plus</string>
+  <string name="deworming_field_next_due_date">Data da próxima aplicação</string>
+  <string name="deworming_field_next_due_date_placeholder">Opcional</string>
+  <string name="deworming_field_note">Observação</string>
+  <string name="deworming_field_note_placeholder">Observação opcional</string>
+  <string name="deworming_detail_type">Tipo:</string>
+  <string name="deworming_detail_next_dose">Próxima dose:</string>
+
+  <!-- Export/Import -->
+  <string name="settings_section_data">Dados</string>
+  <string name="settings_export">Exportar dados</string>
+  <string name="settings_export_description">Salvar todos os seus dados em um arquivo JSON</string>
+  <string name="settings_import">Importar dados</string>
+  <string name="settings_import_description">Restaurar dados de um arquivo de backup</string>
+  <string name="export_success">Dados exportados com sucesso</string>
+  <string name="import_success">Dados importados com sucesso</string>
+  <string name="import_dialog_title">Importar Dados</string>
+  <string name="import_dialog_summary">Dados a serem importados:</string>
+  <string name="import_pets_count">Pets: %1$d</string>
+  <string name="import_weights_count">Registros de peso: %1$d</string>
+  <string name="import_vaccinations_count">Registros de vacinação: %1$d</string>
+  <string name="import_dewormings_count">Registros de vermífugo: %1$d</string>
+  <string name="import_tasks_count">Tarefas: %1$d</string>
+  <string name="import_conflict_title">%1$d pet(s) já existe(m):</string>
+  <string name="import_conflict_resolution_title">Como tratar conflitos?</string>
+  <string name="import_conflict_replace">Substituir existentes</string>
+  <string name="import_conflict_replace_desc">Dados importados vão sobrescrever os registros existentes</string>
+  <string name="import_conflict_keep">Manter existentes</string>
+  <string name="import_conflict_keep_desc">Ignorar registros que já existem</string>
+  <string name="import_conflict_merge">Mesclar (recomendado)</string>
+  <string name="import_conflict_merge_desc">Manter a versão atualizada mais recentemente</string>
+
+  <!-- Delete All Data -->
+  <string name="settings_delete_all_data">Excluir todos os dados</string>
+  <string name="settings_delete_all_data_description">Excluir permanentemente todos os seus dados</string>
+  <string name="delete_all_data_title">Excluir Todos os Dados?</string>
+  <string name="delete_all_data_warning">Esta ação é permanente e não pode ser desfeita. Todos os seus dados serão excluídos:</string>
+  <string name="delete_all_data_pets">Todos os pets cadastrados</string>
+  <string name="delete_all_data_weights">Todos os registros de peso</string>
+  <string name="delete_all_data_vaccinations">Todos os registros de vacinação</string>
+  <string name="delete_all_data_dewormings">Todos os registros de vermífugo</string>
+  <string name="delete_all_data_reminders">Todos os lembretes</string>
+  <string name="delete_all_data_confirm_instruction">Digite EXCLUIR para confirmar:</string>
+  <string name="delete_all_data_confirm_word">EXCLUIR</string>
+  <string name="delete_all_data_success">Todos os dados foram excluídos</string>
+
+  <!-- Accessibility - Content Descriptions -->
+  <string name="cd_icon_back">Voltar</string>
+  <string name="cd_icon_close">Fechar</string>
+  <string name="cd_icon_settings">Configurações</string>
+  <string name="cd_icon_notifications">Notificações</string>
+  <string name="cd_icon_more_options">Mais opções</string>
+  <string name="cd_icon_edit">Editar</string>
+  <string name="cd_icon_delete">Excluir</string>
+  <string name="cd_icon_add">Adicionar</string>
+  <string name="cd_icon_weight">Peso</string>
+  <string name="cd_icon_vaccine">Vacinação</string>
+  <string name="cd_icon_deworming">Vermífugo</string>
+  <string name="cd_icon_pet">Pet</string>
+  <string name="cd_icon_calendar">Calendário</string>
+  <string name="cd_icon_warning">Aviso</string>
+  <string name="cd_icon_check">Marcação</string>
+  <string name="cd_icon_chevron_right">Navegar adiante</string>
+  <string name="cd_icon_dropdown">Expandir opções</string>
+  <string name="cd_icon_reminder">Lembrete</string>
+  <string name="cd_icon_task">Tarefa</string>
+  <string name="cd_icon_theme">Tema</string>
+  <string name="cd_icon_language">Idioma</string>
+  <string name="cd_icon_export">Exportar dados</string>
+  <string name="cd_icon_import">Importar dados</string>
+  <string name="cd_icon_info">Informação</string>
+
+  <!-- Timeline -->
+  <string name="timeline_section_upcoming">PRÓXIMOS EVENTOS</string>
+  <string name="timeline_section_recent">ATIVIDADE RECENTE</string>
+  <string name="timeline_weight_recorded">pesou</string>
+  <string name="timeline_vaccination_done">foi vacinado</string>
+  <string name="timeline_deworming_done">tomou vermífugo</string>
+  <string name="timeline_vaccination_due">vacina agendada</string>
+  <string name="timeline_deworming_due">vermífugo agendado</string>
+  <string name="timeline_today">Hoje</string>
+  <string name="timeline_tomorrow">Amanhã</string>
+  <string name="timeline_yesterday">Ontem</string>
+  <string name="timeline_in_days">Em %1$d dias</string>
+  <string name="timeline_days_ago">Há %1$d dias</string>
+  <string name="timeline_empty_upcoming">Nenhum evento próximo</string>
+  <string name="timeline_empty_recent">Nenhuma atividade recente</string>
+
+  <!-- Activity Timeline Screen -->
+  <string name="activity_timeline_title">Histórico de Atividades</string>
+  <string name="activity_timeline_filter_all">Todos</string>
+  <string name="activity_timeline_filter_5_days">5 dias</string>
+  <string name="activity_timeline_filter_10_days">10 dias</string>
+  <string name="activity_timeline_filter_15_days">15 dias</string>
+  <string name="activity_timeline_filter_custom">Personalizado</string>
+  <string name="activity_timeline_filter_pet">Pet</string>
+  <string name="activity_timeline_filter_all_pets">Todos os pets</string>
+  <string name="activity_timeline_filter_weight">Peso</string>
+  <string name="activity_timeline_filter_vaccination">Vacinação</string>
+  <string name="activity_timeline_filter_deworming">Vermifugação</string>
+  <string name="activity_timeline_empty_title">Nenhuma atividade encontrada</string>
+  <string name="activity_timeline_empty_description">Nenhum evento registrado no período selecionado</string>
+  <string name="activity_timeline_select_date">Selecionar data</string>
+  <string name="activity_timeline_see_all">Ver todos</string>
+
+  <!-- Empty States -->
+  <string name="empty_weight_title">Nenhum peso registrado</string>
+  <string name="empty_weight_description">Registre o peso de %1$s para acompanhar a evolução</string>
+  <string name="empty_weight_action">Adicionar Peso</string>
+  <string name="empty_vaccination_title">Nenhuma vacina registrada</string>
+  <string name="empty_vaccination_description">Registre as vacinas de %1$s para acompanhar o calendário</string>
+  <string name="empty_vaccination_action">Adicionar Vacina</string>
+  <string name="empty_deworming_title">Nenhuma vermifugação registrada</string>
+  <string name="empty_deworming_description">Registre os vermífugos de %1$s para não perder datas</string>
+  <string name="empty_deworming_action">Adicionar Vermífugo</string>
+  <string name="empty_home_recent_activity">Comece registrando peso, vacinas ou vermífugos dos seus pets</string>
+
+  <!-- Tasks -->
+  <string name="tasks_title">Tarefas</string>
+  <string name="tasks_empty_title">Nenhuma tarefa</string>
+  <string name="tasks_empty_for_filter">Nenhuma tarefa para "%1$s"</string>
+  <string name="completed_tasks_title">Tarefas Concluídas</string>
+  <string name="completed_tasks_empty">Nenhuma tarefa concluída ainda</string>
+  <string name="task_add_title">Nova Tarefa</string>
+  <string name="task_edit_title">Editar Tarefa</string>
+  <string name="task_delete_title">Excluir tarefa?</string>
+  <string name="task_delete_message">Esta ação não pode ser desfeita.</string>
+  <string name="task_settings_title">Configurações de Tarefas</string>
+  <string name="task_settings_section_general">Geral</string>
+  <string name="task_settings_section_vaccination">Tarefas de Vacinação</string>
+  <string name="task_settings_section_deworming">Tarefas de Vermifugação</string>
+  <string name="task_settings_section_weight">Tarefas de Peso</string>
+  <string name="task_settings_notification_time">Horário padrão de notificação</string>
+  <string name="task_settings_vaccination_title">Tarefas de vacinação</string>
+  <string name="task_settings_vaccination_description">Tarefas automáticas antes das datas de vacinas</string>
+  <string name="task_settings_deworming_title">Tarefas de vermifugação</string>
+  <string name="task_settings_deworming_description">Tarefas automáticas antes das datas de vermífugos</string>
+  <string name="task_settings_weight_title">Tarefas de peso</string>
+  <string name="task_settings_weight_description">Tarefas periódicas para pesar seus pets</string>
+  <string name="task_settings_days_before">Dias antes</string>
+  <string name="task_settings_interval_days">Intervalo</string>
+  <plurals name="task_settings_days">
+    <item quantity="one">%d dia</item>
+    <item quantity="other">%d dias</item>
+  </plurals>
+  <string name="task_field_title">Título *</string>
+  <string name="task_field_title_placeholder">Ex.: Consulta no veterinário</string>
+  <string name="task_field_description">Descrição</string>
+  <string name="task_field_description_placeholder">Detalhes opcionais</string>
+  <string name="task_field_pet">Pet</string>
+  <string name="task_field_pet_general">Geral (sem pet)</string>
+  <string name="task_field_kind">Tipo</string>
+  <string name="task_field_date">Data *</string>
+  <string name="task_field_time">Horário</string>
+  <string name="action_add_task">Adicionar tarefa</string>
+  <string name="action_complete_task">Concluir tarefa</string>
+  <string name="action_reactivate_task">Reativar tarefa</string>
+  <string name="nav_tasks">Tarefas</string>
+  <string name="home_section_next_tasks">PRÓXIMAS TAREFAS</string>
+
+  <!-- Task filter names -->
+  <string name="task_filter_today">Hoje</string>
+  <string name="task_filter_this_week">Esta Semana</string>
+  <string name="task_filter_this_month">Este Mês</string>
+  <string name="task_filter_next_90_days">Próximos 90 dias</string>
+  <string name="task_filter_this_year">Este Ano</string>
+
+  <!-- Task kind names -->
+  <string name="task_kind_weight">Pesagem</string>
+  <string name="task_kind_vaccination">Vacinação</string>
+  <string name="task_kind_deworming">Vermífugo</string>
+  <string name="task_kind_medication">Medicação</string>
+  <string name="task_kind_custom">Personalizado</string>
+
+  <!-- Task date labels -->
+  <string name="task_date_overdue">Atrasada • %1$s</string>
+  <string name="task_date_today">Hoje</string>
+  <string name="task_date_tomorrow">Amanhã</string>
+
+  <!-- Task error messages -->
+  <string name="task_error_complete">Erro ao concluir tarefa</string>
+  <string name="task_error_delete">Erro ao excluir tarefa</string>
+  <string name="task_error_save">Erro ao salvar tarefa</string>
+  <string name="task_error_reactivate">Erro ao reativar tarefa</string>
+  <string name="task_validation_title_required">Título é obrigatório</string>
+  <string name="task_validation_date_future">Data deve ser no futuro</string>
+
+  <!-- Home next event labels -->
+  <string name="home_next_event_vaccine">Vacina %1$s</string>
+  <string name="home_next_event_deworming">Vermífugo</string>
+
+  <!-- Pet form validation -->
+  <string name="pet_validation_name_required">Nome é obrigatório</string>
+  <string name="pet_validation_name_max_length">Nome deve ter no máximo 50 caracteres</string>
+  <string name="pet_validation_field_max_length">Deve ter no máximo %1$d caracteres</string>
+  <string name="pet_validation_alphanumeric_only">Apenas letras, números, espaços e hífens permitidos</string>
+  <string name="pet_validation_birth_date_future">Data de nascimento não pode ser no futuro</string>
+  <string name="pet_validation_notes_max_length">Observações devem ter no máximo 500 caracteres</string>
+  <string name="pet_error_load">Erro ao carregar</string>
+  <string name="pet_error_save">Erro ao salvar</string>
+  <string name="pet_error_not_found">Pet não encontrado</string>
+  <string name="pet_error_load_data">Erro ao carregar dados</string>
+  <string name="pet_error_delete_load">Erro ao carregar dados do pet</string>
+  <string name="pet_error_delete">Erro ao excluir pet</string>
+
+  <!-- Vaccination validation -->
+  <string name="vaccination_error_date_future">Data não pode ser no futuro</string>
+  <string name="vaccination_error_next_dose_after">Próxima dose deve ser após a data de aplicação</string>
+  <string name="vaccination_error_field_max_length">Deve ter no máximo %1$d caracteres</string>
+  <string name="vaccination_error_note_max_length">Observação deve ter no máximo 500 caracteres</string>
+  <string name="vaccination_error_save">Erro ao salvar vacinação</string>
+  <string name="vaccination_error_delete">Erro ao excluir registro</string>
+
+  <!-- Deworming validation -->
+  <string name="deworming_error_medication_required">Medicamento é obrigatório</string>
+  <string name="deworming_error_medication_max_length">Medicamento deve ter no máximo 100 caracteres</string>
+  <string name="deworming_error_note_max_length">Observação deve ter no máximo 500 caracteres</string>
+  <string name="deworming_error_date_future">Data não pode ser no futuro</string>
+  <string name="deworming_error_next_dose_after">Próxima dose deve ser após a data de aplicação</string>
+  <string name="deworming_error_save">Erro ao salvar vermífugo</string>
+  <string name="deworming_error_delete">Erro ao excluir registro</string>
+
+  <!-- Weight validation -->
+  <string name="weight_error_invalid">Peso inválido</string>
+  <string name="weight_error_date_future">Data não pode ser no futuro</string>
+  <string name="weight_error_note_max_length">Observação deve ter no máximo 500 caracteres</string>
+  <string name="weight_error_save">Erro ao salvar peso</string>
+  <string name="weight_error_delete">Erro ao excluir registro</string>
+
+  <!-- Export/Import errors -->
+  <string name="export_error_failed">Erro na exportação</string>
+  <string name="export_error_save_file">Erro ao salvar arquivo</string>
+  <string name="import_error_invalid_file">Arquivo inválido</string>
+  <string name="import_error_failed">Erro na importação</string>
+
+  <!-- Settings errors -->
+  <string name="error_unknown">Erro desconhecido</string>
+
+  <!-- Task validation -->
+  <string name="task_validation_title_max_length">Título deve ter no máximo 100 caracteres</string>
+  <string name="task_validation_description_max_length">Descrição deve ter no máximo 500 caracteres</string>
+
+  <!-- Delete all data -->
+  <string name="delete_all_confirm_hint">Digite "%1$s" para confirmar</string>
+
+  <!-- Timeline -->
+  <string name="timeline_event_count">%1$d eventos</string>
+
+  <!-- Onboarding -->
+  <string name="onboarding_welcome_title">Bem-vindo ao Petit</string>
+  <string name="onboarding_welcome_description">Seu companheiro para acompanhar a saúde do seu pet, de forma simples e completa.</string>
+  <string name="onboarding_features_title">Tudo em um só lugar</string>
+  <string name="onboarding_feature_weight">Controle de peso</string>
+  <string name="onboarding_feature_vaccination">Registro de vacinas</string>
+  <string name="onboarding_feature_deworming">Controle de vermífugos</string>
+  <string name="onboarding_feature_reminders">Lembretes inteligentes</string>
+  <string name="onboarding_cta_title">Pronto para começar?</string>
+  <string name="onboarding_cta_description">Cadastre seu primeiro pet e comece a acompanhar a saúde dele hoje.</string>
+  <string name="onboarding_skip">Pular</string>
+  <string name="onboarding_next">Próximo</string>
+  <string name="onboarding_get_started">Começar</string>
+  <string name="onboarding_page_indicator">Página %1$d de %2$d</string>
+
+  <!-- Family Group -->
+  <string name="profile_section_family_group">Grupo Familiar</string>
+  <string name="profile_section_settings">Configurações</string>
+  <string name="profile_section_data">Dados</string>
+  <string name="profile_section_about">Sobre</string>
+  <string name="family_group_title">Grupo Familiar</string>
+  <string name="family_group_onboarding_description">Compartilhe os dados dos seus pets com sua família.</string>
+  <string name="family_group_pair_device">Parear Dispositivo</string>
+  <string name="family_group_join">Entrar em Grupo</string>
+  <string name="family_group_manage">Gerenciar Grupo</string>
+  <string name="family_group_send_data">Enviar Dados</string>
+  <string name="family_group_receive_data">Receber Dados</string>
+  <string name="family_group_merge">Mesclar com Locais</string>
+  <string name="family_group_replace">Substituir Dados Locais</string>
+  <string name="family_group_pairing_code">Código de pareamento</string>
+  <string name="family_group_waiting_connection">Aguardando conexão…</string>
+  <string name="family_group_paired_success">Pareamento concluído!</string>
+  <string name="family_group_leave">Sair do Grupo</string>
+  <string name="family_group_leave_confirmation">Tem certeza que deseja sair do grupo familiar? Seus dados locais serão mantidos.</string>
+  <string name="family_group_remove_device">Remover dispositivo</string>
+  <string name="family_group_remove_confirmation">Tem certeza que deseja remover este dispositivo do grupo familiar?</string>
+  <string name="family_group_no_internet_hint">Funciona sem internet!</string>
+  <string name="family_group_members_title">Dispositivos</string>
+  <string name="family_group_actions_title">Ações</string>
+  <string name="family_group_this_device">Este dispositivo</string>
+  <string name="family_group_connection_request">%s deseja se conectar</string>
+  <string name="family_group_sending">Enviando dados…</string>
+  <string name="family_group_receiving">Recebendo dados…</string>
+  <string name="family_group_transfer_complete">Transferência concluída!</string>
+  <string name="family_group_choose_action">Escolha como integrar os dados recebidos:</string>
+  <string name="family_group_merge_complete">Dados integrados!</string>
+  <string name="family_group_merge_summary">%1$d adicionados, %2$d atualizados</string>
+  <string name="family_group_last_sync">Última sincronização: %1$s</string>
+  <string name="family_group_preparing_send">Preparando envio…</string>
+  <string name="family_group_waiting_data">Aguardando dados…</string>
+  <string name="family_group_waiting_data_hint">Peça ao outro dispositivo para enviar os dados</string>
+  <string name="family_group_searching_devices">Procurando dispositivos próximos…</string>
+  <string name="action_accept">Aceitar</string>
+  <string name="action_reject">Rejeitar</string>
+  <string name="action_continue">Continuar</string>
+  <string name="action_done">Concluído</string>
+
+
+    <!-- Tipos de Pet -->
+    <string name="pet_type_cat">Pet</string>
+    <string name="pet_type_dog">Cachorro</string>
+    <string name="pet_type_rabbit">Coelho</string>
+    <string name="pet_type_bird">Pássaro</string>
+    <string name="pet_type_hamster">Hamster</string>
+    <string name="pet_type_other">Outro</string>
+    <string name="pet_form_type_label">Espécie / Tipo</string>
+
+    <!-- Vacinas caninas -->
+    <string name="vaccine_dhpp">DHPP - Quádrupla/Óctupla Canina</string>
+    <string name="vaccine_bordetella">Bordetella / Tosse dos Canis</string>
+    <string name="vaccine_leptospirosis">Leptospirose</string>
+    <string name="vaccine_leishmania">Leishmaniose</string>
+    <string name="vaccine_gripe_canina">Gripe Canina</string>
+
+    <!-- Vacinas para coelhos -->
+    <string name="vaccine_rhdv">RHDV - Calicivirose</string>
+    <string name="vaccine_myxomatosis">Mixomatose</string>
+
+    <!-- Vacinas para pássaros -->
+    <string name="vaccine_polyomavirus">Poliomavírus Aviário</string>
+
+    <!-- Vacina personalizada -->
+    <string name="vaccination_custom_name_label">Nome da vacina</string>
+    <string name="vaccination_custom_name_hint">Digite o nome da vacina</string>
+
+    <!-- Raças de cachorro -->
+    <string name="breed_labrador">Labrador Retriever</string>
+    <string name="breed_golden_retriever">Golden Retriever</string>
+    <string name="breed_german_shepherd">Pastor Alemão</string>
+    <string name="breed_poodle">Poodle</string>
+    <string name="breed_bulldog">Bulldog</string>
+    <string name="breed_beagle">Beagle</string>
+    <string name="breed_shih_tzu">Shih Tzu</string>
+    <string name="breed_yorkshire">Yorkshire Terrier</string>
+
+    <!-- Cores adicionais -->
+    <string name="color_golden">Dourado</string>
+    <string name="color_brindle">Malhado</string>
+
+</resources>

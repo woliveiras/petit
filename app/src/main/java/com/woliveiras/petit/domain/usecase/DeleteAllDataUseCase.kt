@@ -1,0 +1,42 @@
+package com.woliveiras.petit.domain.usecase
+
+import androidx.room.withTransaction
+import com.woliveiras.petit.data.local.db.PetitDatabase
+import com.woliveiras.petit.worker.TaskScheduler
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/**
+ * Use case for deleting all user data from the database. This is used for the "Delete all my data"
+ * feature in settings.
+ */
+interface DeleteAllDataAction {
+  suspend fun execute(): Result<Unit>
+}
+
+@Singleton
+class DeleteAllDataUseCase
+@Inject
+constructor(private val database: PetitDatabase, private val taskScheduler: TaskScheduler) :
+  DeleteAllDataAction {
+
+  override suspend fun execute(): Result<Unit> =
+    withContext(Dispatchers.IO) {
+      try {
+        taskScheduler.cancelAllTasks()
+        database.withTransaction {
+          // Delete in order: first dependent data, then pets
+          database.taskDao().deleteAll()
+          database.dewormingEntryDao().deleteAll()
+          database.vaccinationEntryDao().deleteAll()
+          database.weightEntryDao().deleteAll()
+          database.petDao().deleteAll()
+        }
+        Result.success(Unit)
+      } catch (e: Exception) {
+        Result.failure(e)
+      }
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "kotlin.languageServer.enabled": true,
+    "kotlin.languageServer.path": "",
+    "kotlin.debugAdapter.enabled": true,
+    "kotlin.compiler.jvm.target": "17",
+    "kotlin.indexing.enabled": true,
+    "kotlin.diagnostics.enabled": false,
+    "java.jdt.ls.java.home": "/Users/william.de.oliveira.souza/.sdkman/candidates/java/current",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "/Users/william.de.oliveira.souza/.sdkman/candidates/java/current",
+            "default": true
+        }
+    ],
+    "java.server.launchMode": "Standard",
+    "java.import.gradle.java.home": "/Users/william.de.oliveira.souza/.sdkman/candidates/java/current",
+    "editor.formatOnSave": true,
+    "[kotlin]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 4
+    },
+    "files.exclude": {
+        "**/.gradle": true,
+        "**/build": true,
+        "**/.idea": true,
+        "**/*.iml": true
+    },
+    "search.exclude": {
+        "**/build": true,
+        "**/.gradle": true
+    }
+}
