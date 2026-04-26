@@ -14,6 +14,14 @@ Petit is a multi-pet health tracker — track weight, vaccinations, deworming, a
 
 ## Development
 
+Pick the setup that matches your editor:
+
+- [VS Code setup](docs/dev-setup/vscode.md) — uses the JetBrains Kotlin LSP + workspace tasks
+- [Android Studio setup](docs/dev-setup/android-studio.md)
+- [Android CLI development reference](docs/android-cli-development.md) — SDK, emulator, deeper CLI tooling
+
+Quick commands:
+
 - `./gradlew assembleDebug && ./gradlew installDebug`
 - `./gradlew test`
 - `./gradlew spotlessCheck`

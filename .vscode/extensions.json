@@ -1,8 +1,11 @@
 {
     "recommendations": [
-        "mathiasfrohlich.Kotlin",
-        "fwcd.kotlin",
         "vscjava.vscode-gradle",
-        "naco-siren.gradle-language"
+        "naco-siren.gradle-language",
+        "adelphes.android-dev-ext",
+        "vscjava.vscode-java-pack",
+        "jetbrains.kotlin",
+        "redhat.java",
+        "dotjoshjohnson.xml"
     ]
 }
