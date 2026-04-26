@@ -393,13 +393,13 @@ interface WeightEntryDao {
 object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): MiwDatabase =
-        Room.databaseBuilder(context, MiwDatabase::class.java, "miw-database")
+    fun provideDatabase(@ApplicationContext context: Context): PetitDatabase =
+        Room.databaseBuilder(context, PetitDatabase::class.java, "petit-database")
             .addMigrations(MIGRATION_1_2)
             .build()
 
     @Provides
-    fun provideCatDao(database: MiwDatabase): CatDao = database.catDao()
+    fun provideCatDao(database: PetitDatabase): CatDao = database.catDao()
 }
 ```
 

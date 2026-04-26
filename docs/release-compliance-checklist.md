@@ -15,7 +15,7 @@ Before every release, confirm that this repository contains only public technica
 Run before creating a release tag:
 
 ```bash
-git ls-files | rg 'miw-release-key\.jks|keystore\.properties|local\.properties|google-services\.json' || true
+git ls-files | rg 'petit-release-key\.jks|keystore\.properties|local\.properties|google-services\.json' || true
 ```
 
 Expected result:
@@ -112,8 +112,8 @@ Apply once per repository (and review quarterly).
 ### Collaboration governance
 
 - Add CODEOWNERS for critical areas:
-  - `app/src/main/java/com/miw/app/data/**`
-  - `app/src/main/java/com/miw/app/worker/**`
+  - `app/src/main/java/com/woliveiras/petit/data/**`
+  - `app/src/main/java/com/woliveiras/petit/worker/**`
   - `LICENSE`, `NOTICE`, `TRADEMARK_POLICY.md`, `SECURITY.md`
 - Keep issue and PR templates active.
 
@@ -121,7 +121,7 @@ Apply once per repository (and review quarterly).
 
 ```bash
 # 1) Sensitive tracked files
-git ls-files | rg 'miw-release-key\.jks|keystore\.properties|local\.properties|google-services\.json' || true
+git ls-files | rg 'petit-release-key\.jks|keystore\.properties|local\.properties|google-services\.json' || true
 
 # 2) Secret patterns in repo
 rg -n --hidden --glob '!build/**' --glob '!.git/**' \

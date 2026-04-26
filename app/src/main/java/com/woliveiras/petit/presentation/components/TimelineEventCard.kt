@@ -184,13 +184,13 @@ private fun formatEventDate(event: TimelineEvent): String {
 
 @Composable
 private fun getEventIconAndColor(eventType: TimelineEventType): Pair<ImageVector, Color> {
-  val miwColors = LocalPetitColors.current
+  val petitColors = LocalPetitColors.current
   return when (eventType) {
-    TimelineEventType.WEIGHT -> Icons.Default.MonitorWeight to miwColors.timelineWeightBg
+    TimelineEventType.WEIGHT -> Icons.Default.MonitorWeight to petitColors.timelineWeightBg
     TimelineEventType.VACCINATION,
-    TimelineEventType.VACCINATION_DUE -> Icons.Default.Vaccines to miwColors.timelineVaccineBg
+    TimelineEventType.VACCINATION_DUE -> Icons.Default.Vaccines to petitColors.timelineVaccineBg
     TimelineEventType.DEWORMING,
-    TimelineEventType.DEWORMING_DUE -> Icons.Default.Healing to miwColors.timelineDewormingBg
-    TimelineEventType.REMINDER -> Icons.Default.Notifications to miwColors.timelineReminderBg
+    TimelineEventType.DEWORMING_DUE -> Icons.Default.Healing to petitColors.timelineDewormingBg
+    TimelineEventType.REMINDER -> Icons.Default.Notifications to petitColors.timelineReminderBg
   }
 }
