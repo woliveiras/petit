@@ -74,12 +74,12 @@ fun QuickAddScreen(
 
       Spacer(modifier = Modifier.height(8.dp))
 
-      val miwColors = LocalPetitColors.current
+      val petitColors = LocalPetitColors.current
 
       // Weight option
       QuickAddOption(
         icon = Icons.Default.MonitorWeight,
-        iconBackground = miwColors.weightSectionBg,
+        iconBackground = petitColors.weightSectionBg,
         title = stringResource(R.string.quick_add_weight),
         description = stringResource(R.string.quick_add_weight_desc),
         onClick = onSelectWeight,
@@ -88,7 +88,7 @@ fun QuickAddScreen(
       // Vaccination option
       QuickAddOption(
         icon = Icons.Default.Vaccines,
-        iconBackground = miwColors.vaccinationSectionBg,
+        iconBackground = petitColors.vaccinationSectionBg,
         title = stringResource(R.string.quick_add_vaccination),
         description = stringResource(R.string.quick_add_vaccination_desc),
         onClick = onSelectVaccination,
@@ -97,7 +97,7 @@ fun QuickAddScreen(
       // Deworming option
       QuickAddOption(
         icon = Icons.Default.Healing,
-        iconBackground = miwColors.dewormingSectionBg,
+        iconBackground = petitColors.dewormingSectionBg,
         title = stringResource(R.string.quick_add_deworming),
         description = stringResource(R.string.quick_add_deworming_desc),
         onClick = onSelectDeworming,
@@ -106,7 +106,7 @@ fun QuickAddScreen(
       // Reminder option
       QuickAddOption(
         icon = Icons.Default.Notifications,
-        iconBackground = miwColors.weightSectionBg,
+        iconBackground = petitColors.weightSectionBg,
         title = stringResource(R.string.quick_add_reminder),
         description = stringResource(R.string.quick_add_reminder_desc),
         onClick = onSelectReminder,
@@ -115,7 +115,7 @@ fun QuickAddScreen(
       // New pet option
       QuickAddOption(
         icon = Icons.Default.Pets,
-        iconBackground = miwColors.weightSectionBg,
+        iconBackground = petitColors.weightSectionBg,
         title = stringResource(R.string.quick_add_new_pet),
         description = stringResource(R.string.quick_add_new_pet_desc),
         onClick = onSelectNewPet,

@@ -231,7 +231,7 @@ private fun EmptyHistoryCard() {
 
 @Composable
 private fun WeightHistoryItem(entry: WeightEntry, weightDifference: Double?, onClick: () -> Unit) {
-  val miwColors = LocalPetitColors.current
+  val petitColors = LocalPetitColors.current
   val dateText = entry.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
   val diffText =
     if (weightDifference != null && weightDifference != 0.0) {
@@ -276,9 +276,9 @@ private fun WeightHistoryItem(entry: WeightEntry, weightDifference: Double?, onC
           }
         val diffColor =
           if (isPositive) {
-            miwColors.weightGain
+            petitColors.weightGain
           } else {
-            miwColors.weightLoss
+            petitColors.weightLoss
           }
 
         Text(
