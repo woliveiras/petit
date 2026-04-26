@@ -22,9 +22,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -56,6 +55,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -302,21 +306,44 @@ fun PetFormScreen(
           }
 
           // Birth Date Field
-          FormField(label = stringResource(R.string.pet_form_birth_date)) {
-            Card(
-              modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
-              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-              shape = RoundedCornerShape(12.dp),
-            ) {
-              Text(
-                text =
-                  uiState.birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+          val birthDateLabel = stringResource(R.string.pet_form_birth_date)
+          val formattedBirthDate =
+            uiState.birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+          FormField(label = birthDateLabel) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+              OutlinedTextField(
+                value =
+                  formattedBirthDate
                     ?: stringResource(R.string.pet_form_birth_date_placeholder),
-                style = MaterialTheme.typography.bodyLarge,
-                color =
-                  if (uiState.birthDate != null) MaterialTheme.colorScheme.onSurface
-                  else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
+                trailingIcon = {
+                  Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = null,
+                  )
+                },
+                colors =
+                  OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor =
+                      MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    unfocusedTextColor =
+                      if (uiState.birthDate != null) MaterialTheme.colorScheme.onSurface
+                      else MaterialTheme.colorScheme.onSurfaceVariant,
+                  ),
+                shape = RoundedCornerShape(12.dp),
+              )
+              Box(
+                modifier =
+                  Modifier.matchParentSize()
+                    .semantics {
+                      contentDescription =
+                        if (formattedBirthDate != null) "$birthDateLabel: $formattedBirthDate"
+                        else birthDateLabel
+                      role = Role.Button
+                    }
+                    .clickable { showDatePicker = true },
               )
             }
           }
