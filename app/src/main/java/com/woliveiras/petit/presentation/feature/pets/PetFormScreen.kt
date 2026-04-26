@@ -313,21 +313,16 @@ fun PetFormScreen(
             Box(modifier = Modifier.fillMaxWidth()) {
               OutlinedTextField(
                 value =
-                  formattedBirthDate
-                    ?: stringResource(R.string.pet_form_birth_date_placeholder),
+                  formattedBirthDate ?: stringResource(R.string.pet_form_birth_date_placeholder),
                 onValueChange = {},
                 readOnly = true,
                 modifier = Modifier.fillMaxWidth().clearAndSetSemantics {},
                 trailingIcon = {
-                  Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = null,
-                  )
+                  Icon(imageVector = Icons.Default.DateRange, contentDescription = null)
                 },
                 colors =
                   OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor =
-                      MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                     unfocusedTextColor =
                       if (uiState.birthDate != null) MaterialTheme.colorScheme.onSurface
                       else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -343,7 +338,7 @@ fun PetFormScreen(
                         else birthDateLabel
                       role = Role.Button
                     }
-                    .clickable { showDatePicker = true },
+                    .clickable { showDatePicker = true }
               )
             }
           }
