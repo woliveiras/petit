@@ -62,13 +62,13 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 // Common option
 private const val OTHER_OPTION = "OTHER"
 
 private val monthlyIntervalOptions = listOf(1, 2, 3, 4, 5, 6)
-private val intervalUnitOptions = listOf("DAILY", "WEEKLY", "MONTHLY")
+private val intervalUnitOptions =
+  listOf(DewormingIntervalUnit.DAILY, DewormingIntervalUnit.WEEKLY, DewormingIntervalUnit.MONTHLY)
 
 // Common internal deworming medications (for intestinal parasites)
 private val internalDewormingMedications =
@@ -134,12 +134,6 @@ fun DewormingFormScreen(
   var isMedicationOther by remember { mutableStateOf(false) }
 
   var showMonthlyIntervalPicker by remember { mutableStateOf(false) }
-  var selectedMonthlyInterval by remember {
-    mutableStateOf(form.dewormingType.defaultIntervalMonths)
-  }
-  var isIntervalCustom by remember { mutableStateOf(false) }
-  var customIntervalValue by remember { mutableStateOf("") }
-  var customIntervalUnit by remember { mutableStateOf("MONTHLY") }
   var customIntervalUnitExpanded by remember { mutableStateOf(false) }
   // Track if the user has explicitly selected a deworming type
   var hasSelectedType by remember { mutableStateOf(false) }
@@ -156,42 +150,6 @@ fun DewormingFormScreen(
   LaunchedEffect(entryId) {
     if (entryId != null) {
       viewModel.loadEntryForEdit(entryId)
-    }
-  }
-
-  // Restore interval picker state when editing an existing entry
-  LaunchedEffect(form.editingEntryId) {
-    form.editingEntryId ?: return@LaunchedEffect
-    val nextDate = form.nextDueDate ?: return@LaunchedEffect
-    val appDate = form.applicationDate
-
-    var handled = false
-    for (months in 1..6) {
-      if (appDate.plusMonths(months.toLong()) == nextDate) {
-        selectedMonthlyInterval = months
-        isIntervalCustom = false
-        handled = true
-        break
-      }
-    }
-
-    if (!handled) {
-      isIntervalCustom = true
-      val totalMonths = ChronoUnit.MONTHS.between(appDate, nextDate)
-      if (totalMonths > 0 && appDate.plusMonths(totalMonths) == nextDate) {
-        customIntervalUnit = "MONTHLY"
-        customIntervalValue = totalMonths.toString()
-      } else {
-        val totalWeeks = ChronoUnit.WEEKS.between(appDate, nextDate)
-        if (totalWeeks > 0 && appDate.plusWeeks(totalWeeks) == nextDate) {
-          customIntervalUnit = "WEEKLY"
-          customIntervalValue = totalWeeks.toString()
-        } else {
-          val totalDays = ChronoUnit.DAYS.between(appDate, nextDate)
-          customIntervalUnit = "DAILY"
-          customIntervalValue = totalDays.toString()
-        }
-      }
     }
   }
 
@@ -508,12 +466,12 @@ fun DewormingFormScreen(
           ) {
             val intervalLabel =
               when {
-                isIntervalCustom -> stringResource(R.string.interval_custom)
+                form.isIntervalCustom -> stringResource(R.string.interval_custom)
                 else ->
                   pluralStringResource(
                     R.plurals.interval_months,
-                    selectedMonthlyInterval,
-                    selectedMonthlyInterval,
+                    form.selectedMonthlyInterval,
+                    form.selectedMonthlyInterval,
                   )
               }
             OutlinedTextField(
@@ -538,44 +496,30 @@ fun DewormingFormScreen(
                 DropdownMenuItem(
                   text = { Text(pluralStringResource(R.plurals.interval_months, months, months)) },
                   onClick = {
-                    selectedMonthlyInterval = months
-                    isIntervalCustom = false
                     showMonthlyIntervalPicker = false
-                    viewModel.updateNextDueDate(form.applicationDate.plusMonths(months.toLong()))
+                    viewModel.updateMonthlyInterval(months)
                   },
                 )
               }
               DropdownMenuItem(
                 text = { Text(stringResource(R.string.interval_custom)) },
                 onClick = {
-                  isIntervalCustom = true
-                  customIntervalValue = ""
                   showMonthlyIntervalPicker = false
+                  viewModel.selectCustomInterval()
                 },
               )
             }
           }
 
-          if (isIntervalCustom) {
+          if (form.isIntervalCustom) {
             Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.spacedBy(8.dp),
               verticalAlignment = Alignment.CenterVertically,
             ) {
               OutlinedTextField(
-                value = customIntervalValue,
-                onValueChange = { newValue ->
-                  val digits = newValue.filter { it.isDigit() }
-                  customIntervalValue = digits
-                  val num = digits.toLongOrNull() ?: return@OutlinedTextField
-                  val newDate =
-                    when (customIntervalUnit) {
-                      "DAILY" -> form.applicationDate.plusDays(num)
-                      "WEEKLY" -> form.applicationDate.plusWeeks(num)
-                      else -> form.applicationDate.plusMonths(num)
-                    }
-                  viewModel.updateNextDueDate(newDate)
-                },
+                value = form.customIntervalValue,
+                onValueChange = viewModel::updateCustomIntervalValue,
                 placeholder = { Text(stringResource(R.string.interval_custom_value_hint)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f),
@@ -592,7 +536,7 @@ fun DewormingFormScreen(
                 modifier = Modifier.weight(1f),
               ) {
                 OutlinedTextField(
-                  value = getIntervalUnitLabel(customIntervalUnit),
+                  value = getIntervalUnitLabel(form.customIntervalUnit),
                   onValueChange = {},
                   readOnly = true,
                   trailingIcon = {
@@ -613,16 +557,8 @@ fun DewormingFormScreen(
                     DropdownMenuItem(
                       text = { Text(getIntervalUnitLabel(unit)) },
                       onClick = {
-                        customIntervalUnit = unit
                         customIntervalUnitExpanded = false
-                        val num = customIntervalValue.toLongOrNull() ?: return@DropdownMenuItem
-                        val newDate =
-                          when (unit) {
-                            "DAILY" -> form.applicationDate.plusDays(num)
-                            "WEEKLY" -> form.applicationDate.plusWeeks(num)
-                            else -> form.applicationDate.plusMonths(num)
-                          }
-                        viewModel.updateNextDueDate(newDate)
+                        viewModel.updateCustomIntervalUnit(unit)
                       },
                     )
                   }
@@ -724,11 +660,11 @@ private fun FormField(label: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun getIntervalUnitLabel(unit: String): String =
+private fun getIntervalUnitLabel(unit: DewormingIntervalUnit): String =
   when (unit) {
-    "DAILY" -> stringResource(R.string.interval_unit_daily)
-    "WEEKLY" -> stringResource(R.string.interval_unit_weekly)
-    else -> stringResource(R.string.interval_unit_monthly)
+    DewormingIntervalUnit.DAILY -> stringResource(R.string.interval_unit_daily)
+    DewormingIntervalUnit.WEEKLY -> stringResource(R.string.interval_unit_weekly)
+    DewormingIntervalUnit.MONTHLY -> stringResource(R.string.interval_unit_monthly)
   }
 
 @Composable
