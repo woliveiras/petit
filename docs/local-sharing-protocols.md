@@ -4,7 +4,7 @@
 > `getmiw/specs-miw@09b4497`. As decisões foram generalizadas para o Petit e
 > para dispositivos Android neutros. Exemplos de código são ilustrativos; a
 > implementação atual usa Nearby Connections, enquanto NSD + TCP permanece
-> planejado em [`phase-2/us-104-lan-sync.md`](./phase-2/us-104-lan-sync.md).
+> planejado na [spec 0104](../specs/0104-local-network-sync/spec.md).
 
 ## Introdução
 
