@@ -1,6 +1,6 @@
 ---
 spec: "0003"
-title: Registro de vacinação
+title: Vaccination records
 family: pet-care
 phase: 1
 status: Implemented
@@ -9,39 +9,39 @@ depends_on: ["0001"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Registro de vacinação
+# Spec: Vaccination records
 
-## Contexto e motivação
+## Context and motivation
 
-O tutor precisa manter o calendário de vacinação e a rastreabilidade das doses do pet.
+The pet owner needs to maintain the vaccination schedule and traceability of the pet's doses.
 
-## Requisitos funcionais
+## Functional requirements
 
-- Registrar tipo de vacina filtrado por espécie, aplicação, próxima dose e dados opcionais de veterinário, clínica, lote e observação.
-- Exigir nome customizado para o tipo `OTHER`.
-- Calcular `OK` sem próxima dose ou acima de 30 dias, `SCHEDULED` entre 0 e 30 dias e `OVERDUE` quando vencida.
-- Agrupar o histórico por tipo e mostrar estado visual.
-- Permitir edição e soft delete.
+- Record the vaccine type filtered by species, administration date, next dose, and optional veterinarian, clinic, batch, and note details.
+- Require a custom name for the `OTHER` type.
+- Calculate `OK` when there is no next dose or it is more than 30 days away, `SCHEDULED` when it is 0–30 days away, and `OVERDUE` when past due.
+- Group history by type and display a visual status.
+- Allow editing and soft deletion.
 
-O catálogo inclui vacinas felinas (`V3`, `V4`, `V5`, `FELV`, `FIV`), caninas (`DHPP`, `BORDETELLA`, `LEPTOSPIROSIS`, `LEISHMANIA`, `GRIPE_CANINA`), de coelhos (`RHDV`, `MYXOMATOSIS`), de aves (`POLYOMAVIRUS`) e as opções gerais `RABIES` e `OTHER`.
+The catalog includes feline vaccines (`V3`, `V4`, `V5`, `FELV`, `FIV`), canine vaccines (`DHPP`, `BORDETELLA`, `LEPTOSPIROSIS`, `LEISHMANIA`, `GRIPE_CANINA`), rabbit vaccines (`RHDV`, `MYXOMATOSIS`), bird vaccines (`POLYOMAVIRUS`), and the general options `RABIES` and `OTHER`.
 
-## Critérios de aceite
+## Acceptance criteria
 
-- Dada uma vacinação válida, quando salva, então aparece no histórico e seu status é calculado.
-- Dada próxima dose em cinco dias, então o status é `SCHEDULED`; dada data vencida, é `OVERDUE`.
-- Dada vacina sem próxima dose, então o status é `OK` e nenhuma próxima dose é exibida.
-- Dadas múltiplas doses do mesmo tipo, então o resumo identifica a dose mais recente e o histórico preserva todas as aplicações.
-- Dados opcionais de rastreabilidade salvos ficam disponíveis no detalhe.
+- Given a valid vaccination, When the pet owner saves it, Then it appears in the history and its status is calculated.
+- Given a next dose in five days, Then the status is `SCHEDULED`; Given a past-due date, it is `OVERDUE`.
+- Given a vaccine without a next dose, Then the status is `OK` and no next dose is displayed.
+- Given multiple doses of the same type, Then the summary identifies the latest dose and the history preserves every administration.
+- Saved optional traceability details are available in the detail view.
 
-## Estratégia de testes
+## Test strategy
 
-Unitários cobrem status e validação; integração cobre persistência, agrupamento e soft delete; UI cobre formulário, filtros por espécie e estados visuais.
+Unit tests cover status and validation; integration tests cover persistence, grouping, and soft delete; UI tests cover the form, species filters, and visual states.
 
-## Casos de borda
+## Edge cases
 
-- Próxima dose deve ser posterior à aplicação; aplicação não pode ser futura.
-- Raiva e `OTHER` são gerais; demais tipos respeitam a espécie do pet.
+- The next dose must be after the administration date; the administration date cannot be in the future.
+- Rabies and `OTHER` are general options; all other types must match the pet's species.
 
-## Limitação conhecida
+## Known limitation
 
-O histórico completo implementado é agrupado por mês; a apresentação agrupada por tipo descrita originalmente ainda não foi verificada.
+The implemented full history is grouped by month; the originally described presentation grouped by type has not yet been verified.

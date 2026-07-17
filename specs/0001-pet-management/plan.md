@@ -1,23 +1,23 @@
-# Plano: Gerenciamento de pets
+# Plan: Pet management
 
 Spec: [spec.md](./spec.md)
 
-## Sequenciamento
+## Sequence
 
-1. Modelar `PetEntity`, domínio e mapeadores com metadados de criação, atualização, exclusão e sincronização.
-2. Expor CRUD e consultas ativas por `PetDao` e `PetRepository`.
-3. Implementar validação e estado nos ViewModels.
-4. Integrar lista, detalhe, formulário, confirmação de exclusão e seleção de pet à navegação.
-5. Integrar seleção/captura e armazenamento local da foto.
+1. Model `PetEntity`, the domain, and mappers with creation, update, deletion, and synchronization metadata.
+2. Expose CRUD operations and active queries through `PetDao` and `PetRepository`.
+3. Implement validation and state in the ViewModels.
+4. Integrate the list, details, form, deletion confirmation, and pet selection into navigation.
+5. Integrate photo selection/capture and local storage.
 
-## Arquitetura
+## Architecture
 
-- Room é a fonte local de verdade; consultas ativas filtram `deletedAt IS NULL`.
-- ViewModels dependem de `PetRepository`, nunca do DAO.
-- Rotas: `pets`, `pets/{petId}`, `pets/form?petId={petId}`, `pets/{petId}/delete` e `select-pet/{action}`.
-- A exclusão é lógica e atualiza `deletedAt` e `updatedAt`.
+- Room is the local source of truth; active queries filter by `deletedAt IS NULL`.
+- ViewModels depend on `PetRepository`, never on the DAO.
+- Routes: `pets`, `pets/{petId}`, `pets/form?petId={petId}`, `pets/{petId}/delete`, and `select-pet/{action}`.
+- Deletion is soft and updates `deletedAt` and `updatedAt`.
 
-## Dependências e riscos
+## Dependencies and risks
 
-- Base para todas as demais specs da família `pet-care`.
-- URIs de foto exigem permissões persistentes e tratamento de conteúdo indisponível.
+- Foundation for all other specs in the `pet-care` family.
+- Photo URIs require persistent permissions and handling for unavailable content.

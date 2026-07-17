@@ -1,6 +1,6 @@
 ---
 spec: "0102"
-title: Transferência pontual de dados
+title: One-shot data transfer
 family: local-sharing
 phase: 2
 status: In Progress
@@ -9,77 +9,77 @@ depends_on: ["0101"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Transferência pontual de dados
+# Spec: One-shot data transfer
 
-## Contexto e motivação
+## Context and motivation
 
-Depois do pareamento, uma pessoa cuidadora precisa enviar o histórico completo
-dos pets a outro dispositivo sem servidor ou internet. O receptor escolhe
-mesclar os dados recebidos ou substituir sua base local.
+After pairing, a caregiver needs to send the pets' complete history to another
+device without a server or internet connection. The receiver chooses whether
+to merge the received data or replace its local database.
 
-## Estado atual
+## Current state
 
-`NearbyTransferRepository`, `SendDataUseCase`, `MergeDataUseCase` e a interface
-de transferência existem. O modo `REPLACE` sobrescreve entidades coincidentes,
-mas não remove registros locais ausentes do bundle. Progresso, falhas e o fluxo
-completo ainda não foram validados em dois dispositivos.
+`NearbyTransferRepository`, `SendDataUseCase`, `MergeDataUseCase`, and the
+transfer interface already exist. `REPLACE` mode overwrites matching entities
+but does not remove local records missing from the bundle. Progress, failures,
+and the complete flow have not yet been validated on two devices.
 
-## Requisitos
+## Requirements
 
-### Funcionais
+### Functional
 
-- [x] Serializar os dados compartilháveis em um `ExportBundle`.
-- [x] Enviar e receber o bundle pela conexão Nearby autorizada.
-- [x] Oferecer ao receptor as opções de mesclar e substituir.
-- [x] Mesclar entidades por UUID e `updatedAt`.
-- [ ] Fazer `REPLACE` remover dados locais ausentes antes da importação.
-- [ ] Exibir progresso real e resumo por tipo de entidade.
-- [ ] Descartar payload parcial quando a transferência falhar.
-- [ ] Confirmar o modo destrutivo antes de substituir.
+- [x] Serialize shareable data into an `ExportBundle`.
+- [x] Send and receive the bundle over the authorized Nearby connection.
+- [x] Offer the receiver merge and replace options.
+- [x] Merge entities by UUID and `updatedAt`.
+- [ ] Make `REPLACE` remove missing local data before import.
+- [ ] Display actual progress and a summary by entity type.
+- [ ] Discard a partial payload when the transfer fails.
+- [ ] Confirm the destructive mode before replacing data.
 
-### Não funcionais
+### Non-functional
 
-- [ ] Integridade: aplicar a importação de modo atômico.
-- [ ] Segurança: aceitar payload somente do endpoint pareado.
-- [ ] Performance: escolher BYTES ou FILE conforme o limite do payload sem truncar o bundle.
-- [ ] Acessibilidade e i18n: anunciar progresso e manter textos em pt-BR, en e es.
+- [ ] Integrity: apply the import atomically.
+- [ ] Security: accept payloads only from the paired endpoint.
+- [ ] Performance: choose BYTES or FILE based on the payload limit without truncating the bundle.
+- [ ] Accessibility and i18n: announce progress and keep text in pt-BR, en, and es.
 
 ## Test strategy
 
-Testes unitários cobrem serialização, merge, replace, contadores e tratamento de
-payload incompleto. Testes de integração cobrem Room, Nearby e o fluxo entre
-dois dispositivos, inclusive sem internet. Consulte a
-[pesquisa de protocolos](../../docs/local-sharing-protocols.md).
+Unit tests cover serialization, merge, replace, counters, and incomplete
+payload handling. Integration tests cover Room, Nearby, and the flow between
+two devices, including without an internet connection. See the
+[protocol research](../../docs/local-sharing-protocols.md).
 
-## Critérios de aceitação
+## Acceptance criteria
 
-- [ ] Dado um dispositivo pareado com dados locais, quando envia, então o receptor recebe um `ExportBundle` completo e vê progresso e conclusão.
-- [ ] Dado um receptor com dados existentes, quando escolhe mesclar, então UUIDs são combinados e a versão com `updatedAt` mais recente prevalece.
-- [ ] Dado um receptor com registros ausentes do bundle, quando confirma substituir, então a base compartilhável é limpa e passa a refletir somente o bundle.
-- [ ] Dada uma conexão interrompida, quando chega apenas parte do payload, então nenhuma alteração é persistida e uma nova tentativa é oferecida.
-- [ ] Dados dois dispositivos sem internet, quando transferem por Nearby, então o fluxo termina com sucesso.
-- [ ] Dada uma importação concluída, quando o resumo é exibido, então os contadores correspondem às entidades realmente adicionadas, atualizadas e removidas.
+- [ ] Given a paired device with local data, when it sends the data, then the receiver gets a complete `ExportBundle` and sees progress and completion.
+- [ ] Given a receiver with existing data, when it chooses merge, then UUIDs are matched and the version with the latest `updatedAt` prevails.
+- [ ] Given a receiver with records missing from the bundle, when it confirms replacement, then the shareable database is cleared and reflects only the bundle.
+- [ ] Given an interrupted connection, when only part of the payload arrives, then no changes are persisted and another attempt is offered.
+- [ ] Given two devices without an internet connection, when they transfer through Nearby, then the flow succeeds.
+- [ ] Given a completed import, when the summary is displayed, then the counters match the entities actually added, updated, and removed.
 
-## Casos extremos
+## Edge cases
 
-- Bundle vazio, incompatível ou maior que o limite de BYTES.
-- Espaço insuficiente ou falha transacional no receptor.
-- Entidades filhas cujo pet não existe no bundle.
-- Mesmo bundle recebido mais de uma vez.
-- Soft delete mais recente que a cópia ativa.
+- Empty or incompatible bundle, or one larger than the BYTES limit.
+- Insufficient space or transactional failure on the receiver.
+- Child entities whose pet does not exist in the bundle.
+- Same bundle received more than once.
+- Soft delete newer than the active copy.
 
-## Decisões
+## Decisions
 
-| Decisão | Escolha | Justificativa |
+| Decision | Choice | Rationale |
 | --- | --- | --- |
-| Formato | `ExportBundle` serializado | Reutiliza o limite de exportação/importação local existente. |
-| Mesclagem | UUID + `updatedAt` | Mantém resultado determinístico para versões com timestamps distintos. |
-| Substituição | Limpeza transacional seguida de importação | Faz o comportamento corresponder ao significado apresentado à pessoa usuária. |
-| Transporte | Nearby após a spec 0101 | Funciona localmente e reutiliza o canal autorizado. |
+| Format | Serialized `ExportBundle` | Reuses the existing local export/import boundary. |
+| Merge | UUID + `updatedAt` | Keeps the result deterministic for versions with different timestamps. |
+| Replacement | Transactional cleanup followed by import | Makes the behavior match the meaning presented to the user. |
+| Transport | Nearby after spec 0101 | Works locally and reuses the authorized channel. |
 
-## Fora de escopo
+## Out of scope
 
-- Descobrir ou parear dispositivos.
-- Sincronização automática ou incremental.
-- Resolver o desempate de timestamps idênticos; consulte a spec 0105.
-- Backup em nuvem.
+- Discovering or pairing devices.
+- Automatic or incremental synchronization.
+- Resolving ties between identical timestamps; see spec 0105.
+- Cloud backup.

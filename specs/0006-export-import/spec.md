@@ -1,6 +1,6 @@
 ---
 spec: "0006"
-title: Exportação e importação JSON
+title: JSON export and import
 family: pet-care
 phase: 1
 status: Implemented
@@ -9,34 +9,34 @@ depends_on: ["0001", "0002", "0003", "0004", "0005"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Exportação e importação JSON
+# Spec: JSON export and import
 
-## Contexto e motivação
+## Context and motivation
 
-O tutor precisa criar backup manual e restaurar seus dados em outro dispositivo ou após reinstalar o app.
+The caregiver needs to create a manual backup and restore their data on another device or after reinstalling the app.
 
-## Requisitos funcionais
+## Functional requirements
 
-- Exportar pets, pesos, vacinas, desparasitações e tarefas para JSON por URI escolhida pelo usuário.
-- Incluir versão do app, data da exportação e versão do schema; nomear `petit_backup_YYYY-MM-DD.json`.
-- Ler e validar backup, apresentar contagens e conflitos antes da confirmação.
-- Resolver conflitos por substituir, manter ou mesclar pelo `updatedAt` mais recente.
-- Aplicar importação atomicamente e rejeitar arquivo inválido sem alterar dados.
-- Permitir exportar apenas um pet e seus registros relacionados.
+- Export pets, weights, vaccinations, deworming treatments, and tasks to JSON through a user-selected URI.
+- Include the app version, export date, and schema version; name the file `petit_backup_YYYY-MM-DD.json`.
+- Read and validate the backup, then present counts and conflicts before confirmation.
+- Resolve conflicts by replacing, keeping, or merging based on the latest `updatedAt`.
+- Apply the import atomically and reject an invalid file without changing data.
+- Allow exporting only one pet and its related records.
 
-## Critérios de aceite
+## Acceptance criteria
 
-- Dados registros locais, quando exporta tudo, então o JSON contém todos os domínios e metadados.
-- Dado backup válido, quando seleciona, então vê contagens, conflitos e pode confirmar ou cancelar.
-- Dado conflito de ID, quando escolhe uma estratégia, então o resultado respeita `REPLACE`, `KEEP` ou `MERGE`.
-- Dado arquivo inválido ou corrompido, então nenhum dado local é alterado.
-- Dado um pet, quando exporta seu perfil, então somente ele e seus dados relacionados são incluídos.
+- Given local records, When all data is exported, Then the JSON contains all domains and metadata.
+- Given a valid backup, When it is selected, Then the user sees counts and conflicts and can confirm or cancel.
+- Given an ID conflict, When a strategy is selected, Then the result honors `REPLACE`, `KEEP`, or `MERGE`.
+- Given an invalid or corrupted file, Then no local data is changed.
+- Given a pet, When its profile is exported, Then only that pet and its related data are included.
 
-## Estratégia de testes
+## Test strategy
 
-Unitários cobrem serialização, parsing e merge; integração cobre ContentResolver, transação Room e fluxos de seleção; UI cobre análise e confirmação.
+Unit tests cover serialization, parsing, and merge; integration tests cover ContentResolver, the Room transaction, and selection flows; UI tests cover analysis and confirmation.
 
-## Limitações conhecidas
+## Known limitations
 
-- `exportForPet(petId)` existe, mas não há ponto de entrada correspondente no perfil do pet.
-- O formato atual usa a chave `tasks`; backups históricos com apenas `reminders` exigem conversão explícita.
+- `exportForPet(petId)` exists, but there is no corresponding entry point in the pet profile.
+- The current format uses the `tasks` key; legacy backups containing only `reminders` require explicit conversion.

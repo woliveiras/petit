@@ -1,23 +1,23 @@
-# Plano: Tarefas e lembretes locais
+# Plan: Local tasks and reminders
 
 Spec: [spec.md](./spec.md)
 
-## Sequenciamento
+## Sequence
 
-1. Modelar `TaskEntity` com tipos `VACCINATION`, `DEWORMING`, `WEIGHT` e `CUSTOM` e estados `PENDING`/`COMPLETED`.
-2. Implementar repositório e `AutoTaskService` para criar/cancelar tarefas vinculadas.
-3. Integrar `TaskScheduler` e `TaskNotificationWorker` ao WorkManager.
-4. Persistir `ReminderPreferences` no DataStore.
-5. Integrar lista, formulário, configurações e concluídas.
+1. Model `TaskEntity` with types `VACCINATION`, `DEWORMING`, `WEIGHT`, and `CUSTOM` and states `PENDING`/`COMPLETED`.
+2. Implement the repository and `AutoTaskService` to create/cancel linked tasks.
+3. Integrate `TaskScheduler` and `TaskNotificationWorker` with WorkManager.
+4. Persist `ReminderPreferences` in DataStore.
+5. Integrate the list, form, settings, and completed tasks.
 
-## Arquitetura
+## Architecture
 
-- Tarefas e notificações são locais e one-shot.
-- `referenceEntityId` liga uma tarefa ao registro de saúde que a originou.
-- `PendingIntent` deve ser imutável; exclusão e conclusão cancelam o trabalho agendado.
-- Rotas: `tasks`, `tasks/form?taskId={taskId}`, `tasks/settings` e `tasks/completed`.
+- Tasks and notifications are local and one-shot.
+- `referenceEntityId` links a task to the health record that created it.
+- `PendingIntent` must be immutable; deletion and completion cancel the scheduled job.
+- Routes: `tasks`, `tasks/form?taskId={taskId}`, `tasks/settings`, and `tasks/completed`.
 
-## Dependências e riscos
+## Dependencies and risks
 
-- Depende de `0001` e recebe eventos de `0002`, `0003` e `0004`.
-- Restrições do Android sobre notificações e execução em segundo plano exigem testes de integração.
+- Depends on `0001` and receives events from `0002`, `0003`, and `0004`.
+- Android restrictions on notifications and background execution require integration tests.

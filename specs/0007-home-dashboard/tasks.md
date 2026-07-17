@@ -1,31 +1,31 @@
-# Tarefas: Dashboard inicial
+# Tasks: Home dashboard
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Exibir estado inicial sem pets** (test-type: both)
+- [x] **Display the initial state without pets** (test-type: both)
   - blocked-by: 0001
-  - desired behavior: mostrar boas-vindas e ação de cadastro.
-  - acceptance criteria: ação abre o formulário do primeiro pet.
+  - desired behavior: display a welcome message and an add action.
+  - acceptance criteria: the action opens the form for the first pet.
   - verification: `./gradlew test`
-- [x] **Resumir saúde e próximos cuidados por pet** (test-type: both)
+- [x] **Summarize health and upcoming care by pet** (test-type: both)
   - blocked-by: 0001, 0002, 0003, 0004
-  - desired behavior: combinar foto, nome, último peso, status e próximo evento.
-  - acceptance criteria: cards atualizam com os dados ativos e abrem o perfil.
+  - desired behavior: combine photo, name, latest weight, status, and next event.
+  - acceptance criteria: cards update with active data and open the profile.
   - verification: `./gradlew test`
-- [x] **Exibir tarefas e timeline** (test-type: integration)
+- [x] **Display tasks and timeline** (test-type: integration)
   - blocked-by: 0005
-  - desired behavior: mostrar até cinco próximas tarefas e atividade recente com “ver tudo”.
-  - acceptance criteria: ações abrem as listas completas e os eventos corretos.
+  - desired behavior: display up to five upcoming tasks and recent activity with “View all”.
+  - acceptance criteria: actions open the full lists and the correct events.
   - verification: `./gradlew test`
-- [x] **Oferecer ações rápidas e atualização** (test-type: integration)
-  - blocked-by: resumir saúde e próximos cuidados por pet
-  - desired behavior: navegar por Quick Add, configurações e pull-to-refresh.
-  - acceptance criteria: cinco ações funcionam e seleção de pet aparece quando necessária.
+- [x] **Provide quick actions and refresh** (test-type: integration)
+  - blocked-by: summarize health and upcoming care by pet
+  - desired behavior: navigate through Quick Add and settings, and support pull-to-refresh.
+  - acceptance criteria: all five actions work, and pet selection appears when necessary.
   - verification: `./gradlew test`
-- [ ] **Exibir estado global saudável e alertas separados** (test-type: both)
-  - blocked-by: decisão futura de produto
-  - desired behavior: adicionar banner “Tudo em ordem” e seção de atenção necessária.
-  - acceptance criteria: estados saudáveis e críticos são claros e acessíveis.
+- [ ] **Display the overall healthy state and separate alerts** (test-type: both)
+  - blocked-by: future product decision
+  - desired behavior: add an “All good” banner and a section for items requiring attention.
+  - acceptance criteria: healthy and critical states are clear and accessible.
   - verification: `./gradlew test`

@@ -1,40 +1,40 @@
-# Tarefas: Transferência pontual de dados
+# Tasks: One-shot data transfer
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Enviar e importar um bundle pareado** (test-type: integration)
+- [x] **Send and import a paired bundle** (test-type: integration)
   - blocked-by: spec 0101
-  - summary: serializar, transportar e apresentar opções de merge/replace.
-  - desired behavior: o receptor recebe o conjunto compartilhável e escolhe como aplicá-lo.
-  - acceptance criteria: o fluxo e os componentes correspondentes existem no app atual.
+  - summary: serialize, transport, and present merge/replace options.
+  - desired behavior: the receiver gets the shareable dataset and chooses how to apply it.
+  - acceptance criteria: the flow and corresponding components exist in the current app.
   - verification: `./gradlew test`
 
-- [x] **Mesclar entidades por identidade e atualização** (test-type: unit)
-  - blocked-by: bundle recebido
-  - summary: inserir UUIDs novos e manter a versão com `updatedAt` mais recente.
-  - desired behavior: reaplicar o mesmo bundle não duplica registros.
-  - acceptance criteria: a estratégia de merge atual executa UUID + `updatedAt`.
+- [x] **Merge entities by identity and update time** (test-type: unit)
+  - blocked-by: received bundle
+  - summary: insert new UUIDs and keep the version with the latest `updatedAt`.
+  - desired behavior: reapplying the same bundle does not duplicate records.
+  - acceptance criteria: the current merge strategy applies UUID + `updatedAt`.
   - verification: `./gradlew test`
 
-- [ ] **Substituir a base compartilhável de forma transacional** (test-type: both)
-  - blocked-by: validação do bundle
-  - summary: remover registros locais ausentes e importar somente o conteúdo recebido.
-  - desired behavior: replace reflete exatamente o bundle ou não altera nada em caso de falha.
-  - acceptance criteria: registros locais ausentes deixam de existir; falha reverte toda a operação.
+- [ ] **Replace the shareable database transactionally** (test-type: both)
+  - blocked-by: bundle validation
+  - summary: remove missing local records and import only the received content.
+  - desired behavior: replace reflects the bundle exactly or changes nothing on failure.
+  - acceptance criteria: missing local records cease to exist; failure rolls back the entire operation.
   - verification: `./gradlew test`
 
-- [ ] **Exibir progresso, resultado e falhas confiáveis** (test-type: both)
-  - blocked-by: envio e importação do bundle
-  - summary: ligar bytes transferidos e resultado persistido aos estados da interface.
-  - desired behavior: progresso é monotônico, contadores são exatos e payload parcial é descartado.
-  - acceptance criteria: interrupção não persiste dados; conclusão mostra quantidades reais.
+- [ ] **Display reliable progress, results, and failures** (test-type: both)
+  - blocked-by: bundle sending and import
+  - summary: connect transferred bytes and the persisted result to interface states.
+  - desired behavior: progress is monotonic, counters are exact, and partial payloads are discarded.
+  - acceptance criteria: interruption persists no data; completion shows actual quantities.
   - verification: `./gradlew test`
 
-- [ ] **Validar transferência ponta a ponta em dois dispositivos** (test-type: integration)
-  - blocked-by: replace transacional; progresso, resultado e falhas
-  - summary: executar merge, replace e interrupção com e sem internet.
-  - desired behavior: as bases finais e a interface correspondem à opção escolhida.
-  - acceptance criteria: todos os cenários da spec passam em hardware real.
+- [ ] **Validate end-to-end transfer on two devices** (test-type: integration)
+  - blocked-by: transactional replace; progress, results, and failures
+  - summary: run merge, replace, and interruption with and without an internet connection.
+  - desired behavior: the final databases and interface match the selected option.
+  - acceptance criteria: all spec scenarios pass on physical hardware.
   - verification: `./gradlew assembleDebug && ./gradlew installDebug`

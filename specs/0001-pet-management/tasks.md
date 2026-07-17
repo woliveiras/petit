@@ -1,36 +1,36 @@
-# Tarefas: Gerenciamento de pets
+# Tasks: Pet management
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Cadastrar e editar um pet válido** (test-type: both)
+- [x] **Register and edit a valid pet** (test-type: both)
   - blocked-by: none
-  - desired behavior: validar o formulário, persistir o pet e atualizar `updatedAt` na edição.
-  - acceptance criteria: nome e tipo obrigatórios; limites e nascimento não futuro; dados persistem após reinício.
+  - desired behavior: validate the form, persist the pet, and update `updatedAt` when editing.
+  - acceptance criteria: name and type are required; limits and a non-future birth date are enforced; data persists after restart.
   - verification: `./gradlew test`
-- [x] **Listar e abrir pets ativos** (test-type: integration)
-  - blocked-by: cadastrar e editar um pet válido
-  - desired behavior: mostrar apenas pets sem `deletedAt` e navegar ao perfil.
-  - acceptance criteria: lista ordenada e perfil com dados e ações de gestão.
+- [x] **List and open active pets** (test-type: integration)
+  - blocked-by: register and edit a valid pet
+  - desired behavior: show only pets without `deletedAt` and navigate to the profile.
+  - acceptance criteria: sorted list and profile with data and management actions.
   - verification: `./gradlew test`
-- [x] **Excluir um pet logicamente** (test-type: both)
-  - blocked-by: listar e abrir pets ativos
-  - desired behavior: confirmar exclusão, preencher `deletedAt` e ocultar o pet.
-  - acceptance criteria: registro permanece no banco e deixa consultas ativas.
+- [x] **Soft-delete a pet** (test-type: both)
+  - blocked-by: list and open active pets
+  - desired behavior: confirm deletion, populate `deletedAt`, and hide the pet.
+  - acceptance criteria: the record remains in the database and is excluded from active queries.
   - verification: `./gradlew test`
-- [x] **Selecionar e exibir foto local do pet** (test-type: integration)
-  - blocked-by: cadastrar e editar um pet válido
-  - desired behavior: selecionar uma imagem da galeria e exibi-la no formulário, lista e perfil.
-  - acceptance criteria: a URI selecionada permanece associada após salvar.
+- [x] **Select and display the pet's local photo** (test-type: integration)
+  - blocked-by: register and edit a valid pet
+  - desired behavior: select an image from the gallery and display it in the form, list, and profile.
+  - acceptance criteria: the selected URI remains associated after saving.
   - verification: `./gradlew test`
-- [ ] **Completar captura e validação de foto** (test-type: integration)
-  - blocked-by: selecionar e exibir foto local do pet
-  - desired behavior: oferecer câmera e rejeitar arquivo maior que 5 MB ou formato não suportado.
-  - acceptance criteria: câmera e seletor aceitam apenas JPG/PNG dentro do limite.
+- [ ] **Complete photo capture and validation** (test-type: integration)
+  - blocked-by: select and display the pet's local photo
+  - desired behavior: provide camera capture and reject files larger than 5 MB or in an unsupported format.
+  - acceptance criteria: the camera and picker accept only JPG/PNG files within the limit.
   - verification: `./gradlew test`
-- [ ] **Cobrir o fluxo com testes automatizados** (test-type: both)
-  - blocked-by: excluir um pet logicamente, completar captura e validação de foto
-  - desired behavior: proteger validação, DAO, soft delete e navegação contra regressões.
-  - acceptance criteria: testes unitários do DAO e testes básicos de UI executam com sucesso.
+- [ ] **Cover the flow with automated tests** (test-type: both)
+  - blocked-by: soft-delete a pet, complete photo capture and validation
+  - desired behavior: protect validation, the DAO, soft delete, and navigation against regressions.
+  - acceptance criteria: DAO unit tests and basic UI tests run successfully.
   - verification: `./gradlew test`

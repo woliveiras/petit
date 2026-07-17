@@ -1,6 +1,6 @@
 ---
 spec: "0001"
-title: Gerenciamento de pets
+title: Pet management
 family: pet-care
 phase: 1
 status: Implemented
@@ -9,42 +9,42 @@ depends_on: []
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Gerenciamento de pets
+# Spec: Pet management
 
-## Contexto e motivação
+## Context and motivation
 
-O tutor precisa cadastrar e manter os dados de cada pet para acompanhar seu histórico de saúde individualmente.
+The pet owner needs to register and maintain each pet's data to track its individual health history.
 
-## Requisitos funcionais
+## Functional requirements
 
-- Cadastrar, listar, visualizar, editar e excluir logicamente um pet.
-- Exigir nome (1–50 caracteres) e tipo; aceitar foto, nascimento não futuro, sexo, raça, cor, microchip, passaporte e observações.
-- Suportar gato, cão, coelho, ave, hamster e outro.
-- Exibir no perfil atalhos para vacinas, peso, desparasitação e compartilhamento.
-- Persistir os dados localmente e ocultar registros com `deletedAt` preenchido.
+- Register, list, view, edit, and soft-delete a pet.
+- Require a name (1–50 characters) and type; accept a photo, non-future birth date, sex, breed, color, microchip, passport, and notes.
+- Support cat, dog, rabbit, bird, hamster, and other.
+- Display profile shortcuts for vaccinations, weight, deworming, and sharing.
+- Persist data locally and hide records with a populated `deletedAt`.
 
-## Critérios de aceite
+## Acceptance criteria
 
-- Dado um nome e tipo válidos, quando o tutor salva, então o pet aparece na lista após reiniciar o app.
-- Dado o nome vazio, quando tenta salvar, então vê “Nome é obrigatório” e nada é persistido.
-- Dado um pet existente, quando edita e salva, então os campos e `updatedAt` são atualizados.
-- Dado um pet existente, quando confirma a exclusão, então ele some das consultas ativas e permanece com `deletedAt` preenchido.
-- Dado o seletor ou a câmera, quando o tutor fornece uma imagem JPG ou PNG de até 5 MB e salva, então ela fica disponível no perfil.
+- Given a valid name and type, When the pet owner saves, Then the pet appears in the list after the app restarts.
+- Given an empty name, When the pet owner tries to save, Then they see “Name is required” and nothing is persisted.
+- Given an existing pet, When the pet owner edits and saves it, Then its fields and `updatedAt` are updated.
+- Given an existing pet, When the pet owner confirms deletion, Then the pet disappears from active queries and retains a populated `deletedAt`.
+- Given the picker or camera, When the pet owner provides a JPG or PNG image up to 5 MB and saves, Then the image is available in the profile.
 
-## Estratégia de testes
+## Test strategy
 
-Testes unitários cobrem validações e mapeamentos; testes de integração cobrem Room, CRUD, persistência e soft delete; testes de UI cobrem formulário e navegação.
+Unit tests cover validation and mappings; integration tests cover Room, CRUD, persistence, and soft delete; UI tests cover the form and navigation.
 
-## Casos de borda
+## Edge cases
 
-- Rejeitar nascimento futuro e limites excedidos dos campos.
-- Preservar pets excluídos no banco, sem exibi-los nas consultas ativas.
-- Tratar falta ou perda de acesso à URI de foto sem corromper os demais dados.
+- Reject future birth dates and field values that exceed their limits.
+- Preserve deleted pets in the database without displaying them in active queries.
+- Handle missing or lost access to the photo URI without corrupting other data.
 
-## Limitação conhecida
+## Known limitation
 
-O app seleciona imagens da galeria, mas captura pela câmera e validação explícita do limite de 5 MB ainda não foram verificadas na implementação.
+The app selects images from the gallery, but camera capture and explicit validation of the 5 MB limit have not yet been verified in the implementation.
 
-## Fora de escopo
+## Out of scope
 
-- Sincronização entre dispositivos e compartilhamento do perfil.
+- Cross-device synchronization and profile sharing.

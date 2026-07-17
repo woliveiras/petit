@@ -1,23 +1,23 @@
-# Plano: Registro de desparasitação
+# Plan: Deworming records
 
 Spec: [spec.md](./spec.md)
 
-## Sequenciamento
+## Sequence
 
-1. Modelar `DewormingEntryEntity` referenciando o pet.
-2. Implementar repositório, consultas ativas e cálculo por registro.
-3. Integrar formulário, histórico, edição e soft delete.
-4. Evoluir consultas para último registro por categoria e contabilização de `BOTH`.
-5. Exibir seções interna e externa com status agregado.
+1. Model `DewormingEntryEntity` with a reference to the pet.
+2. Implement the repository, active-record queries, and per-record calculation.
+3. Integrate the form, history, editing, and soft delete.
+4. Extend queries to retrieve the latest record by category and count `BOTH`.
+5. Display internal and external sections with aggregate status.
 
-## Arquitetura
+## Architecture
 
-- Room armazena `type`, medicamento, datas e metadados de sincronização.
-- `DewormingViewModel` acessa o repositório e expõe estado às telas de formulário e registros.
-- A visão por categoria requer selecionar os registros mais recentes aplicáveis a cada categoria.
-- Salvar ou excluir pode acionar tarefas automáticas da spec `0005`.
+- Room stores `type`, medication, dates, and synchronization metadata.
+- `DewormingViewModel` accesses the repository and exposes state to the form and records screens.
+- The category view requires selecting the latest applicable records for each category.
+- Saving or deleting may trigger automatic tasks from spec `0005`.
 
-## Dependências e riscos
+## Dependencies and risks
 
-- Depende de `0001`; integra opcionalmente com `0005`.
-- `BOTH` pode competir com registros específicos; a regra deve escolher o evento aplicável mais recente.
+- Depends on `0001`; optionally integrates with `0005`.
+- `BOTH` may compete with category-specific records; the rule must choose the latest applicable event.

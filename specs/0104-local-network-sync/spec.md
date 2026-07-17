@@ -1,6 +1,6 @@
 ---
 spec: "0104"
-title: Sincronização na rede local
+title: Local network sync
 family: local-sharing
 phase: 2
 status: Draft
@@ -9,83 +9,82 @@ depends_on: ["0101", "0103"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Sincronização na rede local
+# Spec: Local network sync
 
-## Contexto e motivação
+## Context and motivation
 
-Dispositivos do mesmo grupo devem trocar mudanças automaticamente quando estão
-na mesma rede Wi-Fi, sem servidor remoto e sem manter uma conexão de alto
-consumo. O modo planejado usa NSD para descoberta e TCP sobre o Wi-Fi de
-infraestrutura para mudanças incrementais.
+Devices in the same group should exchange changes automatically when they are
+on the same Wi-Fi network, without a remote server or a high-power persistent
+connection. The planned approach uses NSD for discovery and TCP over
+infrastructure Wi-Fi for incremental changes.
 
-## Estado atual
+## Current state
 
-Funcionalidade planejada. Não foram encontrados NSD, servidor TCP,
-`LanSyncRepository`, `LanSyncWorker` ou indicador global de sincronização no
-código atual.
+Planned functionality. No NSD, TCP server, `LanSyncRepository`, `LanSyncWorker`,
+or global sync indicator was found in the current code.
 
-## Requisitos
+## Requirements
 
-### Funcionais
+### Functional
 
-- [ ] Registrar e descobrir serviços `_petit._tcp` enquanto o app está em foreground.
-- [ ] Autenticar cada sessão com a chave do grupo e a identidade do dispositivo.
-- [ ] Trocar changesets bidirecionais desde o último timestamp confirmado.
-- [ ] Aplicar as regras da spec 0105 e registrar o resultado da sincronização.
-- [ ] Sincronizar mudanças acumuladas ao reconectar à rede local.
-- [ ] Agendar tentativas periódicas em background com WorkManager.
-- [ ] Exibir estados sincronizando, sincronizado, parceiro indisponível e erro.
-- [ ] Permitir desativar sincronização automática e forçar uma tentativa manual.
+- [ ] Register and discover `_petit._tcp` services while the app is in the foreground.
+- [ ] Authenticate each session with the group key and device identity.
+- [ ] Exchange bidirectional changesets since the last confirmed timestamp.
+- [ ] Apply the rules from spec 0105 and record the sync result.
+- [ ] Sync accumulated changes after reconnecting to the local network.
+- [ ] Schedule periodic background attempts with WorkManager.
+- [ ] Display syncing, synced, peer unavailable, and error states.
+- [ ] Allow automatic syncing to be disabled and a manual attempt to be triggered.
 
-### Não funcionais
+### Non-functional
 
-- [ ] Bateria: nunca usar Wi-Fi Direct como conexão persistente.
-- [ ] Lifecycle: encerrar anúncio e discovery quando o app sair de foreground.
-- [ ] Segurança: rejeitar chave inválida antes de trocar dados e proteger o TCP em trânsito.
-- [ ] Confiabilidade: aplicar changesets em lotes, com confirmação e repetição idempotente.
-- [ ] Performance: interromper discovery sem parceiro após timeout e usar backoff.
-- [ ] Acessibilidade e i18n: estados não dependem apenas de ícone/cor e são localizados.
+- [ ] Battery: never use Wi-Fi Direct as a persistent connection.
+- [ ] Lifecycle: stop advertising and discovery when the app leaves the foreground.
+- [ ] Security: reject an invalid key before exchanging data and protect TCP data in transit.
+- [ ] Reliability: apply changesets in batches, with acknowledgment and idempotent retries.
+- [ ] Performance: stop discovery after a timeout when no peer is available and use backoff.
+- [ ] Accessibility and i18n: states do not rely only on icons/color and are localized.
 
 ## Test strategy
 
-Testes unitários cobrem protocolo, autenticação, batching e estados. Testes de
-integração usam dois processos para NSD/TCP, Room e WorkManager. A aceitação
-final exige dois dispositivos na mesma Wi-Fi, incluindo perda e retorno da
-rede. Consulte a [pesquisa de protocolos](../../docs/local-sharing-protocols.md).
+Unit tests cover the protocol, authentication, batching, and states. Integration
+tests use two processes for NSD/TCP, Room, and WorkManager. Final acceptance
+requires two devices on the same Wi-Fi network, including network loss and
+recovery. See the [protocol research](../../docs/local-sharing-protocols.md).
 
-## Critérios de aceitação
+## Acceptance criteria
 
-- [ ] Dados dois membros na mesma Wi-Fi, quando o app entra em foreground, então ambos anunciam/descobrem `_petit._tcp` e iniciam uma sessão autenticada.
-- [ ] Dadas mudanças nos dois dispositivos, quando sincronizam, então cada lado envia somente seu changeset e ambos convergem.
-- [ ] Dada uma chave de grupo inválida, quando o cliente envia `HELLO`, então o servidor responde com erro e encerra antes de dados de saúde.
-- [ ] Dadas mudanças feitas offline, quando a Wi-Fi retorna, então elas são sincronizadas automaticamente sem duplicação.
-- [ ] Dado o app em background, quando as constraints são atendidas, então o WorkManager tenta sincronizar no intervalo permitido pelo Android.
-- [ ] Dada a sincronização automática desativada, quando o app abre, então não anuncia nem descobre serviços e ainda permite transferência manual.
-- [ ] Dada qualquer mudança de estado, quando a UI é observada, então informa a situação sem depender apenas de cor.
+- [ ] Given two members on the same Wi-Fi network, when the app enters the foreground, then both advertise/discover `_petit._tcp` and start an authenticated session.
+- [ ] Given changes on both devices, when they sync, then each side sends only its changeset, and both converge.
+- [ ] Given an invalid group key, when the client sends `HELLO`, then the server responds with an error and closes the connection before any health data is sent.
+- [ ] Given changes made offline, when Wi-Fi returns, then they sync automatically without duplication.
+- [ ] Given the app in the background, when the constraints are met, then WorkManager attempts to sync within Android's permitted interval.
+- [ ] Given automatic syncing is disabled, when the app opens, then it neither advertises nor discovers services and still allows manual transfer.
+- [ ] Given any state change, when the UI is observed, then it communicates the status without relying only on color.
 
-## Casos extremos
+## Edge cases
 
-- Duas instâncias iniciam a conexão simultaneamente.
-- NSD retorna o próprio serviço ou múltiplos membros.
-- Rede muda durante o handshake ou changeset.
-- ACK se perde depois de uma aplicação bem-sucedida.
-- Relógios dos dispositivos divergem.
-- Chave é revogada durante uma sessão.
+- Two instances initiate the connection simultaneously.
+- NSD returns the device's own service or multiple members.
+- The network changes during the handshake or changeset.
+- The ACK is lost after successful application.
+- Device clocks diverge.
+- The key is revoked during a session.
 
-## Decisões
+## Decisions
 
-| Decisão | Escolha | Justificativa |
+| Decision | Choice | Rationale |
 | --- | --- | --- |
-| Descoberta | Android NSD / DNS-SD `_petit._tcp` | Funciona na rede local sem Google Play Services. |
-| Transporte contínuo | TCP sobre Wi-Fi de infraestrutura | Usa o rádio já ativo e evita o custo de um grupo Wi-Fi Direct. |
-| Background | Trabalho periódico único, mínimo de 15 minutos | Respeita as restrições e otimizações do Android. |
-| Ciclo de vida | NSD em foreground; tentativa limitada em background | Reduz bateria e recursos mantidos pelo processo. |
-| Unidade de envio | Changeset em lote desde o último ACK | Evita sincronizar cada escrita e permite repetição. |
-| Segurança | Handshake autenticado e canal protegido | A rede local, isoladamente, não é uma fronteira de confiança. |
+| Discovery | Android NSD / DNS-SD `_petit._tcp` | Works on the local network without Google Play Services. |
+| Continuous transport | TCP over infrastructure Wi-Fi | Uses the already active radio and avoids the cost of a Wi-Fi Direct group. |
+| Background | Unique periodic work, minimum 15 minutes | Respects Android restrictions and optimizations. |
+| Lifecycle | NSD in the foreground; limited attempt in the background | Reduces battery use and resources retained by the process. |
+| Transfer unit | Batched changeset since the last ACK | Avoids syncing every write and allows retries. |
+| Security | Authenticated handshake and protected channel | The local network alone is not a trust boundary. |
 
-## Fora de escopo
+## Out of scope
 
-- Pareamento inicial e troca da chave.
-- Wi-Fi Direct persistente.
-- Sincronização pela internet ou cloud.
-- Garantia de execução contínua quando o Android encerra o processo.
+- Initial pairing and key exchange.
+- Persistent Wi-Fi Direct.
+- Internet or cloud sync.
+- Guaranteed continuous execution when Android terminates the process.

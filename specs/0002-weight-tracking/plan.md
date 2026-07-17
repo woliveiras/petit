@@ -1,21 +1,21 @@
-# Plano: Acompanhamento de peso
+# Plan: Weight tracking
 
 Spec: [spec.md](./spec.md)
 
-## Sequenciamento
+## Sequence
 
-1. Modelar `WeightEntryEntity` referenciando `PetEntity` e armazenar `weightGrams`.
-2. Implementar consultas por pet/data, último peso, ordenação e upsert.
-3. Implementar conversão, validação, edição e soft delete no repositório/ViewModel.
-4. Integrar formulário, histórico e gráfico Vico de barras.
+1. Model `WeightEntryEntity` with a reference to `PetEntity` and store `weightGrams`.
+2. Implement queries by pet/date, latest weight, sorting, and upsert.
+3. Implement conversion, validation, editing, and soft delete in the repository/ViewModel.
+4. Integrate the form, history, and Vico bar chart.
 
-## Arquitetura
+## Architecture
 
-- `weight_entries` usa `petId`, metadados de sincronização e consulta ativa.
-- A combinação pet/data determina o comportamento de upsert.
-- O gráfico usa Vico com colunas verticais; apresentação converte gramas para kg.
+- `weight_entries` uses `petId`, synchronization metadata, and an active query.
+- The pet/date combination determines upsert behavior.
+- The chart uses Vico with vertical bars; the presentation layer converts grams to kg.
 
-## Dependências e riscos
+## Dependencies and risks
 
-- Depende de `0001` para o vínculo com o pet.
-- Datas devem ser normalizadas para evitar duplicidade por fuso horário.
+- Depends on `0001` for the relationship with the pet.
+- Dates must be normalized to prevent duplicates caused by time zones.

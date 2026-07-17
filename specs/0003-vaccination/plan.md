@@ -1,21 +1,21 @@
-# Plano: Registro de vacinação
+# Plan: Vaccination records
 
 Spec: [spec.md](./spec.md)
 
-## Sequenciamento
+## Sequence
 
-1. Modelar `VaccinationEntryEntity` com chave do pet e metadados de auditoria.
-2. Implementar repositório, consultas ativas e cálculo de `HealthStatus`.
-3. Implementar formulário com catálogo filtrado por `PetType` e tipo customizado.
-4. Integrar agrupamento, indicadores visuais, edição e exclusão.
+1. Model `VaccinationEntryEntity` with the pet key and audit metadata.
+2. Implement the repository, active queries, and `HealthStatus` calculation.
+3. Implement the form with a catalog filtered by `PetType` and a custom type.
+4. Integrate grouping, visual indicators, editing, and deletion.
 
-## Arquitetura
+## Architecture
 
-- Room mantém as doses; o domínio calcula status a partir de `nextDueDate` e da data atual.
-- `VaccinationViewModel` acessa o repositório e expõe estado para `VaccinationFormScreen` e `VaccinationRecordsScreen`.
-- Salvar ou excluir uma dose pode acionar tarefas automáticas da spec `0005`.
+- Room stores the doses; the domain calculates status from `nextDueDate` and the current date.
+- `VaccinationViewModel` accesses the repository and exposes state to `VaccinationFormScreen` and `VaccinationRecordsScreen`.
+- Saving or deleting a dose may trigger automated tasks from spec `0005`.
 
-## Dependências e riscos
+## Dependencies and risks
 
-- Depende de `0001`; integra opcionalmente com `0005`.
-- O cálculo de dias deve ser determinístico e testável com relógio controlado.
+- Depends on `0001`; optionally integrates with `0005`.
+- Day calculation must be deterministic and testable with a controlled clock.

@@ -1,33 +1,33 @@
-# Tarefas: Pareamento de dispositivos
+# Tasks: Device pairing
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Disponibilizar descoberta e persistência do grupo** (test-type: integration)
-  - blocked-by: nenhum
-  - summary: integrar Nearby, permissões, UI, repositórios e DataStore.
-  - desired behavior: o app inicia ou encerra advertising/discovery e mantém a identidade local do grupo.
-  - acceptance criteria: os componentes existem no fluxo atual sem dependência de cloud.
+- [x] **Provide discovery and group persistence** (test-type: integration)
+  - blocked-by: none
+  - summary: integrate Nearby, permissions, UI, repositories, and DataStore.
+  - desired behavior: the app starts or stops advertising/discovery and retains the local group identity.
+  - acceptance criteria: the components exist in the current flow without a cloud dependency.
   - verification: `./gradlew test`
 
-- [ ] **Autorizar o pareamento com código de quatro dígitos** (test-type: both)
-  - blocked-by: descoberta e persistência do grupo
-  - summary: gerar, exibir, receber, validar e expirar o código.
-  - desired behavior: somente o receptor com o código correto conclui o pareamento.
-  - acceptance criteria: código correto conecta; incorreto é rejeitado; nova tentativa é possível.
+- [ ] **Authorize pairing with a four-digit code** (test-type: both)
+  - blocked-by: discovery and group persistence
+  - summary: generate, display, receive, validate, and expire the code.
+  - desired behavior: only the receiver with the correct code completes pairing.
+  - acceptance criteria: the correct code connects; an incorrect code is rejected; another attempt is allowed.
   - verification: `./gradlew test`
 
-- [ ] **Tornar cancelamento e falhas atômicos** (test-type: both)
-  - blocked-by: autorização por código
-  - summary: limpar advertising, discovery, conexão e estado incompleto.
-  - desired behavior: interrupções nunca deixam chave ou membro parcialmente persistidos.
-  - acceptance criteria: cancelar ou perder o endpoint retorna ao estado inicial sem dados residuais.
+- [ ] **Make cancellation and failures atomic** (test-type: both)
+  - blocked-by: code authorization
+  - summary: clean up advertising, discovery, the connection, and incomplete state.
+  - desired behavior: interruptions never leave a partially persisted key or member.
+  - acceptance criteria: cancelling or losing the endpoint returns to the initial state without residual data.
   - verification: `./gradlew test`
 
-- [ ] **Validar pareamento ponta a ponta em dois dispositivos** (test-type: integration)
-  - blocked-by: autorização por código; cancelamento e falhas atômicos
-  - summary: executar a matriz de aceite em hardware real.
-  - desired behavior: pareamento funciona com e sem internet e respeita permissões.
-  - acceptance criteria: dois dispositivos persistem a mesma chave; código inválido e cancelamento não pareiam.
+- [ ] **Validate end-to-end pairing on two devices** (test-type: integration)
+  - blocked-by: code authorization; atomic cancellation and failures
+  - summary: run the acceptance matrix on physical hardware.
+  - desired behavior: pairing works with and without an internet connection and respects permissions.
+  - acceptance criteria: two devices persist the same key; an invalid code and cancellation do not pair them.
   - verification: `./gradlew assembleDebug && ./gradlew installDebug`

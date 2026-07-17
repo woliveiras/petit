@@ -1,31 +1,31 @@
-# Tarefas: Acompanhamento de peso
+# Tasks: Weight tracking
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Registrar peso em gramas ou quilos** (test-type: both)
+- [x] **Record weight in grams or kilograms** (test-type: both)
   - blocked-by: 0001
-  - desired behavior: validar, converter para gramas e persistir uma pesagem.
-  - acceptance criteria: apenas valores entre 0 e 50 kg e datas não futuras são aceitos.
+  - desired behavior: validate, convert to grams, and persist a weight entry.
+  - acceptance criteria: only values between 0 and 50 kg and non-future dates are accepted.
   - verification: `./gradlew test`
-- [x] **Manter uma pesagem por pet e dia** (test-type: integration)
-  - blocked-by: registrar peso em gramas ou quilos
-  - desired behavior: substituir a entrada ativa quando pet e data coincidirem.
-  - acceptance criteria: a consulta retorna uma única entrada para o dia.
+- [x] **Keep one weight entry per pet per day** (test-type: integration)
+  - blocked-by: record weight in grams or kilograms
+  - desired behavior: replace the active entry when the pet and date match.
+  - acceptance criteria: the query returns a single entry for the day.
   - verification: `./gradlew test`
-- [x] **Exibir histórico e gráfico de evolução** (test-type: integration)
-  - blocked-by: registrar peso em gramas ou quilos
-  - desired behavior: ordenar entradas e renderizar gráfico de barras em kg.
-  - acceptance criteria: histórico decrescente e gráfico atualizam após mudanças.
+- [x] **Display history and weight-change chart** (test-type: integration)
+  - blocked-by: record weight in grams or kilograms
+  - desired behavior: sort entries and render a bar chart in kg.
+  - acceptance criteria: the descending history and chart update after changes.
   - verification: `./gradlew test`
-- [x] **Editar e excluir uma pesagem** (test-type: both)
-  - blocked-by: exibir histórico e gráfico de evolução
-  - desired behavior: atualizar valor/`updatedAt` e realizar soft delete.
-  - acceptance criteria: lista e gráfico refletem edição e exclusão.
+- [x] **Edit and delete a weight entry** (test-type: both)
+  - blocked-by: display history and weight-change chart
+  - desired behavior: update the value/`updatedAt` and perform a soft delete.
+  - acceptance criteria: the list and chart reflect edits and deletions.
   - verification: `./gradlew test`
-- [ ] **Adicionar regressões automatizadas de peso** (test-type: both)
-  - blocked-by: editar e excluir uma pesagem
-  - desired behavior: cobrir conversão, limites, upsert e consultas.
-  - acceptance criteria: suíte automatizada protege todos os critérios da spec.
+- [ ] **Add automated weight regression tests** (test-type: both)
+  - blocked-by: edit and delete a weight entry
+  - desired behavior: cover conversion, limits, upsert, and queries.
+  - acceptance criteria: the automated suite protects all spec criteria.
   - verification: `./gradlew test`

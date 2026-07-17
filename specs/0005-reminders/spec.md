@@ -1,6 +1,6 @@
 ---
 spec: "0005"
-title: Tarefas e lembretes locais
+title: Local tasks and reminders
 family: pet-care
 phase: 1
 status: Implemented
@@ -9,34 +9,34 @@ depends_on: ["0001"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Tarefas e lembretes locais
+# Spec: Local tasks and reminders
 
-## Contexto e motivação
+## Context and motivation
 
-O tutor precisa ser lembrado de cuidados pendentes mesmo sem conexão. O conceito histórico de lembrete evoluiu para tarefas one-shot.
+The caregiver needs reminders about pending care even while offline. The original reminder concept evolved into one-shot tasks.
 
-## Requisitos funcionais
+## Functional requirements
 
-- Criar tarefas automáticas para próximas vacinas, desparasitações e pesagens periódicas habilitadas.
-- Criar e editar tarefa customizada, opcionalmente associada a um pet.
-- Agendar notificação local com WorkManager e concluir ou excluir tarefas.
-- Cancelar agendamento e soft-delete da tarefa vinculada quando o registro de saúde é excluído.
-- Configurar categorias, antecedência, intervalo de pesagem e horário padrão.
-- Filtrar tarefas ativas e exibir histórico de concluídas.
+- Create automatic tasks for upcoming vaccinations, deworming treatments, and enabled periodic weigh-ins.
+- Create and edit a custom task, optionally associated with a pet.
+- Schedule a local notification with WorkManager and complete or delete tasks.
+- Cancel the schedule and soft-delete the linked task when the health record is deleted.
+- Configure categories, advance notice, weigh-in interval, and default time.
+- Filter active tasks and display completed-task history.
 
-## Critérios de aceite
+## Acceptance criteria
 
-- Dada uma próxima dose, quando salva o registro, então uma tarefa vinculada é criada e agendada conforme preferências.
-- Dado lembrete de pesagem habilitado, quando salva uma pesagem, então a próxima tarefa é criada no intervalo configurado.
-- Dada uma tarefa customizada futura, quando salva, então fica `PENDING` e recebe notificação local no horário.
-- Dada uma tarefa pendente, quando conclui, então fica `COMPLETED`, sai da lista ativa e o agendamento é cancelado.
-- Dado um registro vinculado excluído, então suas tarefas são soft-deletadas e os trabalhos cancelados.
-- Dado o dispositivo offline, então a notificação local continua funcionando.
+- Given a next dose, When the record is saved, Then a linked task is created and scheduled according to preferences.
+- Given weigh-in reminders are enabled, When a weigh-in is saved, Then the next task is created at the configured interval.
+- Given a future custom task, When it is saved, Then it becomes `PENDING` and receives a local notification at the scheduled time.
+- Given a pending task, When it is completed, Then it becomes `COMPLETED`, leaves the active list, and its schedule is canceled.
+- Given a deleted linked record, Then its tasks are soft-deleted and its jobs are canceled.
+- Given the device is offline, Then the local notification continues to work.
 
-## Estratégia de testes
+## Test strategy
 
-Unitários cobrem preferências, datas e mapeamentos; integração cobre Room, AutoTaskService e WorkManager; UI cobre formulários, filtros e conclusão.
+Unit tests cover preferences, dates, and mappings; integration tests cover Room, AutoTaskService, and WorkManager; UI tests cover forms, filters, and completion.
 
-## Fora de escopo
+## Out of scope
 
-- Repetição automática de tarefas e snooze de notificações.
+- Automatic task recurrence and notification snooze.

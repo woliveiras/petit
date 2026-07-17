@@ -1,23 +1,23 @@
-# Plano: Dashboard inicial
+# Plan: Home dashboard
 
 Spec: [spec.md](./spec.md)
 
-## Sequenciamento
+## Sequence
 
-1. Agregar pets, tarefas, timeline e último peso no `HomeViewModel`.
-2. Calcular `PetWithSummary` e o estado vazio sem bloquear a UI.
-3. Implementar cards, próximas tarefas, atividade recente e pull-to-refresh.
-4. Integrar navegação para perfil, listas completas, configurações e Quick Add.
-5. Avaliar separação visual de alertas e estado global saudável.
+1. Aggregate pets, tasks, timeline, and latest weight in `HomeViewModel`.
+2. Calculate `PetWithSummary` and the empty state without blocking the UI.
+3. Implement cards, upcoming tasks, recent activity, and pull-to-refresh.
+4. Integrate navigation to the profile, full lists, settings, and Quick Add.
+5. Evaluate visual separation of alerts and the overall healthy state.
 
-## Arquitetura
+## Architecture
 
-- `HomeViewModel` combina `PetRepository`, `TaskRepository`, `TimelineRepository`, `WeightEntryRepository` e resumo de saúde.
-- `HomeUiState` representa carregamento, refresh, pets, tarefas e eventos.
-- `QuickAddScreen` oferece cinco ações; `PetSelectionScreen` intermedeia ações que exigem um pet.
-- `ActivityTimelineScreen` oferece filtros por período e pet.
+- `HomeViewModel` combines `PetRepository`, `TaskRepository`, `TimelineRepository`, `WeightEntryRepository`, and the health summary.
+- `HomeUiState` represents loading, refresh, pets, tasks, and events.
+- `QuickAddScreen` provides five actions; `PetSelectionScreen` mediates actions that require a pet.
+- `ActivityTimelineScreen` provides filters by period and pet.
 
-## Dependências e riscos
+## Dependencies and risks
 
-- Depende de `0001`–`0005`; falhas parciais de uma fonte não devem ocultar todo o dashboard.
-- Agregações por pet precisam evitar consultas excessivas e estados inconsistentes.
+- Depends on `0001`–`0005`; partial failures from one source must not hide the entire dashboard.
+- Per-pet aggregations must avoid excessive queries and inconsistent states.

@@ -1,47 +1,47 @@
-# Tarefas: Sincronização na rede local
+# Tasks: Local network sync
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [ ] **Definir um protocolo local versionado e autenticado** (test-type: unit)
-  - blocked-by: specs 0101 e 0103 aprovadas
-  - summary: modelar mensagens, limites, erros, ACK e regra para sessões simultâneas.
-  - desired behavior: nenhuma entidade é enviada antes de validar versão, chave e membro.
-  - acceptance criteria: mensagens válidas round-trip; chave/versão inválida encerra a sessão.
+- [ ] **Define a versioned, authenticated local protocol** (test-type: unit)
+  - blocked-by: approved specs 0101 and 0103
+  - summary: model messages, limits, errors, ACK, and the rule for simultaneous sessions.
+  - desired behavior: no entity is sent before validating the version, key, and member.
+  - acceptance criteria: valid messages round-trip; an invalid key/version closes the session.
   - verification: `./gradlew test`
 
-- [ ] **Descobrir pares com NSD durante o foreground** (test-type: integration)
-  - blocked-by: protocolo local
-  - summary: registrar, descobrir, resolver e filtrar `_petit._tcp` com lifecycle e timeout.
-  - desired behavior: pares são encontrados sem anunciar indefinidamente fora do app.
-  - acceptance criteria: encontra o outro processo, ignora a si mesmo e libera listeners em `ON_STOP`.
+- [ ] **Discover peers with NSD in the foreground** (test-type: integration)
+  - blocked-by: local protocol
+  - summary: register, discover, resolve, and filter `_petit._tcp` with lifecycle and timeout.
+  - desired behavior: peers are found without advertising indefinitely outside the app.
+  - acceptance criteria: finds the other process, ignores itself, and releases listeners in `ON_STOP`.
   - verification: `./gradlew test`
 
-- [ ] **Sincronizar changesets por TCP de forma idempotente** (test-type: both)
-  - blocked-by: protocolo local; descoberta NSD; spec 0105
-  - summary: trocar lotes bidirecionais, aplicar em transação e confirmar com ACK.
-  - desired behavior: repetição e queda de conexão convergem sem duplicar ou perder dados.
-  - acceptance criteria: dois processos convergem; ACK perdido permite reenvio seguro.
+- [ ] **Sync changesets over TCP idempotently** (test-type: both)
+  - blocked-by: local protocol; NSD discovery; spec 0105
+  - summary: exchange bidirectional batches, apply them in a transaction, and acknowledge with ACK.
+  - desired behavior: retries and connection loss converge without duplicating or losing data.
+  - acceptance criteria: two processes converge; a lost ACK allows a safe resend.
   - verification: `./gradlew test`
 
-- [ ] **Agendar tentativas econômicas em background** (test-type: integration)
-  - blocked-by: sync TCP
-  - summary: criar trabalho periódico único com rede conectada e backoff.
-  - desired behavior: Android agenda tentativas sem serviço contínuo ou Wi-Fi Direct persistente.
-  - acceptance criteria: constraints, periodicidade mínima e política de unicidade são verificadas.
+- [ ] **Schedule power-efficient background attempts** (test-type: integration)
+  - blocked-by: TCP sync
+  - summary: create unique periodic work with a connected network and backoff.
+  - desired behavior: Android schedules attempts without a continuous service or persistent Wi-Fi Direct.
+  - acceptance criteria: constraints, minimum periodicity, and uniqueness policy are verified.
   - verification: `./gradlew test`
 
-- [ ] **Expor configuração e estado de sincronização** (test-type: both)
-  - blocked-by: sync TCP; trabalho periódico
-  - summary: implementar on/off, tentativa manual e indicador global acessível.
-  - desired behavior: pessoa entende e controla a sincronização local.
-  - acceptance criteria: desativar para NSD/worker; estados são localizados e não dependem só de cor.
+- [ ] **Expose sync settings and state** (test-type: both)
+  - blocked-by: TCP sync; periodic work
+  - summary: implement on/off, a manual attempt, and an accessible global indicator.
+  - desired behavior: the user understands and controls local syncing.
+  - acceptance criteria: disabling stops NSD/the worker; states are localized and do not rely only on color.
   - verification: `./gradlew test`
 
-- [ ] **Validar sincronização LAN em dois dispositivos** (test-type: integration)
-  - blocked-by: configuração e estado
-  - summary: testar mesma Wi-Fi, mudanças bidirecionais, reconexão, background e chave inválida.
-  - desired behavior: dispositivos convergem com consumo e lifecycle previstos.
-  - acceptance criteria: todos os critérios da spec passam em hardware real.
+- [ ] **Validate LAN sync on two devices** (test-type: integration)
+  - blocked-by: settings and state
+  - summary: test the same Wi-Fi network, bidirectional changes, reconnection, background, and an invalid key.
+  - desired behavior: devices converge with the expected power usage and lifecycle.
+  - acceptance criteria: all spec criteria pass on real hardware.
   - verification: `./gradlew assembleDebug && ./gradlew installDebug`

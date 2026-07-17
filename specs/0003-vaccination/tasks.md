@@ -1,31 +1,31 @@
-# Tarefas: Registro de vacinação
+# Tasks: Vaccination records
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Registrar e editar uma vacinação** (test-type: both)
+- [x] **Record and edit a vaccination** (test-type: both)
   - blocked-by: 0001
-  - desired behavior: validar datas, tipo por espécie, `OTHER` e rastreabilidade.
-  - acceptance criteria: registro válido é persistido e edição atualiza `updatedAt`.
+  - desired behavior: validate dates, type by species, `OTHER`, and traceability details.
+  - acceptance criteria: a valid record is persisted, and editing updates `updatedAt`.
   - verification: `./gradlew test`
-- [x] **Calcular e mostrar o status da dose** (test-type: unit)
-  - blocked-by: registrar e editar uma vacinação
-  - desired behavior: classificar próxima dose como `OK`, `SCHEDULED` ou `OVERDUE`.
-  - acceptance criteria: limites de 30 dias e ausência de próxima dose seguem a spec.
+- [x] **Calculate and display the dose status** (test-type: unit)
+  - blocked-by: record and edit a vaccination
+  - desired behavior: classify the next dose as `OK`, `SCHEDULED`, or `OVERDUE`.
+  - acceptance criteria: the 30-day thresholds and absence of a next dose follow the spec.
   - verification: `./gradlew test`
-- [x] **Exibir e excluir o histórico de vacinas** (test-type: both)
-  - blocked-by: calcular e mostrar o status da dose
-  - desired behavior: exibir doses por mês, destacar tipos/status e permitir soft delete.
-  - acceptance criteria: histórico e estado visual atualizam após exclusão.
+- [x] **Display and delete vaccination history** (test-type: both)
+  - blocked-by: calculate and display the dose status
+  - desired behavior: display doses by month, highlight types/statuses, and allow soft deletion.
+  - acceptance criteria: the history and visual state update after deletion.
   - verification: `./gradlew test`
-- [ ] **Oferecer histórico agrupado por tipo** (test-type: integration)
-  - blocked-by: exibir e excluir o histórico de vacinas
-  - desired behavior: reunir as doses de cada tipo sem perder a cronologia completa.
-  - acceptance criteria: cada tipo mostra status atual e acesso a todas as suas doses.
+- [ ] **Provide history grouped by type** (test-type: integration)
+  - blocked-by: display and delete vaccination history
+  - desired behavior: group doses of each type without losing the full chronology.
+  - acceptance criteria: each type shows its current status and provides access to all its doses.
   - verification: `./gradlew test`
-- [ ] **Adicionar regressões automatizadas de vacinação** (test-type: both)
-  - blocked-by: oferecer histórico agrupado por tipo
-  - desired behavior: cobrir cálculo, validações, catálogo, persistência e UI.
-  - acceptance criteria: todos os critérios de aceite têm cobertura automatizada.
+- [ ] **Add automated vaccination regression tests** (test-type: both)
+  - blocked-by: provide history grouped by type
+  - desired behavior: cover calculation, validation, catalog, persistence, and UI.
+  - acceptance criteria: all acceptance criteria have automated coverage.
   - verification: `./gradlew test`

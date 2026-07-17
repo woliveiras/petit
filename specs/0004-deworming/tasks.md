@@ -1,26 +1,26 @@
-# Tarefas: Registro de desparasitação
+# Tasks: Deworming records
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Registrar, editar e excluir desparasitação** (test-type: both)
+- [x] **Record, edit, and delete deworming treatments** (test-type: both)
   - blocked-by: 0001
-  - desired behavior: validar e persistir `INTERNAL`, `EXTERNAL` ou `BOTH`, com soft delete.
-  - acceptance criteria: medicamento obrigatório, datas válidas e histórico decrescente.
+  - desired behavior: validate and persist `INTERNAL`, `EXTERNAL`, or `BOTH`, with soft delete.
+  - acceptance criteria: required medication, valid dates, and descending history.
   - verification: `./gradlew test`
-- [x] **Calcular e mostrar status por registro** (test-type: unit)
-  - blocked-by: registrar, editar e excluir desparasitação
-  - desired behavior: classificar cada próxima dose e exibir seu indicador.
-  - acceptance criteria: estados `OK`, `SCHEDULED` e `OVERDUE` seguem as datas.
+- [x] **Calculate and display per-record status** (test-type: unit)
+  - blocked-by: record, edit, and delete deworming treatments
+  - desired behavior: classify each next dose and display its indicator.
+  - acceptance criteria: states `OK`, `SCHEDULED`, and `OVERDUE` follow the dates.
   - verification: `./gradlew test`
-- [ ] **Separar a saúde por categoria** (test-type: both)
-  - blocked-by: calcular e mostrar status por registro
-  - desired behavior: mostrar seções interna e externa usando o registro aplicável mais recente.
-  - acceptance criteria: `BOTH` conta nas duas categorias e cada seção tem status próprio.
+- [ ] **Separate health status by category** (test-type: both)
+  - blocked-by: calculate and display per-record status
+  - desired behavior: display internal and external sections using the latest applicable record.
+  - acceptance criteria: `BOTH` counts in both categories, and each section has its own status.
   - verification: `./gradlew test`
-- [ ] **Adicionar regressões automatizadas de desparasitação** (test-type: both)
-  - blocked-by: separar a saúde por categoria
-  - desired behavior: cobrir validações, status, categorias, Room e UI.
-  - acceptance criteria: todos os critérios de aceite têm cobertura automatizada.
+- [ ] **Add automated deworming regression tests** (test-type: both)
+  - blocked-by: separate health status by category
+  - desired behavior: cover validation, status, categories, Room, and UI.
+  - acceptance criteria: all acceptance criteria have automated coverage.
   - verification: `./gradlew test`

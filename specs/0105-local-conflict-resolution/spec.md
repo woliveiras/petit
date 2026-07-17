@@ -1,6 +1,6 @@
 ---
 spec: "0105"
-title: Resolução local de conflitos
+title: Local conflict resolution
 family: local-sharing
 phase: 2
 status: In Progress
@@ -9,81 +9,81 @@ depends_on: ["0102"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Resolução local de conflitos
+# Spec: Local conflict resolution
 
-## Contexto e motivação
+## Context and motivation
 
-Duas pessoas cuidadoras podem editar ou excluir o mesmo registro antes de seus
-dispositivos voltarem a se comunicar. O Petit precisa convergir sem intervenção
-e sem perder silenciosamente uma alteração. A regra histórica é last-write-wins
-por `updatedAt`, complementada por tratamento explícito de soft delete.
+Two caregivers may edit or delete the same record before their devices
+communicate again. Petit must converge without intervention and without
+silently losing a change. The established rule is last-write-wins by
+`updatedAt`, complemented by explicit soft-delete handling.
 
-## Estado atual
+## Current state
 
-O merge existente compara `updatedAt` e grava `SyncLog`. Não há um
-`ConflictResolver` dedicado, interface de histórico nem testes para todos os
-casos de soft delete. Timestamps iguais com payloads diferentes não têm regra
-de desempate; portanto, simetria ainda não pode ser garantida.
+The existing merge compares `updatedAt` and writes a `SyncLog`. There is no
+dedicated `ConflictResolver`, history UI, or tests for all soft-delete cases.
+Equal timestamps with different payloads have no tie-breaking rule, so symmetry
+cannot yet be guaranteed.
 
-## Requisitos
+## Requirements
 
-### Funcionais
+### Functional
 
-- [x] Inserir entidade remota cujo UUID não existe localmente.
-- [x] Preferir a versão com `updatedAt` mais recente no merge atual.
-- [x] Registrar operações em `SyncLog`.
-- [ ] Resolver soft delete comparando a exclusão com a edição concorrente.
-- [ ] Definir desempate estável para timestamps iguais e payloads diferentes.
-- [ ] Centralizar a regra para que transferência pontual e LAN produzam o mesmo resultado.
-- [ ] Garantir determinismo, idempotência e simetria com testes.
-- [ ] Exibir histórico de sync com enviados, recebidos e conflitos resolvidos.
+- [x] Insert a remote entity whose UUID does not exist locally.
+- [x] Prefer the version with the most recent `updatedAt` in the current merge.
+- [x] Record operations in `SyncLog`.
+- [ ] Resolve a soft delete by comparing the deletion with the concurrent edit.
+- [ ] Define a stable tie-breaker for equal timestamps and different payloads.
+- [ ] Centralize the rule so one-off transfers and LAN produce the same result.
+- [ ] Ensure determinism, idempotency, and symmetry with tests.
+- [ ] Display sync history with sent, received, and resolved conflict counts.
 
-### Não funcionais
+### Non-functional
 
-- [ ] Integridade: aplicar cada lote em uma transação.
-- [ ] Auditabilidade: registrar peer, tipo, horário e contadores sem dados clínicos no log.
-- [ ] Performance: processar por UUID com consultas/lotes apropriados.
-- [ ] Privacidade: manter logs localmente e sem conteúdo sensível desnecessário.
+- [ ] Integrity: apply each batch in a transaction.
+- [ ] Auditability: record the peer, type, time, and counts without clinical data in the log.
+- [ ] Performance: process by UUID with appropriate queries/batches.
+- [ ] Privacy: keep logs local and free of unnecessary sensitive content.
 
 ## Test strategy
 
-Testes unitários tabelados cobrem todas as combinações local/remota, incluindo
-ausência, edição, exclusão, timestamps iguais e repetição. Testes de integração
-cobrem Room, transação, `SyncLog` e os mesmos resultados via spec 0102. Depois,
-a spec 0104 deve reutilizar exatamente o mesmo resolver.
+Table-driven unit tests cover all local/remote combinations, including absence,
+edits, deletion, equal timestamps, and retries. Integration tests cover Room,
+transactions, `SyncLog`, and the same results through spec 0102. Spec 0104 must
+then reuse exactly the same resolver.
 
-## Critérios de aceitação
+## Acceptance criteria
 
-- [ ] Dadas duas versões com timestamps distintos, quando são resolvidas em qualquer ordem, então a versão com `updatedAt` mais recente prevalece.
-- [ ] Dado um UUID remoto inexistente, quando o lote é aplicado, então o registro é inserido uma única vez.
-- [ ] Dado um soft delete e uma edição concorrente, quando são comparados, então o evento efetivamente mais recente prevalece.
-- [ ] Dados timestamps iguais e payloads diferentes, quando são resolvidos em ambos os dispositivos, então o desempate documentado produz o mesmo resultado.
-- [ ] Dado o mesmo changeset aplicado repetidamente, quando o merge termina, então estado e contadores não mudam após a primeira aplicação.
-- [ ] Dada uma sincronização concluída, quando o histórico é aberto, então mostra peer, horário, tipo e contadores corretos.
-- [ ] Dada uma falha durante o lote, quando a transação é revertida, então entidades e log permanecem consistentes.
+- [ ] Given two versions with different timestamps, when they are resolved in either order, then the version with the most recent `updatedAt` prevails.
+- [ ] Given a remote UUID that does not exist locally, when the batch is applied, then the record is inserted exactly once.
+- [ ] Given a soft delete and a concurrent edit, when they are compared, then the event that is actually newer prevails.
+- [ ] Given equal timestamps and different payloads, when they are resolved on both devices, then the documented tie-breaker produces the same result.
+- [ ] Given the same changeset applied repeatedly, when the merge finishes, then the state and counts do not change after the first application.
+- [ ] Given a completed sync, when the history is opened, then it shows the correct peer, time, type, and counts.
+- [ ] Given a failure during the batch, when the transaction is rolled back, then the entities and log remain consistent.
 
-## Casos extremos
+## Edge cases
 
-- `updatedAt` igual com um lado deletado.
-- Relógio local retrocede ou diverge do outro dispositivo.
-- Entidade filha chega antes do pet pai.
-- Mesmo soft delete é reaplicado.
-- Lote contém versões duplicadas do mesmo UUID.
-- Falha depois das entidades e antes do log.
+- Equal `updatedAt` with one side deleted.
+- The local clock moves backward or diverges from the other device.
+- A child entity arrives before its parent pet.
+- The same soft delete is reapplied.
+- A batch contains duplicate versions of the same UUID.
+- Failure after the entities and before the log.
 
-## Decisões
+## Decisions
 
-| Decisão | Escolha | Justificativa |
+| Decision | Choice | Rationale |
 | --- | --- | --- |
-| Regra principal | Last-write-wins por `updatedAt` | Preserva a regra já usada e é simples quando timestamps diferem. |
-| Exclusão | `deletedAt` participa como evento concorrente | Uma edição posterior pode desfazer uma exclusão anterior. |
-| Implementação | Resolver único e puro | Evita divergência entre importação Nearby e futura sincronização LAN. |
-| Empate | Decisão pendente antes da implementação final | Sem uma chave estável adicional, “manter local” quebra simetria. |
-| Auditoria | `SyncLog` local com metadados e contadores | Permite diagnosticar sem duplicar conteúdo de saúde. |
+| Primary rule | Last-write-wins by `updatedAt` | Preserves the existing rule and is simple when timestamps differ. |
+| Deletion | `deletedAt` participates as a concurrent event | A later edit can undo an earlier deletion. |
+| Implementation | Single pure resolver | Prevents divergence between Nearby import and future LAN sync. |
+| Tie | Decision pending before final implementation | Without an additional stable key, “keep local” breaks symmetry. |
+| Audit | Local `SyncLog` with metadata and counts | Supports diagnosis without duplicating health content. |
 
-## Fora de escopo
+## Out of scope
 
-- Edição colaborativa em tempo real.
-- Interface para a pessoa escolher manualmente cada conflito.
-- Restaurar versões históricas de um registro.
-- Transporte ou descoberta entre dispositivos.
+- Real-time collaborative editing.
+- UI for manually choosing each conflict.
+- Restoring historical versions of a record.
+- Transport or discovery between devices.

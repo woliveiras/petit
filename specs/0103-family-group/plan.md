@@ -1,41 +1,41 @@
-# Plano: Grupo familiar local
+# Plan: Local family group
 
 Spec: [spec.md](./spec.md)
 
-## Estado de partida
+## Starting point
 
-O app já lista e remove membros localmente, permite sair do grupo e persiste as
-preferências necessárias. A próxima execução deve acrescentar identidade
-editável e tornar mudanças de membresia parte do protocolo de sincronização.
+The app already lists and removes members locally, allows users to leave the
+group, and persists the required preferences. The next implementation should
+add an editable identity and make membership changes part of the sync protocol.
 
-## Sequência de implementação
+## Implementation sequence
 
-1. Cobrir o estado existente de lista, remoção e saída com testes de regressão.
-2. Implementar renomeação por ID local estável e persistir o nome no DataStore/Room.
-3. Modelar renomeação, remoção e saída como mudanças sincronizáveis e idempotentes.
-4. Rejeitar conexões de identidades removidas ou com chave revogada.
-5. Exibir a última sincronização conhecida e estados vazios na tela do grupo.
-6. Validar propagação e preservação dos dados em dois dispositivos.
+1. Cover the existing list, removal, and departure behavior with regression tests.
+2. Implement renaming by stable local ID and persist the name in DataStore/Room.
+3. Model renaming, removal, and departure as syncable, idempotent changes.
+4. Reject connections from removed identities or identities with a revoked key.
+5. Display the last known sync and empty states on the group screen.
+6. Validate propagation and data preservation on two devices.
 
-## Dependências e integração
+## Dependencies and integration
 
-- Depende da identidade e da chave estabelecidas pela spec 0101.
-- A propagação manual pode usar a spec 0102.
-- A propagação automática futura usa a spec 0104.
-- Resolução idempotente segue a spec 0105.
+- Depends on the identity and key established by spec 0101.
+- Manual propagation can use spec 0102.
+- Future automatic propagation uses spec 0104.
+- Idempotent resolution follows spec 0105.
 
-## Riscos e mitigação
+## Risks and mitigation
 
-| Risco | Mitigação |
+| Risk | Mitigation |
 | --- | --- |
-| Dispositivo removido volta a aparecer | Propagar marcador de remoção e validar autorização antes de sincronizar. |
-| Nome usado como identidade | Manter UUID imutável separado do nome editável. |
-| Saída apaga dados de saúde | Isolar limpeza de membresia das tabelas de pets e testar essa fronteira. |
-| Mudanças offline divergem | Aplicar eventos de membresia de forma determinística e idempotente. |
+| Removed device reappears | Propagate a removal marker and validate authorization before syncing. |
+| Name used as identity | Keep the immutable UUID separate from the editable name. |
+| Leaving deletes health data | Isolate membership cleanup from pet tables and test this boundary. |
+| Offline changes diverge | Apply membership events deterministically and idempotently. |
 
-## Verificação final
+## Final verification
 
-1. Executar `./gradlew spotlessCheck` e `./gradlew test`.
-2. Executar `./gradlew assembleDebug && ./gradlew installDebug`.
-3. Em dois dispositivos, validar renomear, remover, sair e reencontrar o par.
-4. Confirmar que a chave antiga é recusada e que os dados dos pets permanecem.
+1. Run `./gradlew spotlessCheck` and `./gradlew test`.
+2. Run `./gradlew assembleDebug && ./gradlew installDebug`.
+3. On two devices, validate renaming, removing, leaving, and reconnecting with the peer.
+4. Confirm that the old key is rejected and that pet data remains.

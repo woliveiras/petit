@@ -1,6 +1,6 @@
 ---
 spec: "0101"
-title: Pareamento de dispositivos
+title: Device pairing
 family: local-sharing
 phase: 2
 status: In Progress
@@ -9,79 +9,79 @@ depends_on: []
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Pareamento de dispositivos
+# Spec: Device pairing
 
-## Contexto e motivação
+## Context and motivation
 
-Pessoas cuidadoras precisam autorizar dois dispositivos próximos a compartilhar
-os dados de saúde dos mesmos pets sem conta, servidor remoto ou internet. O
-Petit usa Nearby Connections para descoberta e transporte e persiste uma chave
-comum do grupo familiar depois do pareamento.
+Caregivers need to authorize two nearby devices to share health data for the
+same pets without an account, remote server, or internet connection. Petit uses
+Nearby Connections for discovery and transport, then persists a shared family
+group key after pairing.
 
-## Estado atual
+## Current state
 
-Nearby Connections, permissões, telas, repositórios e persistência já existem.
-A interface atual descobre dispositivos, mas ainda não permite que o receptor
-digite e valide o código de quatro dígitos previsto pelo fluxo. O pareamento
-completo também não foi validado em dois dispositivos reais.
+Nearby Connections, permissions, screens, repositories, and persistence are
+already in place. The current interface discovers devices but does not yet let
+the receiver enter and validate the four-digit code required by the flow. The
+complete pairing flow has also not been validated on two physical devices.
 
-## Requisitos
+## Requirements
 
-### Funcionais
+### Functional
 
-- [x] Iniciar e cancelar advertising ou discovery pelo fluxo de pareamento.
-- [x] Solicitar as permissões de Bluetooth e Wi-Fi exigidas pela versão do Android.
-- [x] Persistir a chave e a identidade local do grupo familiar.
-- [ ] Exibir ao transmissor um código de pareamento de quatro dígitos.
-- [ ] Permitir que o receptor informe o código e rejeitar códigos inválidos.
-- [ ] Trocar a mesma chave de grupo entre os dois dispositivos após validação.
-- [ ] Confirmar o pareamento sem acesso à internet.
-- [ ] Desfazer o pareamento sem apagar os dados locais.
+- [x] Start and cancel advertising or discovery through the pairing flow.
+- [x] Request the Bluetooth and Wi-Fi permissions required by the Android version.
+- [x] Persist the family group key and local identity.
+- [ ] Show the sender a four-digit pairing code.
+- [ ] Let the receiver enter the code and reject invalid codes.
+- [ ] Exchange the same group key between both devices after validation.
+- [ ] Confirm pairing without internet access.
+- [ ] Unpair without deleting local data.
 
-### Não funcionais
+### Non-functional
 
-- [ ] Segurança: aceitar a conexão somente após os dois lados validarem o mesmo código.
-- [x] Privacidade: não enviar dados a um servidor remoto durante o pareamento.
-- [ ] Acessibilidade: fornecer rótulos e alvos de toque de pelo menos 48 dp.
-- [ ] Internacionalização: manter textos visíveis em `strings.xml` para pt-BR, en e es.
-- [ ] Compatibilidade: apresentar fallback claro quando Google Play Services não estiver disponível.
+- [ ] Security: accept the connection only after both sides validate the same code.
+- [x] Privacy: do not send data to a remote server during pairing.
+- [ ] Accessibility: provide labels and touch targets of at least 48 dp.
+- [ ] Internationalization: keep visible text in `strings.xml` for pt-BR, en, and es.
+- [ ] Compatibility: provide a clear fallback when Google Play Services is unavailable.
 
 ## Test strategy
 
-Testes unitários cobrem geração/validação do código e transições de estado.
-Testes de integração cobrem DataStore, permissões e callbacks do Nearby. A
-aceitação final exige dois dispositivos Android reais, com o cenário repetido
-sem internet. Consulte a [pesquisa de protocolos](../../docs/local-sharing-protocols.md).
+Unit tests cover code generation/validation and state transitions. Integration
+tests cover DataStore, permissions, and Nearby callbacks. Final acceptance
+requires two physical Android devices, with the scenario repeated without an
+internet connection. See the [protocol research](../../docs/local-sharing-protocols.md).
 
-## Critérios de aceitação
+## Acceptance criteria
 
-- [ ] Dado um transmissor pronto, quando inicia o pareamento, então vê um código de quatro dígitos e o advertising fica ativo.
-- [ ] Dado um receptor próximo, quando informa o código correto, então os dispositivos estabelecem conexão e persistem a mesma chave do grupo.
-- [ ] Dado um código incorreto, quando o receptor tenta conectar, então a conexão é rejeitada e uma nova tentativa é permitida.
-- [ ] Dado um fluxo em espera, quando a pessoa cancela, então advertising e discovery são interrompidos e nenhum grupo incompleto permanece.
-- [ ] Dados Bluetooth ou Wi-Fi ativos e internet indisponível, quando o fluxo completo é executado, então o pareamento termina com sucesso.
-- [ ] Dado um dispositivo pareado, quando ele desfaz o pareamento, então perde a referência de sincronização e mantém os dados locais.
+- [ ] Given a ready sender, when pairing starts, then it displays a four-digit code and advertising becomes active.
+- [ ] Given a nearby receiver, when it enters the correct code, then the devices connect and persist the same group key.
+- [ ] Given an incorrect code, when the receiver tries to connect, then the connection is rejected and another attempt is allowed.
+- [ ] Given a waiting flow, when the person cancels, then advertising and discovery stop and no incomplete group remains.
+- [ ] Given active Bluetooth or Wi-Fi and no internet connection, when the complete flow runs, then pairing succeeds.
+- [ ] Given a paired device, when it unpairs, then it loses the synchronization reference and retains its local data.
 
-## Casos extremos
+## Edge cases
 
-- Permissão negada ou revogada durante descoberta.
-- Bluetooth e Wi-Fi indisponíveis.
-- Endpoint desaparece antes da validação.
-- Código expira, colide ou recebe tentativas repetidas.
-- Processo é recriado durante advertising ou discovery.
+- Permission denied or revoked during discovery.
+- Bluetooth and Wi-Fi unavailable.
+- Endpoint disappears before validation.
+- Code expires, collides, or receives repeated attempts.
+- Process is recreated during advertising or discovery.
 
-## Decisões
+## Decisions
 
-| Decisão | Escolha | Justificativa |
+| Decision | Choice | Rationale |
 | --- | --- | --- |
-| Transporte | Nearby Connections com `P2P_STAR` | Corresponde à implementação atual e abstrai BLE, Bluetooth e Wi-Fi Direct. |
-| Autorização inicial | Código de quatro dígitos | Permite confirmação presencial simples antes da troca da chave. |
-| Identidade do grupo | Chave persistida no DataStore | Mantém o fluxo local e permite autenticar transferências posteriores. |
-| Uso de Wi-Fi Direct | Somente transporte pontual gerenciado pelo Nearby | Evita mantê-lo ativo para sincronização contínua. |
+| Transport | Nearby Connections with `P2P_STAR` | Matches the current implementation and abstracts BLE, Bluetooth, and Wi-Fi Direct. |
+| Initial authorization | Four-digit code | Enables simple in-person confirmation before exchanging the key. |
+| Group identity | Key persisted in DataStore | Keeps the flow local and enables authentication of later transfers. |
+| Wi-Fi Direct usage | Only one-shot transport managed by Nearby | Avoids keeping it active for continuous synchronization. |
 
-## Fora de escopo
+## Out of scope
 
-- Transferir o conjunto de dados após parear; consulte a spec 0102.
-- Gerenciar membros já pareados; consulte a spec 0103.
-- Sincronização contínua pela rede local; consulte a spec 0104.
-- Login, Firebase ou qualquer serviço cloud.
+- Transferring the dataset after pairing; see spec 0102.
+- Managing already paired members; see spec 0103.
+- Continuous synchronization over the local network; see spec 0104.
+- Login, Firebase, or any cloud service.

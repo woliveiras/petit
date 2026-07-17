@@ -1,41 +1,41 @@
-# Plano: Transferência pontual de dados
+# Plan: One-shot data transfer
 
 Spec: [spec.md](./spec.md)
 
-## Estado de partida
+## Starting point
 
-O envio, a recepção, as opções de merge/replace e a apresentação já existem.
-O plano concentra a execução nas diferenças semânticas do replace, na
-atomicidade, na telemetria local de progresso e na validação em hardware.
+Sending, receiving, merge/replace options, and presentation already exist. The
+plan focuses the implementation on the semantic differences of replace,
+atomicity, local progress telemetry, and hardware validation.
 
-## Sequência de implementação
+## Implementation sequence
 
-1. Fixar a lista de entidades incluídas no `ExportBundle` e validar o payload antes da escrita.
-2. Cobrir o merge atual por UUID, `updatedAt` e soft delete com testes.
-3. Implementar replace transacional: limpar o conjunto compartilhável e importar o bundle.
-4. Descartar transferências incompletas e mapear erros recuperáveis na UI.
-5. Derivar progresso dos bytes efetivamente enviados/recebidos e gerar resumo do resultado.
-6. Validar merge, replace, repetição e interrupção em dois dispositivos.
+1. Fix the list of entities included in the `ExportBundle` and validate the payload before writing.
+2. Cover the current merge by UUID, `updatedAt`, and soft delete with tests.
+3. Implement transactional replace: clear the shareable dataset and import the bundle.
+4. Discard incomplete transfers and map recoverable errors to the UI.
+5. Derive progress from bytes actually sent/received and generate a result summary.
+6. Validate merge, replace, repetition, and interruption on two devices.
 
-## Dependências e integração
+## Dependencies and integration
 
-- Depende do canal autorizado pela spec 0101.
-- Usa Room como fonte local e o fluxo de exportação/importação existente.
-- Reutiliza as regras formalizadas na spec 0105.
-- Referência técnica: [protocolos de compartilhamento local](../../docs/local-sharing-protocols.md).
+- Depends on the channel authorized by spec 0101.
+- Uses Room as the local source and the existing export/import flow.
+- Reuses the rules formalized in spec 0105.
+- Technical reference: [local sharing protocols](../../docs/local-sharing-protocols.md).
 
-## Riscos e mitigação
+## Risks and mitigation
 
-| Risco | Mitigação |
+| Risk | Mitigation |
 | --- | --- |
-| Replace apaga dados antes de validar o bundle | Validar primeiro e executar limpeza/importação na mesma transação. |
-| Payload excede BYTES | Selecionar FILE para bundles grandes e verificar integridade ao final. |
-| Repetição duplica registros | Tornar merge idempotente por UUID. |
-| Conexão cai durante escrita | Só persistir depois de receber e validar o payload completo. |
+| Replace deletes data before validating the bundle | Validate first and run cleanup/import in the same transaction. |
+| Payload exceeds BYTES | Select FILE for large bundles and verify integrity at the end. |
+| Repetition duplicates records | Make merge idempotent by UUID. |
+| Connection drops during writing | Persist only after receiving and validating the complete payload. |
 
-## Verificação final
+## Final verification
 
-1. Executar `./gradlew spotlessCheck` e `./gradlew test`.
-2. Executar `./gradlew assembleDebug && ./gradlew installDebug`.
-3. Em dois dispositivos, validar merge, replace, ausência de internet e interrupção.
-4. Comparar a base final e os contadores exibidos com o bundle enviado.
+1. Run `./gradlew spotlessCheck` and `./gradlew test`.
+2. Run `./gradlew assembleDebug && ./gradlew installDebug`.
+3. On two devices, validate merge, replace, no internet connection, and interruption.
+4. Compare the final database and displayed counters with the sent bundle.

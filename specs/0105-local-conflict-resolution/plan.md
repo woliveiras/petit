@@ -1,51 +1,51 @@
-# Plano: Resolução local de conflitos
+# Plan: Local conflict resolution
 
 Spec: [spec.md](./spec.md)
 
-## Estado de partida
+## Starting point
 
-O merge por `updatedAt` e a gravação de `SyncLog` já existem. A execução deve
-primeiro caracterizar esse comportamento, decidir o empate ainda aberto e só
-então extrair uma regra única reutilizável.
+The `updatedAt` merge and `SyncLog` write already exist. Implementation should
+first characterize this behavior, decide the unresolved tie-breaker, and only
+then extract a single reusable rule.
 
-## Sequência de implementação
+## Implementation sequence
 
-1. Criar testes de caracterização para inserção, versão mais recente e log atuais.
-2. Escolher e documentar um desempate estável para timestamps iguais.
-3. Implementar um resolver puro que compare criação, edição e `deletedAt`.
-4. Cobrir determinismo, idempotência, simetria e lotes duplicados com testes tabelados.
-5. Integrar o resolver à transferência 0102 dentro de uma transação com `SyncLog`.
-6. Implementar consulta e tela de histórico com contadores corretos.
-7. Tornar o resolver a única regra consumida pela futura spec 0104.
+1. Create characterization tests for the current insertion, most recent version, and log behavior.
+2. Choose and document a stable tie-breaker for equal timestamps.
+3. Implement a pure resolver that compares creation, editing, and `deletedAt`.
+4. Cover determinism, idempotency, symmetry, and duplicate batches with table-driven tests.
+5. Integrate the resolver into transfer 0102 within a transaction with `SyncLog`.
+6. Implement the history query and screen with correct counts.
+7. Make the resolver the only rule consumed by future spec 0104.
 
-## Regra base a preservar
+## Base rule to preserve
 
-1. UUID ausente localmente: inserir a versão remota.
-2. Comparar eventos ativos e exclusões pelo instante efetivo mais recente.
-3. Evento remoto mais recente: atualizar ou aplicar soft delete.
-4. Evento local mais recente: manter local.
-5. Instantes iguais: aplicar o desempate estável ainda a decidir, nunca “manter local” em ambos os lados.
+1. UUID missing locally: insert the remote version.
+2. Compare active events and deletions by the most recent effective time.
+3. Newer remote event: update or apply the soft delete.
+4. Newer local event: keep the local version.
+5. Equal times: apply the stable tie-breaker still to be decided, never “keep local” on both sides.
 
-## Dependências e integração
+## Dependencies and integration
 
-- Depende do bundle e do merge exercitados pela spec 0102.
-- A spec 0104 dependerá deste resolver antes de aplicar changesets LAN.
-- Room fornece a fronteira transacional e `SyncLog` registra o resultado.
+- Depends on the bundle and merge tested by spec 0102.
+- Spec 0104 will depend on this resolver before applying LAN changesets.
+- Room provides the transaction boundary, and `SyncLog` records the result.
 
-## Riscos e mitigação
+## Risks and mitigation
 
-| Risco | Mitigação |
+| Risk | Mitigation |
 | --- | --- |
-| Empate produz resultados diferentes | Usar chave de desempate derivada de dados estáveis e testar as duas ordens. |
-| Delete posterior é perdido | Comparar `deletedAt` como evento, não apenas como flag. |
-| Resolver difere entre transportes | Expor uma única API pura usada por todos os importadores. |
-| Log diverge da transação | Persistir entidades e log na mesma fronteira transacional. |
-| Relógios incorretos | Documentar a limitação e preparar versão/ID lógico como evolução futura. |
+| Tie produces different results | Use a tie-break key derived from stable data and test both orders. |
+| Later deletion is lost | Compare `deletedAt` as an event, not only as a flag. |
+| Resolver differs between transports | Expose a single pure API used by all importers. |
+| Log diverges from the transaction | Persist entities and the log within the same transaction boundary. |
+| Incorrect clocks | Document the limitation and prepare a logical version/ID as a future evolution. |
 
-## Verificação final
+## Final verification
 
-1. Executar testes unitários tabelados nas duas ordens de entrada.
-2. Executar testes de integração de Room, rollback e histórico.
-3. Executar `./gradlew spotlessCheck` e `./gradlew test`.
-4. Executar o mesmo bundle duas vezes e confirmar estado/contadores idempotentes.
-5. Validar em dois dispositivos que edições e exclusões convergem.
+1. Run table-driven unit tests with both input orders.
+2. Run Room integration, rollback, and history tests.
+3. Run `./gradlew spotlessCheck` and `./gradlew test`.
+4. Run the same bundle twice and confirm idempotent state/counts.
+5. Validate on two devices that edits and deletions converge.

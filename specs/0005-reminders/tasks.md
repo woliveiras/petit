@@ -1,36 +1,36 @@
-# Tarefas: Tarefas e lembretes locais
+# Tasks: Local tasks and reminders
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [x] **Criar tarefas automáticas de cuidado** (test-type: both)
+- [x] **Create automatic care tasks** (test-type: both)
   - blocked-by: 0001
-  - desired behavior: criar/cancelar tarefas vinculadas a vacina, desparasitação e peso conforme preferências.
-  - acceptance criteria: tipo e referência corretos; exclusão do registro cancela e remove a tarefa ativa.
+  - desired behavior: create/cancel tasks linked to vaccination, deworming, and weight according to preferences.
+  - acceptance criteria: correct type and reference; deleting the record cancels and removes the active task.
   - verification: `./gradlew test`
-- [x] **Gerenciar tarefa personalizada** (test-type: both)
+- [x] **Manage a custom task** (test-type: both)
   - blocked-by: 0001
-  - desired behavior: criar, editar, concluir e listar tarefas customizadas.
-  - acceptance criteria: tarefa futura inicia `PENDING`; conclusão move para o histórico.
+  - desired behavior: create, edit, complete, and list custom tasks.
+  - acceptance criteria: a future task starts as `PENDING`; completion moves it to history.
   - verification: `./gradlew test`
-- [x] **Agendar notificação local one-shot** (test-type: integration)
-  - blocked-by: criar tarefas automáticas de cuidado, gerenciar tarefa personalizada
-  - desired behavior: agendar via WorkManager e notificar mesmo offline.
-  - acceptance criteria: execução usa a tarefa atual e `PendingIntent` imutável.
+- [x] **Schedule a one-shot local notification** (test-type: integration)
+  - blocked-by: create automatic care tasks, manage a custom task
+  - desired behavior: schedule via WorkManager and notify even while offline.
+  - acceptance criteria: execution uses the current task and an immutable `PendingIntent`.
   - verification: `./gradlew test`
-- [x] **Configurar e filtrar tarefas** (test-type: integration)
-  - blocked-by: gerenciar tarefa personalizada
-  - desired behavior: persistir preferências e filtrar por hoje, semana e mês.
-  - acceptance criteria: configurações sobrevivem ao reinício e filtros exibem tarefas esperadas.
+- [x] **Configure and filter tasks** (test-type: integration)
+  - blocked-by: manage a custom task
+  - desired behavior: persist preferences and filter by today, week, and month.
+  - acceptance criteria: settings persist across restarts, and filters display the expected tasks.
   - verification: `./gradlew test`
-- [ ] **Adicionar repetição automática** (test-type: both)
-  - blocked-by: decisão futura de produto
-  - desired behavior: ainda fora do escopo desta fase.
-  - acceptance criteria: requer nova aprovação de spec antes de implementação.
+- [ ] **Add automatic recurrence** (test-type: both)
+  - blocked-by: future product decision
+  - desired behavior: remains out of scope for this phase.
+  - acceptance criteria: requires new spec approval before implementation.
   - verification: `./gradlew test`
-- [ ] **Adicionar snooze** (test-type: both)
-  - blocked-by: decisão futura de produto
-  - desired behavior: ainda fora do escopo desta fase.
-  - acceptance criteria: requer nova aprovação de spec antes de implementação.
+- [ ] **Add snooze** (test-type: both)
+  - blocked-by: future product decision
+  - desired behavior: remains out of scope for this phase.
+  - acceptance criteria: requires new spec approval before implementation.
   - verification: `./gradlew test`

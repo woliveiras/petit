@@ -1,6 +1,6 @@
 ---
 spec: "0002"
-title: Acompanhamento de peso
+title: Weight tracking
 family: pet-care
 phase: 1
 status: Implemented
@@ -9,32 +9,32 @@ depends_on: ["0001"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Acompanhamento de peso
+# Spec: Weight tracking
 
-## Contexto e motivação
+## Context and motivation
 
-O tutor precisa registrar o peso ao longo do tempo para identificar variações na saúde do pet.
+The pet owner needs to record weight over time to identify changes in the pet's health.
 
-## Requisitos funcionais
+## Functional requirements
 
-- Registrar data, peso em kg ou g e observação opcional.
-- Normalizar a persistência em gramas e manter no máximo uma pesagem ativa por pet e dia.
-- Listar o histórico por data decrescente e exibir gráfico de barras da evolução.
-- Permitir editar e excluir logicamente uma pesagem.
-- Rejeitar peso menor ou igual a zero, superior a 50 kg e data futura.
+- Record the date, weight in kg or g, and an optional note.
+- Normalize persistence to grams and keep at most one active weight entry per pet per day.
+- List the history by descending date and display a bar chart of weight changes.
+- Allow editing and soft deletion of a weight entry.
+- Reject weights less than or equal to zero, weights over 50 kg, and future dates.
 
-## Critérios de aceite
+## Acceptance criteria
 
-- Dado `3,5 kg` ou `350 g`, quando salva, então persiste respectivamente 3500 ou 350 gramas.
-- Dada uma pesagem no mesmo pet e data, quando outra é salva, então a anterior é substituída.
-- Dadas várias pesagens, quando abre a tela, então vê histórico decrescente e gráfico com datas e kg.
-- Dado valor inválido ou data futura, quando salva, então vê erro e nada é persistido.
-- Dada uma pesagem, quando edita ou exclui, então lista e gráfico refletem a mudança e a exclusão é lógica.
+- Given `3.5 kg` or `350 g`, When the pet owner saves, Then 3500 or 350 grams are persisted, respectively.
+- Given a weight entry for the same pet and date, When another is saved, Then the previous entry is replaced.
+- Given several weight entries, When the pet owner opens the screen, Then they see the history in descending order and a chart with dates and kg values.
+- Given an invalid value or future date, When the pet owner saves, Then they see an error and nothing is persisted.
+- Given a weight entry, When the pet owner edits or deletes it, Then the list and chart reflect the change, and deletion is soft.
 
-## Estratégia de testes
+## Test strategy
 
-Testes unitários cobrem conversão e validação; integração cobre unicidade por dia, Room, ordenação e soft delete; UI cobre formulário e gráfico.
+Unit tests cover conversion and validation; integration tests cover daily uniqueness, Room, sorting, and soft delete; UI tests cover the form and chart.
 
-## Fora de escopo
+## Out of scope
 
-- Diagnóstico clínico ou recomendação automática de faixa ideal.
+- Clinical diagnosis or automatic recommendation of an ideal range.

@@ -1,43 +1,43 @@
-# Plano: Pareamento de dispositivos
+# Plan: Device pairing
 
 Spec: [spec.md](./spec.md)
 
-## Estado de partida
+## Starting point
 
-O projeto já contém a integração Nearby, permissões, apresentação,
-repositórios e persistência do grupo. A execução deve preservar essas partes e
-fechar o protocolo explícito de código e a validação entre dispositivos.
+The project already includes Nearby integration, permissions, presentation,
+repositories, and group persistence. The implementation must preserve these
+parts and complete the explicit code protocol and inter-device validation.
 
-## Sequência de implementação
+## Implementation sequence
 
-1. Mapear as transições atuais de `PairingState` e separar descoberta de autorização.
-2. Implementar geração, expiração e validação do código de quatro dígitos.
-3. Conectar a entrada do código no receptor ao pedido de conexão Nearby.
-4. Garantir troca atômica e persistência da chave somente após autorização.
-5. Encerrar advertising, discovery e conexões em cancelamento, erro e sucesso.
-6. Validar permissões por API level e mensagens de fallback.
-7. Cobrir lógica e integração; concluir com teste manual em dois dispositivos.
+1. Map the current `PairingState` transitions and separate discovery from authorization.
+2. Implement generation, expiration, and validation of the four-digit code.
+3. Connect code entry on the receiver to the Nearby connection request.
+4. Ensure atomic key exchange and persistence only after authorization.
+5. Stop advertising, discovery, and connections on cancellation, error, and success.
+6. Validate permissions by API level and fallback messages.
+7. Cover logic and integration; finish with a manual test on two devices.
 
-## Dependências e integração
+## Dependencies and integration
 
-- Nearby Connections e Google Play Services para o modo de pareamento.
-- DataStore para chave do grupo e identidade do dispositivo.
-- A spec 0102 consome a conexão autorizada resultante.
-- Referência técnica: [protocolos de compartilhamento local](../../docs/local-sharing-protocols.md).
+- Nearby Connections and Google Play Services for pairing mode.
+- DataStore for the group key and device identity.
+- Spec 0102 consumes the resulting authorized connection.
+- Technical reference: [local sharing protocols](../../docs/local-sharing-protocols.md).
 
-## Riscos e mitigação
+## Risks and mitigation
 
-| Risco | Mitigação |
+| Risk | Mitigation |
 | --- | --- |
-| Endpoint errado aceito por descoberta automática | Tornar a validação do código obrigatória antes da troca da chave. |
-| Estado residual após interrupção | Centralizar cleanup idempotente para todos os estados terminais. |
-| Diferenças de permissões entre versões do Android | Testar matrizes abaixo e acima das APIs 31 e 33. |
-| Dispositivo sem Google Play Services | Detectar a indisponibilidade e explicar a limitação sem perder dados. |
+| Wrong endpoint accepted through automatic discovery | Require code validation before exchanging the key. |
+| Residual state after interruption | Centralize idempotent cleanup for all terminal states. |
+| Permission differences between Android versions | Test matrices below and above APIs 31 and 33. |
+| Device without Google Play Services | Detect unavailability and explain the limitation without losing data. |
 
-## Verificação final
+## Final verification
 
-1. Executar `./gradlew spotlessCheck` e `./gradlew test`.
-2. Executar `./gradlew assembleDebug && ./gradlew installDebug` no primeiro dispositivo.
-3. Instalar o mesmo APK no segundo dispositivo.
-4. Validar código correto, incorreto, cancelamento e ausência de internet.
-5. Confirmar que ambos persistem a mesma chave e que nenhum dado é apagado ao sair.
+1. Run `./gradlew spotlessCheck` and `./gradlew test`.
+2. Run `./gradlew assembleDebug && ./gradlew installDebug` on the first device.
+3. Install the same APK on the second device.
+4. Validate correct code, incorrect code, cancellation, and no internet connection.
+5. Confirm that both persist the same key and that no data is deleted on exit.

@@ -1,6 +1,6 @@
 ---
 spec: "0007"
-title: Dashboard inicial
+title: Home dashboard
 family: pet-care
 phase: 1
 status: Implemented
@@ -9,33 +9,33 @@ depends_on: ["0001", "0002", "0003", "0004", "0005"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Dashboard inicial
+# Spec: Home dashboard
 
-## Contexto e motivação
+## Context and motivation
 
-O tutor precisa enxergar rapidamente o estado de saúde dos pets e os cuidados que exigem atenção.
+The caregiver needs a quick view of the pets' health and the care that requires attention.
 
-## Requisitos funcionais
+## Functional requirements
 
-- Exibir boas-vindas e ação para cadastrar o primeiro pet quando não há dados.
-- Exibir cards dos pets com foto, nome, último peso, estado geral e próximo evento.
-- Exibir até cinco tarefas próximas e atividade recente, com acesso às listas completas.
-- Abrir o perfil ao tocar no pet e oferecer Quick Add para peso, vacina, desparasitação, tarefa e novo pet.
-- Permitir acesso às configurações e atualização manual.
+- Display a welcome message and an action to add the first pet when there is no data.
+- Display pet cards with photo, name, latest weight, overall status, and next event.
+- Display up to five upcoming tasks and recent activity, with access to the full lists.
+- Open the profile when the pet is tapped and provide Quick Add for weight, vaccination, deworming, task, and a new pet.
+- Provide access to settings and manual refresh.
 
-## Critérios de aceite
+## Acceptance criteria
 
-- Sem pets, quando abre a home, então vê boas-vindas e botão para cadastrar o primeiro pet.
-- Com pets, quando abre a home, então vê resumo individual e indicação visual de saúde.
-- Com tarefas, então vê até cinco próximas e pode abrir a lista completa.
-- Com eventos de saúde, então vê atividade recente e pode abrir a timeline completa.
-- Ao tocar num pet ou ação rápida, então navega ao perfil ou ao fluxo correto, selecionando pet quando necessário.
+- Given there are no pets, When the home screen opens, Then the user sees a welcome message and a button to add the first pet.
+- Given there are pets, When the home screen opens, Then the user sees an individual summary and visual health indicator.
+- Given there are tasks, Then the user sees up to five upcoming tasks and can open the full list.
+- Given there are health events, Then the user sees recent activity and can open the full timeline.
+- When a pet or quick action is tapped, Then the app navigates to the profile or correct flow, prompting for pet selection when necessary.
 
-## Estratégia de testes
+## Test strategy
 
-Unitários cobrem agregação e estado vazio; integração cobre repositórios e navegação; UI cobre estados, Quick Add, refresh e acessibilidade.
+Unit tests cover aggregation and the empty state; integration tests cover repositories and navigation; UI tests cover states, Quick Add, refresh, and accessibility.
 
-## Limitações conhecidas
+## Known limitations
 
-- O banner “Tudo em ordem” e uma seção separada de alertas não foram implementados.
-- O Quick Add substituiu o Speed Dial histórico.
+- The “All good” banner and a separate alerts section have not been implemented.
+- Quick Add replaced the original Speed Dial.

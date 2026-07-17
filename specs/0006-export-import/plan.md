@@ -1,23 +1,23 @@
-# Plano: Exportação e importação JSON
+# Plan: JSON export and import
 
 Spec: [spec.md](./spec.md)
 
-## Sequenciamento
+## Sequence
 
-1. Agregar os cinco domínios em `ExportBundle` com `ExportMetadata`.
-2. Serializar/deserializar com `org.json` e versionar o schema.
-3. Ler e escrever por `ContentResolver`, validando o documento antes de importar.
-4. Analisar contagens e conflitos e aplicar `REPLACE`, `KEEP` ou `MERGE` em transação.
-5. Integrar exportação/importação às configurações e exportação por pet ao perfil.
+1. Aggregate the five domains into `ExportBundle` with `ExportMetadata`.
+2. Serialize/deserialize with `org.json` and version the schema.
+3. Read and write through `ContentResolver`, validating the document before import.
+4. Analyze counts and conflicts and apply `REPLACE`, `KEEP`, or `MERGE` in a transaction.
+5. Integrate export/import with settings and per-pet export with the profile.
 
-## Arquitetura
+## Architecture
 
-- `ExportImportUseCase` coordena repositórios, parsing, análise e merge.
-- `ExportBundle` usa as chaves `pets`, `weightEntries`, `vaccinationEntries`, `dewormingEntries` e `tasks`.
-- A importação só persiste depois da validação e confirmação do usuário.
+- `ExportImportUseCase` coordinates repositories, parsing, analysis, and merge.
+- `ExportBundle` uses the keys `pets`, `weightEntries`, `vaccinationEntries`, `dewormingEntries`, and `tasks`.
+- The import is persisted only after validation and user confirmation.
 
-## Dependências e riscos
+## Dependencies and risks
 
-- Depende de `0001`–`0005` e precisa preservar IDs e referências.
-- Mudanças de schema exigem migração explícita e testes com backups antigos.
-- Falhas de I/O ou parse não podem produzir importação parcial.
+- Depends on `0001`–`0005` and must preserve IDs and references.
+- Schema changes require explicit migration and tests with older backups.
+- I/O or parsing failures must not produce a partial import.

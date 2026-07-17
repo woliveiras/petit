@@ -1,6 +1,6 @@
 ---
 spec: "0004"
-title: Registro de desparasitação
+title: Deworming records
 family: pet-care
 phase: 1
 status: Implemented
@@ -9,32 +9,32 @@ depends_on: ["0001"]
 origin: "getmiw/specs-miw@09b4497"
 ---
 
-# Spec: Registro de desparasitação
+# Spec: Deworming records
 
-## Contexto e motivação
+## Context and motivation
 
-O tutor precisa registrar vermífugos e antiparasitários externos para manter a proteção do pet atualizada.
+The caregiver needs to record dewormers and external antiparasitic treatments to keep the pet's protection up to date.
 
-## Requisitos funcionais
+## Functional requirements
 
-- Registrar tipo `INTERNAL`, `EXTERNAL` ou `BOTH`, medicamento, aplicação, próxima dose e observação.
-- Exigir medicamento, impedir aplicação futura e exigir próxima dose posterior à aplicação.
-- Calcular `OK`, `SCHEDULED` ou `OVERDUE` para cada registro.
-- Listar histórico por data, com indicadores visuais, edição e soft delete.
-- Contabilizar `BOTH` nas categorias interna e externa quando a visão por categoria estiver disponível.
+- Record type `INTERNAL`, `EXTERNAL`, or `BOTH`, medication, administration date, next dose, and notes.
+- Require a medication, prevent future administration dates, and require the next dose to be after administration.
+- Calculate `OK`, `SCHEDULED`, or `OVERDUE` for each record.
+- List history by date, with visual indicators, editing, and soft delete.
+- Count `BOTH` in the internal and external categories when the category view is available.
 
-## Critérios de aceite
+## Acceptance criteria
 
-- Dados registros interno, externo ou combinado válidos, quando salva, então o tipo correto é persistido e o status é calculado.
-- Dada próxima dose em cinco dias, então o indicador é `SCHEDULED`; dada dose vencida, é `OVERDUE`.
-- Dados registros de diferentes tipos, quando abre o histórico, então eles aparecem em ordem decrescente.
-- Dado tipo `BOTH`, quando a saúde por categoria é calculada, então ele conta como interno e externo.
-- Dado um registro, quando edita ou exclui, então a tela reflete a mudança e a exclusão é lógica.
+- Given valid internal, external, or combined records, When they are saved, Then the correct type is persisted and the status is calculated.
+- Given a next dose in five days, Then the indicator is `SCHEDULED`; Given an overdue dose, Then it is `OVERDUE`.
+- Given records of different types, When the history is opened, Then they appear in descending order.
+- Given type `BOTH`, When health by category is calculated, Then it counts as both internal and external.
+- Given a record, When it is edited or deleted, Then the screen reflects the change and deletion is logical.
 
-## Estratégia de testes
+## Test strategy
 
-Unitários cobrem status e categorias; integração cobre Room, ordenação e soft delete; UI cobre formulário e indicadores.
+Unit tests cover status and categories; integration tests cover Room, ordering, and soft delete; UI tests cover the form and indicators.
 
-## Limitação conhecida
+## Known limitation
 
-A API atual calcula status por registro; a separação visual e o cálculo agregado por categoria permanecem pendentes.
+The current API calculates status per record; visual separation and aggregate calculation by category remain pending.

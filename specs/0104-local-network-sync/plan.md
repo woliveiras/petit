@@ -1,59 +1,59 @@
-# Plano: Sincronização na rede local
+# Plan: Local network sync
 
 Spec: [spec.md](./spec.md)
 
-## Estado de partida
+## Starting point
 
-Não há implementação de NSD/TCP no projeto. Este plano deve começar somente
-após aprovação explícita da spec e pressupõe identidade/chave (0101), grupo
-local (0103) e regras determinísticas de conflito (0105).
+There is no NSD/TCP implementation in the project. This plan should begin only
+after explicit approval of the spec and assumes identity/key (0101), a local
+group (0103), and deterministic conflict rules (0105).
 
-## Sequência de implementação
+## Implementation sequence
 
-1. Definir mensagens versionadas `HELLO`, `HELLO_ACK`, `CHANGESET`, `ACK`, `ERROR` e `CLOSE`.
-2. Implementar `NsdServiceManager` com register, discover, resolve, timeout e filtro do próprio serviço.
-3. Implementar servidor/cliente TCP com autenticação antes do payload e limites de tamanho/tempo.
-4. Criar `LanSyncRepository` para changesets, ACK e integração transacional com o resolver.
-5. Integrar lifecycle: iniciar em `ON_START`, parar em `ON_STOP` e limpar listeners/sockets.
-6. Criar trabalho periódico único com `NetworkType.CONNECTED`, backoff e intervalo mínimo de 15 minutos.
-7. Implementar configuração on/off, ação manual e indicador global acessível.
-8. Testar em dois processos e depois em dois dispositivos na mesma rede.
+1. Define versioned `HELLO`, `HELLO_ACK`, `CHANGESET`, `ACK`, `ERROR`, and `CLOSE` messages.
+2. Implement `NsdServiceManager` with register, discover, resolve, timeout, and filtering of its own service.
+3. Implement a TCP server/client with authentication before the payload and size/time limits.
+4. Create `LanSyncRepository` for changesets, ACK, and transactional integration with the resolver.
+5. Integrate the lifecycle: start in `ON_START`, stop in `ON_STOP`, and clean up listeners/sockets.
+6. Create unique periodic work with `NetworkType.CONNECTED`, backoff, and a minimum interval of 15 minutes.
+7. Implement the on/off setting, manual action, and accessible global indicator.
+8. Test in two processes and then on two devices on the same network.
 
-## Fluxo do protocolo
+## Protocol flow
 
-1. Cliente envia `HELLO {protocolVersion, familyGroupKey, deviceId, lastSyncTimestamp}`.
-2. Servidor valida versão, chave e membro; erro encerra a sessão.
-3. Servidor responde `HELLO_ACK {deviceId, lastSyncTimestamp}`.
-4. Ambos trocam `CHANGESET` com entidades posteriores ao timestamp conhecido.
-5. Cada lado aplica o lote de forma idempotente e responde `ACK {newSyncTimestamp}`.
-6. Ambos encerram a sessão; sem ACK, o lote pode ser reenviado com segurança.
+1. The client sends `HELLO {protocolVersion, familyGroupKey, deviceId, lastSyncTimestamp}`.
+2. The server validates the version, key, and member; an error closes the session.
+3. The server responds with `HELLO_ACK {deviceId, lastSyncTimestamp}`.
+4. Both exchange `CHANGESET` messages with entities newer than the known timestamp.
+5. Each side applies the batch idempotently and responds with `ACK {newSyncTimestamp}`.
+6. Both close the session; without an ACK, the batch can be safely resent.
 
-## Bateria e lifecycle
+## Battery and lifecycle
 
-| Contexto | Comportamento |
+| Context | Behavior |
 | --- | --- |
-| Foreground | NSD ativo e TCP sob demanda. |
-| Background | WorkManager periódico, limitado pelas constraints. |
-| Processo encerrado | Nenhum serviço persistente. |
-| Parceiro ausente | Discovery termina por timeout e tenta depois com backoff. |
+| Foreground | Active NSD and on-demand TCP. |
+| Background | Periodic WorkManager, limited by constraints. |
+| Terminated process | No persistent service. |
+| Peer unavailable | Discovery ends after a timeout and retries later with backoff. |
 
-Wi-Fi Direct é proibido para sincronização contínua. Nearby permanece reservado
-ao pareamento e à transferência pontual.
+Wi-Fi Direct is prohibited for continuous syncing. Nearby remains reserved for
+pairing and one-off transfers.
 
-## Riscos e mitigação
+## Risks and mitigation
 
-| Risco | Mitigação |
+| Risk | Mitigation |
 | --- | --- |
-| Descoberta lenta ou bloqueada pela rede | Timeout, backoff, estado explícito e ação manual. |
-| TCP expõe dados na LAN | Autenticar antes do payload e usar canal protegido. |
-| Sessões simultâneas duplicam trabalho | Eleger direção por IDs e manter aplicação idempotente. |
-| Consumo em background | Trabalho periódico único, constraints e batching. |
-| Relógios divergentes | Não considerar timestamp suficiente para desempate; aplicar a spec 0105. |
+| Discovery is slow or blocked by the network | Timeout, backoff, explicit state, and manual action. |
+| TCP exposes data on the LAN | Authenticate before the payload and use a protected channel. |
+| Simultaneous sessions duplicate work | Select the direction by IDs and keep application idempotent. |
+| Background power consumption | Unique periodic work, constraints, and batching. |
+| Divergent clocks | Do not treat the timestamp as sufficient for tie-breaking; apply spec 0105. |
 
-## Verificação final
+## Final verification
 
-1. Executar testes do protocolo com dois processos locais e falhas injetadas.
-2. Executar `./gradlew spotlessCheck` e `./gradlew test`.
-3. Executar `./gradlew assembleDebug && ./gradlew installDebug`.
-4. Em dois dispositivos, validar foreground, background, perda/retorno de Wi-Fi e chave inválida.
-5. Confirmar que NSD e sockets são liberados ao sair do app e que Wi-Fi Direct não é mantido.
+1. Run protocol tests with two local processes and injected failures.
+2. Run `./gradlew spotlessCheck` and `./gradlew test`.
+3. Run `./gradlew assembleDebug && ./gradlew installDebug`.
+4. On two devices, validate foreground, background, Wi-Fi loss/recovery, and an invalid key.
+5. Confirm that NSD and sockets are released when leaving the app and that Wi-Fi Direct is not kept active.
