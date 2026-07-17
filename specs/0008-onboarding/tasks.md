@@ -29,3 +29,9 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - desired behavior: cover preference defaults, persistence, start destination, page navigation, skip, completion, and bottom-bar visibility.
   - acceptance criteria: every acceptance criterion has automated coverage.
   - verification: `./gradlew test`
+
+- [x] **Cover the onboarding-to-home E2E journey** (test-type: integration)
+  - blocked-by: persist completion and enter Home
+  - desired behavior: exercise the real Activity, navigation, and DataStore from a clean app state.
+  - acceptance criteria: the three-page journey reaches Home, completion survives Activity recreation, and onboarding does not return.
+  - verification: `./gradlew connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.woliveiras.petit.e2e.OnboardingJourneyTest`
