@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.woliveiras.petit.data.local.entity.WeightEntryEntity
 import kotlinx.coroutines.flow.Flow
@@ -45,13 +46,52 @@ interface WeightEntryDao {
   /** Update an existing weight entry. */
   @Update suspend fun updateWeightEntry(entry: WeightEntryEntity)
 
+  /** Atomically upsert by pet/day while also handling an edit moved onto an occupied day. */
+  @Transaction
+  suspend fun upsertActiveWeightEntry(entry: WeightEntryEntity) {
+    val existingOnDate = getWeightEntryByDate(entry.petId, entry.date)
+    val existingById = getWeightEntryById(entry.id)
+    val timestamp = System.currentTimeMillis()
+    val movingOntoOccupiedDate =
+      existingOnDate != null && existingById != null && existingOnDate.id != existingById.id
+
+    if (movingOntoOccupiedDate) {
+      softDeleteWeightEntry(checkNotNull(existingOnDate).id, timestamp)
+    }
+
+    val entryToSave =
+      when {
+        movingOntoOccupiedDate ->
+          entry.copy(
+            id = checkNotNull(existingById).id,
+            createdAt = checkNotNull(existingById).createdAt,
+            updatedAt = timestamp,
+          )
+        existingOnDate != null ->
+          entry.copy(
+            id = existingOnDate.id,
+            createdAt = existingOnDate.createdAt,
+            updatedAt = timestamp,
+          )
+        existingById != null ->
+          entry.copy(createdAt = existingById.createdAt, updatedAt = timestamp)
+        else -> entry.copy(updatedAt = timestamp)
+      }
+
+    if (getWeightEntryById(entryToSave.id) != null) {
+      updateWeightEntry(entryToSave)
+    } else {
+      insertWeightEntry(entryToSave)
+    }
+  }
+
   /** Soft delete a weight entry. */
   @Query("UPDATE weight_entries SET deletedAt = :timestamp, updatedAt = :timestamp WHERE id = :id")
   suspend fun softDeleteWeightEntry(id: String, timestamp: Long = System.currentTimeMillis())
 
   /** Get weight entries for chart (limited to last N entries). */
   @Query(
-    "SELECT * FROM weight_entries WHERE petId = :petId AND deletedAt IS NULL ORDER BY date ASC LIMIT :limit"
+    "SELECT * FROM (SELECT * FROM weight_entries WHERE petId = :petId AND deletedAt IS NULL ORDER BY date DESC LIMIT :limit) ORDER BY date ASC"
   )
   fun getWeightEntriesForChart(petId: String, limit: Int = 30): Flow<List<WeightEntryEntity>>
 

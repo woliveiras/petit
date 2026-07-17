@@ -12,6 +12,7 @@ import com.woliveiras.petit.domain.model.WeightEntry
 import com.woliveiras.petit.worker.AutoTaskService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
@@ -28,6 +29,8 @@ enum class WeightUnit(val label: String, val suffix: String) {
   KG("kg", "kg"),
   GRAMS("g", "g"),
 }
+
+private val decimalInputPattern = Regex("^-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)$")
 
 data class WeightFormUiState(
   val petId: String = "",
@@ -63,11 +66,13 @@ constructor(
   private val petRepository: PetRepository,
   private val weightEntryRepository: WeightEntryRepository,
   private val autoTaskService: AutoTaskService,
+  private val clock: Clock,
 ) : ViewModel() {
 
   private val petId: String = savedStateHandle.get<String>("petId") ?: ""
 
-  private val _uiState = MutableStateFlow(WeightFormUiState(petId = petId))
+  private val _uiState =
+    MutableStateFlow(WeightFormUiState(petId = petId, date = LocalDate.now(clock)))
   val uiState: StateFlow<WeightFormUiState> = _uiState.asStateFlow()
 
   private val _events = MutableSharedFlow<WeightFormEvent>()
@@ -95,12 +100,9 @@ constructor(
   }
 
   fun updateWeight(weight: String) {
-    // Allow only valid decimal numbers
-    val filtered = weight.filter { it.isDigit() || it == '.' || it == ',' }
-    val normalized = filtered.replace(',', '.')
+    val normalized = weight.replace(',', '.')
 
-    // Validate format
-    if (normalized.isEmpty() || normalized.toDoubleOrNull() != null) {
+    if (normalized.isEmpty() || normalized == "-" || decimalInputPattern.matches(normalized)) {
       _uiState.update { it.copy(weightValue = normalized, weightError = null) }
     }
   }
@@ -147,7 +149,7 @@ constructor(
         editingEntryId = null,
         weightValue = "",
         weightUnit = WeightUnit.KG,
-        date = LocalDate.now(),
+        date = LocalDate.now(clock),
         note = "",
       )
     }
@@ -161,12 +163,14 @@ constructor(
 
     // Validation based on unit
     val maxWeight = if (state.weightUnit == WeightUnit.KG) 50.0 else 50000.0
-    if (weightValue == null || weightValue <= 0 || weightValue > maxWeight) {
+    if (
+      weightValue == null || !weightValue.isFinite() || weightValue <= 0 || weightValue > maxWeight
+    ) {
       _uiState.update { it.copy(weightError = context.getString(R.string.weight_error_invalid)) }
       return
     }
 
-    if (state.date.isAfter(LocalDate.now())) {
+    if (state.date.isAfter(LocalDate.now(clock))) {
       _uiState.update { it.copy(dateError = context.getString(R.string.weight_error_date_future)) }
       return
     }
@@ -189,7 +193,7 @@ constructor(
       _uiState.update { it.copy(isSaving = true) }
 
       try {
-        val now = System.currentTimeMillis()
+        val now = clock.millis()
 
         val entry =
           WeightEntry(
@@ -223,7 +227,7 @@ constructor(
             editingEntryId = null,
             weightValue = "",
             weightUnit = WeightUnit.KG,
-            date = LocalDate.now(),
+            date = LocalDate.now(clock),
             note = "",
           )
         }

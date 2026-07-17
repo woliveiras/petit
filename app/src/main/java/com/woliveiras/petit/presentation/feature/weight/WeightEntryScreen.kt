@@ -256,7 +256,7 @@ fun WeightEntryScreen(
 }
 
 @Composable
-private fun WeightInputCard(
+internal fun WeightInputCard(
   weightValue: String,
   weightUnit: WeightUnit,
   onWeightChange: (String) -> Unit,

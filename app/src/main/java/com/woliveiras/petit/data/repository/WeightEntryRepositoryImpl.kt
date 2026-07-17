@@ -4,7 +4,6 @@ import com.woliveiras.petit.data.local.dao.WeightEntryDao
 import com.woliveiras.petit.data.mapper.toDomain
 import com.woliveiras.petit.data.mapper.toEntity
 import com.woliveiras.petit.domain.model.WeightEntry
-import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -42,28 +41,7 @@ class WeightEntryRepositoryImpl @Inject constructor(private val weightEntryDao: 
   }
 
   override suspend fun saveWeightEntry(entry: WeightEntry) {
-    val dateMillis = entry.date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
-    // Check if there's already an entry for this date (upsert logic)
-    val existingEntry = weightEntryDao.getWeightEntryByDate(entry.petId, dateMillis)
-
-    val entryToSave =
-      if (existingEntry != null) {
-        entry.copy(
-          id = existingEntry.id,
-          createdAt = existingEntry.createdAt,
-          updatedAt = System.currentTimeMillis(),
-        )
-      } else {
-        entry.copy(updatedAt = System.currentTimeMillis())
-      }
-
-    val existingById = weightEntryDao.getWeightEntryById(entryToSave.id)
-    if (existingById != null) {
-      weightEntryDao.updateWeightEntry(entryToSave.toEntity())
-    } else {
-      weightEntryDao.insertWeightEntry(entryToSave.toEntity())
-    }
+    weightEntryDao.upsertActiveWeightEntry(entry.toEntity())
   }
 
   override suspend fun deleteWeightEntry(id: String) {

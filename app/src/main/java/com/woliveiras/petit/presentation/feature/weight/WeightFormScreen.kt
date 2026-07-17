@@ -57,7 +57,6 @@ fun WeightFormScreen(
   viewModel: WeightFormViewModel = hiltViewModel(),
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-  val latestWeight = uiState.weightEntries.maxByOrNull { it.date }
 
   Scaffold(
     topBar = {
@@ -83,50 +82,55 @@ fun WeightFormScreen(
       }
     },
   ) { padding ->
-    LazyColumn(
+    WeightHistoryContent(
+      entries = uiState.weightEntries,
+      onNavigateToEditEntry = onNavigateToEditEntry,
       modifier = Modifier.padding(padding),
-      contentPadding = PaddingValues(16.dp),
-      verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-      // Current Weight Card
-      item { CurrentWeightCard(weight = latestWeight?.formattedWeight) }
+    )
+  }
+}
 
-      // Evolution Chart (show when 2+ entries)
-      if (uiState.weightEntries.size >= 2) {
-        item { EvolutionChartCard(entries = uiState.weightEntries) }
-      }
+@Composable
+internal fun WeightHistoryContent(
+  entries: List<WeightEntry>,
+  onNavigateToEditEntry: (String) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val latestWeight = entries.maxByOrNull { it.date }
+  LazyColumn(
+    modifier = modifier,
+    contentPadding = PaddingValues(16.dp),
+    verticalArrangement = Arrangement.spacedBy(12.dp),
+  ) {
+    item { CurrentWeightCard(weight = latestWeight?.formattedWeight) }
 
-      // History Section Title
-      item {
-        Text(
-          text = stringResource(R.string.weight_history_title),
-          style = MaterialTheme.typography.labelLarge,
-          fontWeight = FontWeight.Bold,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.padding(top = 8.dp),
+    if (entries.size >= 2) {
+      item { EvolutionChartCard(entries = entries) }
+    }
+
+    item {
+      Text(
+        text = stringResource(R.string.weight_history_title),
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 8.dp),
+      )
+    }
+
+    if (entries.isEmpty()) {
+      item { EmptyHistoryCard() }
+    } else {
+      val sortedEntries = entries.sortedByDescending { it.date }
+      itemsIndexed(sortedEntries, key = { _, entry -> entry.id }) { index, entry ->
+        val previousEntry = if (index < sortedEntries.size - 1) sortedEntries[index + 1] else null
+        val weightDiff = previousEntry?.let { entry.weightKg - it.weightKg }
+
+        WeightHistoryItem(
+          entry = entry,
+          weightDifference = weightDiff,
+          onClick = { onNavigateToEditEntry(entry.id) },
         )
-      }
-
-      // History List
-      if (uiState.weightEntries.isEmpty()) {
-        item { EmptyHistoryCard() }
-      } else {
-        // Sort entries by date descending
-        val sortedEntries = uiState.weightEntries.sortedByDescending { it.date }
-        itemsIndexed(sortedEntries, key = { _, entry -> entry.id }) { index, entry ->
-          // Calculate weight difference from previous record (chronologically next in sorted list)
-          val previousEntry = if (index < sortedEntries.size - 1) sortedEntries[index + 1] else null
-          val weightDiff =
-            if (previousEntry != null) {
-              entry.weightKg - previousEntry.weightKg
-            } else null
-
-          WeightHistoryItem(
-            entry = entry,
-            weightDifference = weightDiff,
-            onClick = { onNavigateToEditEntry(entry.id) },
-          )
-        }
       }
     }
   }

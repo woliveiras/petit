@@ -24,7 +24,7 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - desired behavior: update the value/`updatedAt` and perform a soft delete.
   - acceptance criteria: the list and chart reflect edits and deletions.
   - verification: `./gradlew test`
-- [ ] **Add automated weight regression tests** (test-type: both)
+- [x] **Add automated weight regression tests** (test-type: both)
   - blocked-by: edit and delete a weight entry
   - desired behavior: cover conversion, limits, upsert, and queries.
   - acceptance criteria: the automated suite protects all spec criteria.

@@ -38,7 +38,7 @@ PRD: [Pet health management in Petit](../prds/2026-07-17-petit-pet-health-manage
 | Spec | Title | Status | Depends on |
 | --- | --- | --- | --- |
 | [0001](0001-pet-management/spec.md) | Pet management | Implemented | — |
-| [0002](0002-weight-tracking/spec.md) | Weight tracking | Implemented | 0001 |
+| [0002](0002-weight-tracking/spec.md) | Weight tracking | Completed | 0001 |
 | [0003](0003-vaccination/spec.md) | Vaccination records | Completed | 0001 |
 | [0004](0004-deworming/spec.md) | Deworming records | Completed | 0001 |
 | [0005](0005-reminders/spec.md) | Local tasks and reminders | Completed | 0001 |

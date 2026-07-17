@@ -2,12 +2,19 @@
 spec: "0002"
 title: Weight tracking
 family: pet-care
-status: Implemented
+status: Completed
 owner: woliveiras
 depends_on: ["0001"]
 ---
 
 # Spec: Weight tracking
+
+## Current state
+
+Weight entry creation, editing, daily replacement, soft deletion, descending
+history, and the chronological chart are implemented. Validation and Room
+regressions cover unit conversion, limits, occupied-day edits, and the latest
+chart window.
 
 ## Context and motivation
 

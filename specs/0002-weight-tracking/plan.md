@@ -4,10 +4,10 @@ Spec: [spec.md](./spec.md)
 
 ## Sequence
 
-1. Model `WeightEntryEntity` with a reference to `PetEntity` and store `weightGrams`.
-2. Implement queries by pet/date, latest weight, sorting, and upsert.
-3. Implement conversion, validation, editing, and soft delete in the repository/ViewModel.
-4. Integrate the form, history, and Vico bar chart.
+1. [x] Model `WeightEntryEntity` with a reference to `PetEntity` and store `weightGrams`.
+2. [x] Implement queries by pet/date, latest weight, sorting, and upsert.
+3. [x] Implement conversion, validation, editing, and soft delete in the repository/ViewModel.
+4. [x] Integrate the form, history, and Vico bar chart.
 
 ## Architecture
 
