@@ -22,8 +22,10 @@ wireframe, with no additional requirements.
 ## Current state
 
 The member list, local removal, leaving the group, and DataStore preferences
-already exist. There is still no evidence of device renaming or of propagating
-removal or departure to the other device during the next sync.
+already exist, but group creation persists state before pairing authorization
+completes. Removal and departure are local database/preference operations; they
+do not revoke the old key on another device. There is still no device renaming
+or propagation of membership changes during a later transfer.
 
 ## Requirements
 
@@ -82,4 +84,4 @@ available, in the LAN channel.
 - Initial pairing, defined in spec 0101.
 - Full history transfer, defined in spec 0102.
 - Detailed sync history UI, covered in spec 0105.
-- Administrative roles or cloud-based group recovery.
+- Administrative roles, remote invitations, and cloud-based group recovery; see spec 0405.

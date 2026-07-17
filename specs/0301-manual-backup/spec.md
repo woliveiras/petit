@@ -1,13 +1,13 @@
 ---
 spec: "0301"
-title: "Manual Backup"
+title: "Manual Cloud Backup"
 family: backup-recovery
 status: On Hold
 owner: woliveiras
 depends_on: ["0201"]
 ---
 
-# Spec: Manual Backup
+# Spec: Manual Cloud Backup
 
 ## Context and motivation
 
@@ -15,7 +15,7 @@ depends_on: ["0201"]
 > I want to back up my data to Google Drive,
 > So that I can recover it if I lose my phone.
 
-This is a historical hypothesis that has not yet been implemented. The product, external provider, availability, and monetization must be revalidated before approval.
+This is a historical cloud-backup hypothesis that has not yet been implemented. Local JSON export is already covered by spec 0006; this proposal concerns authenticated storage and lifecycle management in an external provider. The product, provider, availability, and monetization must be revalidated before approval.
 
 ## Functional requirements
 

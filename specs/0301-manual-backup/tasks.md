@@ -1,4 +1,4 @@
-# Tasks: Manual Backup
+# Tasks: Manual Cloud Backup
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 

@@ -1,4 +1,4 @@
-# Plan: Restore Backup
+# Plan: Restore Cloud Backup
 
 Spec: [spec.md](./spec.md)
 

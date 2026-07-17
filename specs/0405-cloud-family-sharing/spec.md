@@ -15,7 +15,13 @@ depends_on: ["0201", "0401"]
 > I want to share my pets' data with my family,
 > So that we can all track and record pet information together.
 
-This is a historical hypothesis that has not yet been implemented. The product, external provider, availability, and monetization must be revalidated before approval.
+This cloud proposal has not yet been implemented. Spec 0103 is the local
+foundation for listing devices, removing a local member, leaving a group, and
+preserving pet data. It does not provide user accounts, administrative roles,
+cloud invitations, remote revocation, shared-pet visibility, or automatic
+multi-device updates. Those capabilities remain entirely in this spec. The
+product, provider, availability, and monetization must be revalidated before
+approval.
 
 ## Functional requirements
 

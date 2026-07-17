@@ -18,8 +18,10 @@ silently losing a change. The established rule is last-write-wins by
 
 ## Current state
 
-The existing merge compares `updatedAt` and writes a `SyncLog`. There is no
-dedicated `ConflictResolver`, history UI, or tests for all soft-delete cases.
+The existing one-shot import compares `updatedAt` and `MergeDataUseCase` writes
+a `SyncLog` after that import returns. The entity import and log are not part of
+one transaction. There is no dedicated `ConflictResolver`, history UI, or tests
+for all soft-delete cases.
 Equal timestamps with different payloads have no tie-breaking rule, so symmetry
 cannot yet be guaranteed.
 
@@ -85,3 +87,4 @@ then reuse exactly the same resolver.
 - UI for manually choosing each conflict.
 - Restoring historical versions of a record.
 - Transport or discovery between devices.
+- Resolving conflicts delivered through cloud sync; see spec 0403, which must reuse the local resolver once completed.

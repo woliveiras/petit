@@ -15,7 +15,12 @@ depends_on: ["0401"]
 > I want edit conflicts to be resolved automatically,
 > So that I do not lose data or have to resolve conflicts manually.
 
-This is a historical hypothesis that has not been implemented. The product, external provider, availability, and monetization must be revalidated before approval.
+This cloud proposal has not been implemented. Spec 0105 is the local foundation:
+the existing one-shot import compares UUIDs and `updatedAt`, but still lacks a
+central resolver, complete soft-delete behavior, atomic logging, and convergence
+tests. Cloud transport, remote listeners, and offline queue handling remain
+entirely in this spec. The product, provider, availability, and monetization
+must be revalidated before approval.
 
 ## Functional Requirements
 

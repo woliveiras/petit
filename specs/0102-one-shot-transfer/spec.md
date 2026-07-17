@@ -18,22 +18,28 @@ to merge the received data or replace its local database.
 ## Current state
 
 `NearbyTransferRepository`, `SendDataUseCase`, `MergeDataUseCase`, and the
-transfer interface already exist. `REPLACE` mode overwrites matching entities
-but does not remove local records missing from the bundle. Progress, failures,
-and the complete flow have not yet been validated on two devices.
+transfer interface already exist. However, completing pairing returns to
+Settings, while the transfer routes later expect the process-local Nearby
+connection to still be available; the app does not hand the paired connection
+into a transfer automatically. `REPLACE` mode overwrites matching entities but
+does not remove local records missing from the bundle. Sending reports only an
+initial zero-byte state, receiving progress depends on already-buffered data,
+and success has not been validated on two devices.
 
 ## Requirements
 
 ### Functional
 
 - [x] Serialize shareable data into an `ExportBundle`.
-- [x] Send and receive the bundle over the authorized Nearby connection.
+- [ ] Carry an authorized Nearby connection from pairing into send/receive.
+- [x] Serialize and submit a bundle when a connected endpoint is already available.
 - [x] Offer the receiver merge and replace options.
 - [x] Merge entities by UUID and `updatedAt`.
 - [ ] Make `REPLACE` remove missing local data before import.
 - [ ] Display actual progress and a summary by entity type.
 - [ ] Discard a partial payload when the transfer fails.
 - [ ] Confirm the destructive mode before replacing data.
+- [ ] Allow cancellation to disconnect and discard any partial payload.
 
 ### Non-functional
 

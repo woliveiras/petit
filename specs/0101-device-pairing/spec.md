@@ -19,9 +19,12 @@ group key after pairing.
 ## Current state
 
 Nearby Connections, permissions, screens, repositories, and persistence are
-already in place. The current interface discovers devices but does not yet let
-the receiver enter and validate the four-digit code required by the flow. The
-complete pairing flow has also not been validated on two physical devices.
+already in place. The sender displays the first four characters of its group
+key, but the receiver neither enters nor validates that code: discovery passes
+a blank expected key and automatically requests the first endpoint it finds.
+The sender also persists its group key and local member before authorization,
+so cancellation or failure can leave an incomplete group. The complete pairing
+flow has not been validated on two physical devices.
 
 ## Requirements
 
@@ -29,8 +32,8 @@ complete pairing flow has also not been validated on two physical devices.
 
 - [x] Start and cancel advertising or discovery through the pairing flow.
 - [x] Request the Bluetooth and Wi-Fi permissions required by the Android version.
-- [x] Persist the family group key and local identity.
-- [ ] Show the sender a four-digit pairing code.
+- [ ] Persist the family group key and local identity only after authorization succeeds.
+- [x] Show the sender a four-digit pairing code.
 - [ ] Let the receiver enter the code and reject invalid codes.
 - [ ] Exchange the same group key between both devices after validation.
 - [ ] Confirm pairing without internet access.

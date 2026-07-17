@@ -27,16 +27,16 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - acceptance criteria: GIVEN I have completed automatic backups WHEN I open "View history" THEN I see a list of the latest backups AND each item shows: - Date/time - Whether it was automatic or manual - Status (success/failure)
   - verification: `./gradlew test` and `./gradlew connectedDebugAndroidTest`
 
-- [ ] **Scenario 5: Backup notification** (test-type: both)
+- [ ] **Scenario 4: Backup notification** (test-type: both)
   - blocked-by: spec 0305; previous task in this spec
   - summary: deliver this behavior as a vertical slice, including the domain, persistence/service, and interface where applicable.
-  - desired behavior: the “Scenario 5: Backup notification” flow works end to end without compromising local data.
+  - desired behavior: the “Scenario 4: Backup notification” flow works end to end without compromising local data.
   - acceptance criteria: GIVEN "Notify after backup" is enabled WHEN an automatic backup completes successfully THEN I receive a silent notification "Backup completed: 2 pets, 15 KB" GIVEN "Notify after backup" is disabled WHEN a backup is completed THEN I do NOT receive a notification
   - verification: `./gradlew test` and `./gradlew connectedDebugAndroidTest`
 
-- [ ] **Scenario 6: Back up now** (test-type: both)
+- [ ] **Scenario 5: Back up now** (test-type: both)
   - blocked-by: spec 0305; previous task in this spec
   - summary: deliver this behavior as a vertical slice, including the domain, persistence/service, and interface where applicable.
-  - desired behavior: the “Scenario 6: Back up now” flow works end to end without compromising local data.
+  - desired behavior: the “Scenario 5: Back up now” flow works end to end without compromising local data.
   - acceptance criteria: GIVEN I am on the backup settings screen WHEN I tap "Back up now" THEN a backup runs immediately AND the timer for the next automatic backup is reset ---
   - verification: `./gradlew test` and `./gradlew connectedDebugAndroidTest`

@@ -8,7 +8,7 @@ This plan is **On Hold**. No step authorizes implementation until the spec has b
 
 ## Dependencies
 
-- Specs: `0201`, `0401`
+- Specs: `0201`, `0401`; reuse applicable local membership behavior from `0103`
 - Revalidate demand, privacy, costs, provider terms, and the availability model.
 
 ## Proposed sequence

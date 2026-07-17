@@ -7,7 +7,7 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 ## Tasks
 
 - [ ] **Scenario 1: Basic Last-Write-Wins** (test-type: both)
-  - blocked-by: spec 0401
+  - blocked-by: spec 0401; the shared resolver from spec 0105
   - summary: deliver this behavior as a vertical slice, including the domain, persistence/service, and UI where applicable.
   - desired behavior: the “Scenario 1: Basic Last-Write-Wins” flow works end to end without compromising local data.
   - acceptance criteria: GIVEN the pet "Luna" has updatedAt = 1000 on device A AND device B edits Luna (updatedAt = 1500) WHEN device A receives the change from the Firestore snapshot listener THEN device B's version (the newer one) is retained AND device A shows B's changes

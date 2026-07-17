@@ -1,4 +1,4 @@
-# Plan: Manual Backup
+# Plan: Manual Cloud Backup
 
 Spec: [spec.md](./spec.md)
 
@@ -205,9 +205,9 @@ Google Drive backup was postponed because:
 
 ## Preserved Specs
 
-### Manual Backup
-- [US-N11: Manual Backup](../0301-manual-backup/spec.md)
-- [US-N12: Restore Backup](../0302-restore-backup/spec.md)
+### Manual Cloud Backup
+- [US-N11: Manual Cloud Backup](../0301-manual-backup/spec.md)
+- [US-N12: Restore Cloud Backup](../0302-restore-backup/spec.md)
 - [US-N13: Manage Backups](../0303-manage-backups/spec.md)
 
 ### Automatic Backup
@@ -216,8 +216,8 @@ Google Drive backup was postponed because:
 - [US-N14b: Backup Settings](../0306-backup-settings/spec.md)
 - [US-N14c: Backup Triggers](../0307-backup-triggers/spec.md)
 
-### Device-to-Device Transfer (historical reference)
-- [Original US-204](../0304-device-transfer/spec.md) — This proposal served as a reference for family sharing but remains unimplemented in this form
+### Canonical local transfer reference
+- [Spec 0102: One-shot data transfer](../0102-one-shot-transfer/spec.md) owns device-to-device transfer without a cloud provider.
 
 
 ## Prerequisites
@@ -231,10 +231,9 @@ Google Drive backup was postponed because:
 
 | ID | Feature | Priority |
 |----|---------|------------|
-| [US-201](../0301-manual-backup/spec.md) | Manual Backup | P0 |
-| [US-202](../0302-restore-backup/spec.md) | Restore Backup | P0 |
+| [US-201](../0301-manual-backup/spec.md) | Manual Cloud Backup | P0 |
+| [US-202](../0302-restore-backup/spec.md) | Restore Cloud Backup | P0 |
 | [US-203](../0303-manage-backups/spec.md) | Manage Backups | P1 |
-| [US-204](../0304-device-transfer/spec.md) | Device-to-Device Transfer | P1 |
 
 
 ## Architecture

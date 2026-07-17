@@ -87,19 +87,7 @@ AND the new backup is added
 AND I see the notification "Old backup removed to free up space"
 ```
 
-### Scenario 7: Backups after account deletion
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
-
-```gherkin
-GIVEN I have backups saved in Google Drive
-WHEN I delete my app account
-THEN the backups are retained for 90 days (grace period)
-AND I see the warning "Your account will be permanently deleted in X days."
-AND after 90 days without reactivation, the backups are purged automatically
-```
-
-### Scenario 8: Backups after account deletion
+### Scenario 6: Backups after account deletion
 
 - [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
 
@@ -110,7 +98,7 @@ THEN the backups are scheduled for purging in 30 days
 AND after 30 days, all files in the user's bucket are permanently removed
 ```
 
-### Scenario 6: Total space used
+### Scenario 7: Total space used
 
 - [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
 

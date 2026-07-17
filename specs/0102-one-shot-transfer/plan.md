@@ -4,18 +4,21 @@ Spec: [spec.md](./spec.md)
 
 ## Starting point
 
-Sending, receiving, merge/replace options, and presentation already exist. The
-plan focuses the implementation on the semantic differences of replace,
-atomicity, local progress telemetry, and hardware validation.
+Serialization, Nearby payload callbacks, merge/replace options, and
+presentation already exist. The pairing completion route does not currently
+carry its connection into transfer, so the plan also connects those lifecycle
+states before addressing replace semantics, atomicity, progress telemetry, and
+hardware validation.
 
 ## Implementation sequence
 
-1. Fix the list of entities included in the `ExportBundle` and validate the payload before writing.
-2. Cover the current merge by UUID, `updatedAt`, and soft delete with tests.
-3. Implement transactional replace: clear the shareable dataset and import the bundle.
-4. Discard incomplete transfers and map recoverable errors to the UI.
-5. Derive progress from bytes actually sent/received and generate a result summary.
-6. Validate merge, replace, repetition, and interruption on two devices.
+1. Carry the authorized endpoint from successful pairing into an explicit send/receive flow.
+2. Fix the list of entities included in the `ExportBundle` and validate the payload before writing.
+3. Cover the current merge by UUID, `updatedAt`, and soft delete with tests.
+4. Implement transactional replace: clear the shareable dataset and import the bundle.
+5. Discard incomplete or cancelled transfers and map recoverable errors to the UI.
+6. Derive progress from bytes actually sent/received and generate a result summary.
+7. Validate merge, replace, repetition, cancellation, and interruption on two devices.
 
 ## Dependencies and integration
 

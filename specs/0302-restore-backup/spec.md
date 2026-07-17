@@ -1,13 +1,13 @@
 ---
 spec: "0302"
-title: "Restore Backup"
+title: "Restore Cloud Backup"
 family: backup-recovery
 status: On Hold
 owner: woliveiras
 depends_on: ["0301"]
 ---
 
-# Spec: Restore Backup
+# Spec: Restore Cloud Backup
 
 ## Context and motivation
 
@@ -15,7 +15,7 @@ depends_on: ["0301"]
 > I want to restore my data from a backup in Google Drive,
 > So that I can recover my data on a new phone or after reinstalling the app.
 
-This is a historical hypothesis that has not yet been implemented. The product, external provider, availability, and monetization must be revalidated before approval.
+This is a historical cloud-restore hypothesis that has not yet been implemented. Local JSON import is already covered by spec 0006; this proposal concerns discovering and downloading authenticated backups from an external provider. The product, provider, availability, and monetization must be revalidated before approval.
 
 ## Functional requirements
 

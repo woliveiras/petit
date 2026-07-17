@@ -8,7 +8,7 @@ This plan is **On Hold**. No step authorizes implementation until the spec has b
 
 ## Dependencies
 
-- Specs: `0401`
+- Specs: `0401`; reuse the conflict rules completed under `0105`
 - Revalidate demand, privacy, costs, provider terms, and the availability model.
 
 ## Proposed Sequence

@@ -66,7 +66,7 @@ AND each item shows:
   - Status (success/failure)
 ```
 
-### Scenario 5: Backup notification
+### Scenario 4: Backup notification
 
 - [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
 
@@ -81,7 +81,7 @@ WHEN a backup is completed
 THEN I do NOT receive a notification
 ```
 
-### Scenario 6: Back up now
+### Scenario 5: Back up now
 
 - [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
 

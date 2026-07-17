@@ -1,4 +1,4 @@
-# Tasks: Restore Backup
+# Tasks: Restore Cloud Backup
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
