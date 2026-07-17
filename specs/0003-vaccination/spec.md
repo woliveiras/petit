@@ -2,7 +2,7 @@
 spec: "0003"
 title: Vaccination records
 family: pet-care
-status: In Progress
+status: Completed
 owner: woliveiras
 depends_on: ["0001"]
 ---
@@ -15,7 +15,10 @@ The pet owner needs to maintain the vaccination schedule and traceability of the
 
 ## Current state
 
-Vaccination records can be created, edited, listed, and soft-deleted. Status is calculated from the next-dose date, but the form does not yet require a name for `OTHER`, and the history UI only renders an explicit visual state for overdue doses.
+Vaccination records can be created, edited, grouped by type, listed with their
+complete history, and soft-deleted. Validation requires a species-compatible
+type and a custom name for `OTHER`. Status calculation is clock-controlled and
+the history renders explicit `OK`, `SCHEDULED`, and `OVERDUE` indicators.
 
 ## Functional requirements
 
@@ -60,6 +63,4 @@ the complete save-to-history journey is not already covered at those boundaries.
 
 ## Known limitations
 
-- The form accepts `OTHER` without the required custom name.
-- The history only highlights `OVERDUE`; `OK` and `SCHEDULED` are not displayed as visual states.
-- The full history is grouped by month rather than by vaccine type.
+- Status shown by an already-open screen is refreshed when the screen is recreated; it does not run a midnight ticker.

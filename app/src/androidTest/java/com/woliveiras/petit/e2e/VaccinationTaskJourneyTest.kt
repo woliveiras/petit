@@ -1,9 +1,11 @@
 package com.woliveiras.petit.e2e
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -46,15 +48,21 @@ class VaccinationTaskJourneyTest {
     val vaccinations = context.getString(R.string.pet_detail_section_vaccinations)
     val addVaccination = context.getString(R.string.vaccination_add)
     val addVaccinationTitle = context.getString(R.string.vaccination_add_title)
-    val initialVaccine = context.getString(R.string.vaccine_v3)
     val rabies = context.getString(R.string.vaccine_rabies)
+    val other = context.getString(R.string.vaccine_other)
     val petName = "Luna"
     val expectedTaskTitle = "$petName - ${VaccineType.RABIES.displayName}"
 
     composeRule.onNodeWithText(next).performClick()
     composeRule.onNodeWithText(next).performClick()
     composeRule.onNodeWithText(getStarted).performClick()
-    composeRule.onNodeWithText(registerPet).performClick()
+    composeRule.waitUntil(timeoutMillis = 5_000) {
+      composeRule
+        .onAllNodesWithText(registerPet, useUnmergedTree = true)
+        .fetchSemanticsNodes()
+        .isNotEmpty()
+    }
+    composeRule.onNodeWithText(registerPet, useUnmergedTree = true).performClick()
     composeRule.onNodeWithText(namePlaceholder).performTextInput(petName)
     closeSoftKeyboard()
     composeRule.onNodeWithText(save).performScrollTo().performClick()
@@ -66,7 +74,12 @@ class VaccinationTaskJourneyTest {
     composeRule.onNodeWithContentDescription(addVaccination).performClick()
     composeRule.onNodeWithText(addVaccinationTitle).assertIsDisplayed()
 
-    composeRule.onNodeWithText(initialVaccine).performClick()
+    composeRule.onNodeWithText(rabies).performClick()
+    composeRule.onAllNodesWithText(rabies).assertCountEquals(2)
+    composeRule.onAllNodesWithText(other).assertCountEquals(1)
+    composeRule.onAllNodesWithText(context.getString(R.string.vaccine_v3)).assertCountEquals(0)
+    composeRule.onNodeWithText(other).performClick()
+    composeRule.onNodeWithText(other).performClick()
     composeRule.onNodeWithText(rabies).performClick()
     composeRule.onNodeWithText(save).performScrollTo().performClick()
 

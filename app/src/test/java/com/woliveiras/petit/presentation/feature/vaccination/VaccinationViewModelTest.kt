@@ -1,0 +1,218 @@
+package com.woliveiras.petit.presentation.feature.vaccination
+
+import android.content.Context
+import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ApplicationProvider
+import com.google.common.truth.Truth.assertThat
+import com.woliveiras.petit.data.repository.PetRepository
+import com.woliveiras.petit.data.repository.VaccinationEntryRepository
+import com.woliveiras.petit.domain.model.Pet
+import com.woliveiras.petit.domain.model.PetType
+import com.woliveiras.petit.domain.model.Sex
+import com.woliveiras.petit.domain.model.SyncStatus
+import com.woliveiras.petit.domain.model.VaccinationEntry
+import com.woliveiras.petit.domain.model.VaccineType
+import com.woliveiras.petit.worker.AutoTaskService
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
+class VaccinationViewModelTest {
+
+  private val dispatcher: TestDispatcher = StandardTestDispatcher()
+  private val context: Context = ApplicationProvider.getApplicationContext()
+  private val clock = Clock.fixed(Instant.parse("2026-07-17T12:00:00Z"), ZoneOffset.UTC)
+  private lateinit var repository: FakeVaccinationRepository
+  private lateinit var viewModel: VaccinationViewModel
+
+  @Before
+  fun setUp() {
+    Dispatchers.setMain(dispatcher)
+    repository = FakeVaccinationRepository()
+    viewModel =
+      VaccinationViewModel(
+        savedStateHandle = SavedStateHandle(mapOf("petId" to "pet-1")),
+        context = context,
+        petRepository = FakePetRepository(),
+        vaccinationRepository = repository,
+        autoTaskService = NoOpAutoTaskService(),
+        clock = clock,
+      )
+  }
+
+  @After
+  fun tearDown() {
+    Dispatchers.resetMain()
+  }
+
+  @Test
+  fun otherMustHaveVisibleCustomNameBeforeSaving() =
+    runTest(dispatcher) {
+      advanceUntilIdle()
+      viewModel.updateVaccineType(VaccineType.OTHER)
+      viewModel.updateCustomName("   ")
+
+      viewModel.saveVaccination()
+      advanceUntilIdle()
+
+      assertThat(repository.saved).isEmpty()
+      assertThat(viewModel.uiState.value.form.customNameError).isNotNull()
+    }
+
+  @Test
+  fun invalidSpeciesTypeCannotBeSaved() =
+    runTest(dispatcher) {
+      advanceUntilIdle()
+      viewModel.updateVaccineType(VaccineType.DHPP)
+
+      viewModel.saveVaccination()
+      advanceUntilIdle()
+
+      assertThat(repository.saved).isEmpty()
+      assertThat(viewModel.uiState.value.form.vaccineTypeError).isNotNull()
+    }
+
+  @Test
+  fun validOtherIsTrimmedAndTraceabilityDetailsArePreserved() =
+    runTest(dispatcher) {
+      advanceUntilIdle()
+      viewModel.updateVaccineType(VaccineType.OTHER)
+      viewModel.updateCustomName("  Especial  ")
+      viewModel.updateVeterinarian("  Dra. Ana  ")
+      viewModel.updateClinic("  Petit Vet  ")
+      viewModel.updateBatchNumber("  lote-7  ")
+      viewModel.updateNote("  reforço  ")
+
+      viewModel.saveVaccination()
+      advanceUntilIdle()
+
+      assertThat(repository.saved.single().customVaccineTypeName).isEqualTo("Especial")
+      assertThat(repository.saved.single().veterinarian).isEqualTo("Dra. Ana")
+      assertThat(repository.saved.single().clinic).isEqualTo("Petit Vet")
+      assertThat(repository.saved.single().batchNumber).isEqualTo("lote-7")
+      assertThat(repository.saved.single().note).isEqualTo("reforço")
+    }
+
+  @Test
+  fun selectingCatalogTypeClearsOtherName() =
+    runTest(dispatcher) {
+      advanceUntilIdle()
+      viewModel.updateVaccineType(VaccineType.OTHER)
+      viewModel.updateCustomName("Especial")
+
+      viewModel.updateVaccineType(VaccineType.V3)
+
+      assertThat(viewModel.uiState.value.form.customName).isEmpty()
+    }
+
+  @Test
+  fun editingPreservesCreatedAtAndUpdatesUpdatedAtFromClock() =
+    runTest(dispatcher) {
+      val original = entry(id = "entry-1", createdAt = 10L, updatedAt = 20L)
+      repository.entries.value = listOf(original)
+      advanceUntilIdle()
+      viewModel.loadEntryForEdit(original.id)
+      advanceUntilIdle()
+
+      viewModel.updateNote("updated")
+      viewModel.saveVaccination()
+      advanceUntilIdle()
+
+      assertThat(repository.saved.single().createdAt).isEqualTo(10L)
+      assertThat(repository.saved.single().updatedAt).isEqualTo(clock.millis())
+    }
+
+  private fun entry(id: String, createdAt: Long, updatedAt: Long) =
+    VaccinationEntry(
+      id = id,
+      petId = "pet-1",
+      vaccineType = VaccineType.V3,
+      applicationDate = LocalDate.of(2026, 7, 1),
+      createdAt = createdAt,
+      updatedAt = updatedAt,
+      syncStatus = SyncStatus.LOCAL_ONLY,
+    )
+
+  private class FakePetRepository : PetRepository {
+    private val pet =
+      Pet(
+        id = "pet-1",
+        name = "Mimi",
+        petType = PetType.CAT,
+        sex = Sex.UNKNOWN,
+        createdAt = 1L,
+        updatedAt = 1L,
+      )
+
+    override fun getAllPets(): Flow<List<Pet>> = MutableStateFlow(listOf(pet))
+
+    override suspend fun getPetById(id: String): Pet? = pet.takeIf { it.id == id }
+
+    override fun getPetByIdFlow(id: String): Flow<Pet?> = MutableStateFlow(pet)
+
+    override fun getPetCount(): Flow<Int> = MutableStateFlow(1)
+
+    override suspend fun savePet(pet: Pet) = Unit
+
+    override suspend fun deletePet(id: String) = Unit
+  }
+
+  private class FakeVaccinationRepository : VaccinationEntryRepository {
+    val entries = MutableStateFlow<List<VaccinationEntry>>(emptyList())
+    val saved = mutableListOf<VaccinationEntry>()
+
+    override fun getVaccinationEntriesForPet(petId: String): Flow<List<VaccinationEntry>> = entries
+
+    override fun getLatestVaccinationsForPet(petId: String): Flow<List<VaccinationEntry>> = entries
+
+    override suspend fun getVaccinationEntryById(id: String) = entries.value.find { it.id == id }
+
+    override fun getOverdueVaccinations(): Flow<List<VaccinationEntry>> =
+      MutableStateFlow(emptyList())
+
+    override fun getUpcomingVaccinations(days: Int): Flow<List<VaccinationEntry>> =
+      MutableStateFlow(emptyList())
+
+    override suspend fun saveVaccinationEntry(entry: VaccinationEntry) {
+      saved += entry
+    }
+
+    override suspend fun deleteVaccinationEntry(id: String) = Unit
+
+    override suspend fun countEntriesForPet(petId: String): Int = entries.value.size
+  }
+
+  private class NoOpAutoTaskService : AutoTaskService {
+    override suspend fun handleVaccinationSaved(entry: VaccinationEntry) = Unit
+
+    override suspend fun handleVaccinationDeleted(entryId: String) = Unit
+
+    override suspend fun handleDewormingSaved(
+      entry: com.woliveiras.petit.domain.model.DewormingEntry
+    ) = Unit
+
+    override suspend fun handleDewormingDeleted(entryId: String) = Unit
+
+    override suspend fun handleWeightSaved(petId: String, petName: String) = Unit
+
+    override suspend fun cancelWeightTask(petId: String) = Unit
+  }
+}

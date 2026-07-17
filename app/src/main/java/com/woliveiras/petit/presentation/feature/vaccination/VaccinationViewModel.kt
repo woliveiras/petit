@@ -9,11 +9,15 @@ import com.woliveiras.petit.data.repository.PetRepository
 import com.woliveiras.petit.data.repository.VaccinationEntryRepository
 import com.woliveiras.petit.domain.model.PetType
 import com.woliveiras.petit.domain.model.SyncStatus
+import com.woliveiras.petit.domain.model.VaccinationDraft
 import com.woliveiras.petit.domain.model.VaccinationEntry
+import com.woliveiras.petit.domain.model.VaccinationValidationError
 import com.woliveiras.petit.domain.model.VaccineType
+import com.woliveiras.petit.domain.model.validate
 import com.woliveiras.petit.worker.AutoTaskService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
@@ -31,6 +35,7 @@ data class VaccinationUiState(
   val petId: String = "",
   val petName: String = "",
   val petType: PetType = PetType.OTHER,
+  val today: LocalDate = LocalDate.now(),
   val isLoading: Boolean = true,
   val latestVaccinations: List<VaccinationEntry> = emptyList(),
   val allVaccinations: List<VaccinationEntry> = emptyList(),
@@ -49,6 +54,7 @@ data class VaccinationUiState(
 data class VaccinationFormState(
   val isEditMode: Boolean = false,
   val editingEntryId: String? = null,
+  val editingCreatedAt: Long? = null,
   val vaccineType: VaccineType = VaccineType.V3,
   val customName: String = "",
   val applicationDate: LocalDate = LocalDate.now(),
@@ -85,11 +91,19 @@ constructor(
   private val petRepository: PetRepository,
   private val vaccinationRepository: VaccinationEntryRepository,
   private val autoTaskService: AutoTaskService,
+  private val clock: Clock,
 ) : ViewModel() {
 
   private val petId: String = savedStateHandle.get<String>("petId") ?: ""
 
-  private val _uiState = MutableStateFlow(VaccinationUiState(petId = petId))
+  private val _uiState =
+    MutableStateFlow(
+      VaccinationUiState(
+        petId = petId,
+        today = LocalDate.now(clock),
+        form = VaccinationFormState(applicationDate = LocalDate.now(clock)),
+      )
+    )
   val uiState: StateFlow<VaccinationUiState> = _uiState.asStateFlow()
 
   private val _events = MutableSharedFlow<VaccinationEvent>()
@@ -103,7 +117,16 @@ constructor(
   private fun loadPetInfo() {
     viewModelScope.launch {
       petRepository.getPetById(petId)?.let { pet ->
-        _uiState.update { it.copy(petName = pet.name, petType = pet.petType) }
+        _uiState.update { state ->
+          val availableTypes = VaccineType.forPetType(pet.petType)
+          val selectedType =
+            state.form.vaccineType.takeIf { it in availableTypes } ?: availableTypes.first()
+          state.copy(
+            petName = pet.name,
+            petType = pet.petType,
+            form = state.form.copy(vaccineType = selectedType),
+          )
+        }
       }
     }
   }
@@ -137,13 +160,19 @@ constructor(
         }
       state.copy(
         form =
-          form.copy(vaccineType = type, vaccineTypeError = null, nextDueDate = suggestedNextDue)
+          form.copy(
+            vaccineType = type,
+            customName = if (type == VaccineType.OTHER) form.customName else "",
+            vaccineTypeError = null,
+            customNameError = null,
+            nextDueDate = suggestedNextDue,
+          )
       )
     }
   }
 
   fun updateCustomName(name: String) {
-    _uiState.update { it.copy(form = it.form.copy(customName = name)) }
+    _uiState.update { it.copy(form = it.form.copy(customName = name, customNameError = null)) }
   }
 
   fun updateApplicationDate(date: LocalDate) {
@@ -194,6 +223,7 @@ constructor(
               it.form.copy(
                 isEditMode = true,
                 editingEntryId = entry.id,
+                editingCreatedAt = entry.createdAt,
                 vaccineType = entry.vaccineType,
                 customName = entry.customVaccineTypeName ?: "",
                 applicationDate = entry.applicationDate,
@@ -210,94 +240,28 @@ constructor(
   }
 
   fun resetForm() {
-    _uiState.update { it.copy(form = VaccinationFormState()) }
+    _uiState.update { it.copy(form = VaccinationFormState(applicationDate = LocalDate.now(clock))) }
   }
 
   fun saveVaccination() {
     val state = _uiState.value
     val form = state.form
 
-    // Validation
-    if (form.applicationDate.isAfter(LocalDate.now())) {
-      _uiState.update {
-        it.copy(
-          form =
-            it.form.copy(
-              applicationDateError = context.getString(R.string.vaccination_error_date_future)
-            )
+    val validationErrors =
+      VaccinationDraft(
+          petType = state.petType,
+          vaccineType = form.vaccineType,
+          customName = form.customName,
+          applicationDate = form.applicationDate,
+          nextDueDate = form.nextDueDate,
+          veterinarian = form.veterinarian,
+          clinic = form.clinic,
+          batchNumber = form.batchNumber,
+          note = form.note,
         )
-      }
-      return
-    }
-
-    if (form.nextDueDate != null && !form.nextDueDate.isAfter(form.applicationDate)) {
-      _uiState.update {
-        it.copy(
-          form =
-            it.form.copy(
-              applicationDateError = context.getString(R.string.vaccination_error_next_dose_after)
-            )
-        )
-      }
-      return
-    }
-
-    if (form.veterinarian.length > 100) {
-      _uiState.update {
-        it.copy(
-          form =
-            it.form.copy(
-              veterinarianError =
-                context.getString(R.string.vaccination_error_field_max_length, 100)
-            )
-        )
-      }
-      return
-    }
-
-    if (form.clinic.length > 100) {
-      _uiState.update {
-        it.copy(
-          form =
-            it.form.copy(
-              clinicError = context.getString(R.string.vaccination_error_field_max_length, 100)
-            )
-        )
-      }
-      return
-    }
-
-    if (form.batchNumber.length > 50) {
-      _uiState.update {
-        it.copy(
-          form =
-            it.form.copy(
-              batchNumberError = context.getString(R.string.vaccination_error_field_max_length, 50)
-            )
-        )
-      }
-      return
-    }
-
-    if (form.note.length > 500) {
-      _uiState.update {
-        it.copy(
-          form =
-            it.form.copy(noteError = context.getString(R.string.vaccination_error_note_max_length))
-        )
-      }
-      return
-    }
-
-    if (form.vaccineType == VaccineType.OTHER && form.customName.trim().length > 100) {
-      _uiState.update {
-        it.copy(
-          form =
-            it.form.copy(
-              customNameError = context.getString(R.string.vaccination_error_field_max_length, 100)
-            )
-        )
-      }
+        .validate(clock)
+    if (validationErrors.isNotEmpty()) {
+      applyValidationErrors(validationErrors)
       return
     }
 
@@ -305,12 +269,7 @@ constructor(
       _uiState.update { it.copy(form = it.form.copy(isSaving = true)) }
 
       try {
-        val now = System.currentTimeMillis()
-        val existingEntry =
-          if (form.isEditMode) {
-            state.allVaccinations.find { it.id == form.editingEntryId }
-          } else null
-
+        val now = clock.millis()
         val entry =
           VaccinationEntry(
             id = form.editingEntryId ?: UUID.randomUUID().toString(),
@@ -325,7 +284,7 @@ constructor(
             clinic = form.clinic.trim().ifBlank { null },
             batchNumber = form.batchNumber.trim().ifBlank { null },
             note = form.note.trim().ifBlank { null },
-            createdAt = existingEntry?.createdAt ?: now,
+            createdAt = form.editingCreatedAt ?: now,
             updatedAt = now,
             syncStatus = SyncStatus.LOCAL_ONLY,
           )
@@ -339,7 +298,9 @@ constructor(
           // DB saved but auto-task failed — non-critical
         }
 
-        _uiState.update { it.copy(form = VaccinationFormState()) }
+        _uiState.update {
+          it.copy(form = VaccinationFormState(applicationDate = LocalDate.now(clock)))
+        }
 
         _events.emit(VaccinationEvent.VaccinationSaved(petId))
       } catch (e: Exception) {
@@ -349,6 +310,52 @@ constructor(
       } finally {
         _uiState.update { it.copy(form = it.form.copy(isSaving = false)) }
       }
+    }
+  }
+
+  private fun applyValidationErrors(errors: List<VaccinationValidationError>) {
+    _uiState.update { state ->
+      state.copy(
+        form =
+          state.form.copy(
+            vaccineTypeError =
+              context.getString(R.string.vaccination_error_type_not_applicable).takeIf {
+                VaccinationValidationError.VACCINE_TYPE_NOT_APPLICABLE in errors
+              },
+            customNameError =
+              when {
+                VaccinationValidationError.CUSTOM_NAME_REQUIRED in errors ->
+                  context.getString(R.string.vaccination_error_custom_name_required)
+                VaccinationValidationError.CUSTOM_NAME_TOO_LONG in errors ->
+                  context.getString(R.string.vaccination_error_field_max_length, 100)
+                else -> null
+              },
+            applicationDateError =
+              when {
+                VaccinationValidationError.APPLICATION_DATE_IN_FUTURE in errors ->
+                  context.getString(R.string.vaccination_error_date_future)
+                VaccinationValidationError.NEXT_DUE_DATE_NOT_AFTER_APPLICATION in errors ->
+                  context.getString(R.string.vaccination_error_next_dose_after)
+                else -> null
+              },
+            veterinarianError =
+              context.getString(R.string.vaccination_error_field_max_length, 100).takeIf {
+                VaccinationValidationError.VETERINARIAN_TOO_LONG in errors
+              },
+            clinicError =
+              context.getString(R.string.vaccination_error_field_max_length, 100).takeIf {
+                VaccinationValidationError.CLINIC_TOO_LONG in errors
+              },
+            batchNumberError =
+              context.getString(R.string.vaccination_error_field_max_length, 50).takeIf {
+                VaccinationValidationError.BATCH_NUMBER_TOO_LONG in errors
+              },
+            noteError =
+              context.getString(R.string.vaccination_error_note_max_length).takeIf {
+                VaccinationValidationError.NOTE_TOO_LONG in errors
+              },
+          )
+      )
     }
   }
 

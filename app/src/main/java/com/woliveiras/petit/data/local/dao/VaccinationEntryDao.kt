@@ -14,7 +14,11 @@ interface VaccinationEntryDao {
 
   /** Get all vaccination entries for a pet, ordered by application date (newest first). */
   @Query(
-    "SELECT * FROM vaccination_entries WHERE petId = :petId AND deletedAt IS NULL ORDER BY applicationDate DESC"
+    """
+      SELECT * FROM vaccination_entries
+      WHERE petId = :petId AND deletedAt IS NULL
+      ORDER BY applicationDate DESC, updatedAt DESC, id DESC
+    """
   )
   fun getVaccinationEntriesForPet(petId: String): Flow<List<VaccinationEntryEntity>>
 
@@ -24,12 +28,18 @@ interface VaccinationEntryDao {
         SELECT * FROM vaccination_entries v1
         WHERE petId = :petId 
         AND deletedAt IS NULL
-        AND applicationDate = (
-            SELECT MAX(applicationDate) FROM vaccination_entries v2 
-            WHERE v2.petId = v1.petId 
-            AND v2.vaccineType = v1.vaccineType 
+        AND NOT EXISTS (
+            SELECT 1 FROM vaccination_entries v2
+            WHERE v2.petId = v1.petId
+            AND v2.vaccineType = v1.vaccineType
             AND v2.deletedAt IS NULL
+            AND (
+              v2.applicationDate > v1.applicationDate
+              OR (v2.applicationDate = v1.applicationDate AND v2.updatedAt > v1.updatedAt)
+              OR (v2.applicationDate = v1.applicationDate AND v2.updatedAt = v1.updatedAt AND v2.id > v1.id)
+            )
         )
+        ORDER BY applicationDate DESC, updatedAt DESC, id DESC
     """
   )
   fun getLatestVaccinationsForPet(petId: String): Flow<List<VaccinationEntryEntity>>
@@ -47,11 +57,16 @@ interface VaccinationEntryDao {
         WHERE deletedAt IS NULL
         AND nextDueDate IS NOT NULL
         AND nextDueDate < :today
-        AND applicationDate = (
-            SELECT MAX(applicationDate) FROM vaccination_entries v2 
-            WHERE v2.petId = v1.petId 
-            AND v2.vaccineType = v1.vaccineType 
+        AND NOT EXISTS (
+            SELECT 1 FROM vaccination_entries v2
+            WHERE v2.petId = v1.petId
+            AND v2.vaccineType = v1.vaccineType
             AND v2.deletedAt IS NULL
+            AND (
+              v2.applicationDate > v1.applicationDate
+              OR (v2.applicationDate = v1.applicationDate AND v2.updatedAt > v1.updatedAt)
+              OR (v2.applicationDate = v1.applicationDate AND v2.updatedAt = v1.updatedAt AND v2.id > v1.id)
+            )
         )
     """
   )
@@ -67,11 +82,16 @@ interface VaccinationEntryDao {
         WHERE deletedAt IS NULL
         AND nextDueDate IS NOT NULL
         AND nextDueDate BETWEEN :today AND :futureDate
-        AND applicationDate = (
-            SELECT MAX(applicationDate) FROM vaccination_entries v2 
-            WHERE v2.petId = v1.petId 
-            AND v2.vaccineType = v1.vaccineType 
+        AND NOT EXISTS (
+            SELECT 1 FROM vaccination_entries v2
+            WHERE v2.petId = v1.petId
+            AND v2.vaccineType = v1.vaccineType
             AND v2.deletedAt IS NULL
+            AND (
+              v2.applicationDate > v1.applicationDate
+              OR (v2.applicationDate = v1.applicationDate AND v2.updatedAt > v1.updatedAt)
+              OR (v2.applicationDate = v1.applicationDate AND v2.updatedAt = v1.updatedAt AND v2.id > v1.id)
+            )
         )
         ORDER BY nextDueDate ASC
     """

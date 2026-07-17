@@ -4,8 +4,8 @@ import com.woliveiras.petit.data.local.dao.VaccinationEntryDao
 import com.woliveiras.petit.data.mapper.toDomain
 import com.woliveiras.petit.data.mapper.toEntity
 import com.woliveiras.petit.domain.model.VaccinationEntry
+import java.time.Clock
 import java.time.LocalDate
-import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.map
 @Singleton
 class VaccinationEntryRepositoryImpl
 @Inject
-constructor(private val vaccinationEntryDao: VaccinationEntryDao) : VaccinationEntryRepository {
+constructor(private val vaccinationEntryDao: VaccinationEntryDao, private val clock: Clock) :
+  VaccinationEntryRepository {
 
   override fun getVaccinationEntriesForPet(petId: String): Flow<List<VaccinationEntry>> {
     return vaccinationEntryDao.getVaccinationEntriesForPet(petId).map { entities ->
@@ -34,16 +35,16 @@ constructor(private val vaccinationEntryDao: VaccinationEntryDao) : VaccinationE
   }
 
   override fun getOverdueVaccinations(): Flow<List<VaccinationEntry>> {
-    val today = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val today = LocalDate.now(clock).atStartOfDay(clock.zone).toInstant().toEpochMilli()
     return vaccinationEntryDao.getOverdueVaccinations(today).map { entities -> entities.toDomain() }
   }
 
   override fun getUpcomingVaccinations(days: Int): Flow<List<VaccinationEntry>> {
-    val today = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val today = LocalDate.now(clock).atStartOfDay(clock.zone).toInstant().toEpochMilli()
     val futureDate =
-      LocalDate.now()
+      LocalDate.now(clock)
         .plusDays(days.toLong())
-        .atStartOfDay(ZoneId.systemDefault())
+        .atStartOfDay(clock.zone)
         .toInstant()
         .toEpochMilli()
     return vaccinationEntryDao.getUpcomingVaccinations(today, futureDate).map { entities ->
@@ -52,12 +53,11 @@ constructor(private val vaccinationEntryDao: VaccinationEntryDao) : VaccinationE
   }
 
   override suspend fun saveVaccinationEntry(entry: VaccinationEntry) {
-    val updatedEntry = entry.copy(updatedAt = System.currentTimeMillis())
     val existingEntry = vaccinationEntryDao.getVaccinationEntryById(entry.id)
     if (existingEntry != null) {
-      vaccinationEntryDao.updateVaccinationEntry(updatedEntry.toEntity())
+      vaccinationEntryDao.updateVaccinationEntry(entry.toEntity())
     } else {
-      vaccinationEntryDao.insertVaccinationEntry(updatedEntry.toEntity())
+      vaccinationEntryDao.insertVaccinationEntry(entry.toEntity())
     }
   }
 

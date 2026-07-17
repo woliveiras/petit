@@ -1,5 +1,6 @@
 package com.woliveiras.petit.domain.model
 
+import java.time.Clock
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -32,7 +33,11 @@ data class VaccinationEntry(
 
   /** Whether this vaccination is overdue. */
   val isOverdue: Boolean
-    get() = nextDueDate?.isBefore(LocalDate.now()) == true
+    get() = isOverdue(Clock.systemDefaultZone())
+
+  fun isOverdue(clock: Clock): Boolean = isOverdue(LocalDate.now(clock))
+
+  fun isOverdue(onDate: LocalDate): Boolean = nextDueDate?.isBefore(onDate) == true
 
   /**
    * Calculates the current status based on nextDueDate.
@@ -41,16 +46,19 @@ data class VaccinationEntry(
    * - OK: nextDueDate is more than 30 days away or null
    */
   val status: HealthStatus
-    get() {
-      val dueDate = nextDueDate ?: return HealthStatus.OK
-      val today = LocalDate.now()
-      val daysUntilDue = ChronoUnit.DAYS.between(today, dueDate)
-      return when {
-        daysUntilDue < 0 -> HealthStatus.OVERDUE
-        daysUntilDue <= 30 -> HealthStatus.SCHEDULED
-        else -> HealthStatus.OK
-      }
+    get() = status(Clock.systemDefaultZone())
+
+  fun status(clock: Clock): HealthStatus = status(LocalDate.now(clock))
+
+  fun status(onDate: LocalDate): HealthStatus {
+    val dueDate = nextDueDate ?: return HealthStatus.OK
+    val daysUntilDue = ChronoUnit.DAYS.between(onDate, dueDate)
+    return when {
+      daysUntilDue < 0 -> HealthStatus.OVERDUE
+      daysUntilDue <= 30 -> HealthStatus.SCHEDULED
+      else -> HealthStatus.OK
     }
+  }
 
   companion object
 }

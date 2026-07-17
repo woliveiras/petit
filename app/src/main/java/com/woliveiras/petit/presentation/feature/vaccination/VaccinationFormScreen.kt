@@ -56,7 +56,6 @@ import com.woliveiras.petit.domain.model.VaccineType
 import com.woliveiras.petit.presentation.components.PetitTopAppBar
 import com.woliveiras.petit.presentation.util.localizedName
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -120,9 +119,7 @@ fun VaccinationFormScreen(
           onClick = {
             datePickerState.selectedDateMillis?.let { millis ->
               val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
-              if (!date.isAfter(LocalDate.now())) {
-                viewModel.updateApplicationDate(date)
-              }
+              viewModel.updateApplicationDate(date)
             }
             showApplicationDatePicker = false
           }
@@ -231,6 +228,8 @@ fun VaccinationFormScreen(
             value = form.vaccineType.localizedName(),
             onValueChange = {},
             readOnly = true,
+            isError = form.vaccineTypeError != null,
+            supportingText = form.vaccineTypeError?.let { error -> { Text(error) } },
             trailingIcon = {
               ExposedDropdownMenuDefaults.TrailingIcon(expanded = vaccineTypeExpanded)
             },
@@ -259,25 +258,12 @@ fun VaccinationFormScreen(
         }
       }
 
-      // Custom name field (only shown if OTHER selected)
-      if (form.vaccineType == VaccineType.OTHER) {
-        FormField(label = stringResource(R.string.vaccination_field_custom_name)) {
-          OutlinedTextField(
-            value = form.customName,
-            onValueChange = viewModel::updateCustomName,
-            placeholder = {
-              Text(stringResource(R.string.vaccination_field_custom_name_placeholder))
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            colors =
-              OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-              ),
-          )
-        }
-      }
+      VaccinationCustomNameField(
+        vaccineType = form.vaccineType,
+        customName = form.customName,
+        error = form.customNameError,
+        onValueChange = viewModel::updateCustomName,
+      )
 
       // Application Date
       FormField(
@@ -346,6 +332,8 @@ fun VaccinationFormScreen(
           },
           modifier = Modifier.fillMaxWidth(),
           singleLine = true,
+          isError = form.veterinarianError != null,
+          supportingText = form.veterinarianError?.let { error -> { Text(error) } },
           shape = RoundedCornerShape(12.dp),
           colors =
             OutlinedTextFieldDefaults.colors(
@@ -362,6 +350,8 @@ fun VaccinationFormScreen(
           placeholder = { Text(stringResource(R.string.vaccination_field_clinic_placeholder)) },
           modifier = Modifier.fillMaxWidth(),
           singleLine = true,
+          isError = form.clinicError != null,
+          supportingText = form.clinicError?.let { error -> { Text(error) } },
           shape = RoundedCornerShape(12.dp),
           colors =
             OutlinedTextFieldDefaults.colors(
@@ -378,6 +368,8 @@ fun VaccinationFormScreen(
           placeholder = { Text(stringResource(R.string.vaccination_field_batch_placeholder)) },
           modifier = Modifier.fillMaxWidth(),
           singleLine = true,
+          isError = form.batchNumberError != null,
+          supportingText = form.batchNumberError?.let { error -> { Text(error) } },
           shape = RoundedCornerShape(12.dp),
           colors =
             OutlinedTextFieldDefaults.colors(
@@ -395,6 +387,8 @@ fun VaccinationFormScreen(
           modifier = Modifier.fillMaxWidth(),
           minLines = 3,
           maxLines = 5,
+          isError = form.noteError != null,
+          supportingText = form.noteError?.let { error -> { Text(error) } },
           shape = RoundedCornerShape(12.dp),
           colors =
             OutlinedTextFieldDefaults.colors(
@@ -429,6 +423,33 @@ fun VaccinationFormScreen(
 
       Spacer(modifier = Modifier.height(16.dp))
     }
+  }
+}
+
+@Composable
+internal fun VaccinationCustomNameField(
+  vaccineType: VaccineType,
+  customName: String,
+  error: String?,
+  onValueChange: (String) -> Unit,
+) {
+  if (vaccineType != VaccineType.OTHER) return
+
+  FormField(label = stringResource(R.string.vaccination_field_custom_name)) {
+    OutlinedTextField(
+      value = customName,
+      onValueChange = onValueChange,
+      placeholder = { Text(stringResource(R.string.vaccination_field_custom_name_placeholder)) },
+      modifier = Modifier.fillMaxWidth(),
+      singleLine = true,
+      isError = error != null,
+      supportingText = error?.let { message -> { Text(message) } },
+      shape = RoundedCornerShape(12.dp),
+      colors =
+        OutlinedTextFieldDefaults.colors(
+          unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        ),
+    )
   }
 }
 

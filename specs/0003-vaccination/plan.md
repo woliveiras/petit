@@ -4,11 +4,11 @@ Spec: [spec.md](./spec.md)
 
 ## Sequence
 
-1. Add unit tests for date/status boundaries, species validation, `OTHER`, and edit metadata.
-2. Centralize validation and make date-dependent behavior use a controlled clock.
-3. Complete the form behavior for species-specific types and the required custom name.
-4. Render every health state and provide a latest-dose summary grouped by type.
-5. Add Room and Compose coverage for persistence, grouping, history, and soft delete.
+1. [x] Add unit tests for date/status boundaries, species validation, `OTHER`, and edit metadata.
+2. [x] Centralize validation and make date-dependent behavior use a controlled clock.
+3. [x] Complete the form behavior for species-specific types and the required custom name.
+4. [x] Render every health state and provide a latest-dose summary grouped by type.
+5. [x] Add Room and Compose coverage for persistence, grouping, history, and soft delete.
 
 ## Architecture
 

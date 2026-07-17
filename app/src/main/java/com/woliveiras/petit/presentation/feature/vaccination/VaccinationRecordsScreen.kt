@@ -44,15 +44,14 @@ import com.woliveiras.petit.R
 import com.woliveiras.petit.domain.model.HealthStatus
 import com.woliveiras.petit.domain.model.VaccinationEntry
 import com.woliveiras.petit.domain.model.VaccineType
+import com.woliveiras.petit.domain.model.groupVaccinationsByType
 import com.woliveiras.petit.presentation.components.EmptyState
 import com.woliveiras.petit.presentation.components.HealthStatusBadge
 import com.woliveiras.petit.presentation.components.PetitTopAppBar
 import com.woliveiras.petit.presentation.util.localizedName
 import com.woliveiras.petit.ui.theme.*
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /**
  * Screen displaying vaccination records for a pet. Shows latest vaccination for each type with
@@ -105,6 +104,7 @@ fun VaccinationRecordsScreen(
     } else {
       VaccinationTimeline(
         vaccinations = uiState.allVaccinations,
+        today = uiState.today,
         onEditEntry = { onNavigateToEditEntry(it.id) },
         modifier = Modifier.padding(padding),
       )
@@ -113,45 +113,51 @@ fun VaccinationRecordsScreen(
 }
 
 @Composable
-private fun VaccinationTimeline(
+internal fun VaccinationTimeline(
   vaccinations: List<VaccinationEntry>,
+  today: LocalDate,
   onEditEntry: (VaccinationEntry) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault()) }
-
-  // Group vaccinations by YearMonth, sorted descending (most recent first)
-  val groupedByMonth =
-    remember(vaccinations) {
-      vaccinations
-        .sortedByDescending { it.applicationDate }
-        .groupBy { YearMonth.from(it.applicationDate) }
-        .toSortedMap(compareByDescending { it })
-    }
+  val groups = remember(vaccinations) { vaccinations.groupVaccinationsByType() }
 
   LazyColumn(
     modifier = modifier,
     contentPadding = PaddingValues(16.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp),
   ) {
-    groupedByMonth.entries.forEachIndexed { index, (yearMonth, entries) ->
-      // Month header
-      item(key = "header_$yearMonth") {
+    groups.forEachIndexed { index, group ->
+      item(key = "header_${group.vaccineType}") {
         if (index > 0) {
           Spacer(modifier = Modifier.height(8.dp))
         }
-        Text(
-          text = yearMonth.format(monthFormatter).uppercase(),
-          style = MaterialTheme.typography.labelLarge,
-          fontWeight = FontWeight.Bold,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.padding(bottom = 4.dp),
-        )
+        Row(
+          modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Column {
+            Text(
+              text = group.latest.effectiveVaccineDisplayName,
+              style = MaterialTheme.typography.titleMedium,
+              fontWeight = FontWeight.Bold,
+            )
+            Text(
+              text = stringResource(R.string.vaccination_history_dose_count, group.history.size),
+              style = MaterialTheme.typography.bodySmall,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+          }
+          HealthStatusBadge(status = group.latest.status(today))
+        }
       }
 
-      // Vaccination cards for this month
-      items(entries, key = { it.id }) { vaccination ->
-        VaccinationTimelineCard(vaccination = vaccination, onEdit = { onEditEntry(vaccination) })
+      items(group.history, key = { it.id }) { vaccination ->
+        VaccinationTimelineCard(
+          vaccination = vaccination,
+          status = vaccination.status(today),
+          onEdit = { onEditEntry(vaccination) },
+        )
       }
     }
   }
@@ -160,16 +166,17 @@ private fun VaccinationTimeline(
 @Composable
 private fun VaccinationTimelineCard(
   vaccination: VaccinationEntry,
+  status: HealthStatus,
   onEdit: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-  val isOverdue = vaccination.nextDueDate?.isBefore(LocalDate.now()) == true
   val cardDescription =
     listOfNotNull(
-        vaccination.vaccineType.localizedName(),
+        vaccination.effectiveVaccineDisplayName,
         vaccination.applicationDate.format(dateFormatter),
         vaccination.nextDueDate?.let { it.format(dateFormatter) },
+        status.localizedName(),
       )
       .joinToString(", ")
 
@@ -201,13 +208,11 @@ private fun VaccinationTimelineCard(
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Text(
-            text = vaccination.vaccineType.localizedName(),
+            text = vaccination.effectiveVaccineDisplayName,
             style = MaterialTheme.typography.titleLarge,
           )
 
-          if (isOverdue) {
-            HealthStatusBadge(status = HealthStatus.OVERDUE)
-          }
+          HealthStatusBadge(status = status)
         }
 
         // Application date
@@ -244,6 +249,12 @@ private fun VaccinationTimelineCard(
           ?.takeIf { it.isNotBlank() }
           ?.let { batch ->
             DetailRow(label = stringResource(R.string.vaccination_detail_batch), value = batch)
+          }
+
+        vaccination.note
+          ?.takeIf { it.isNotBlank() }
+          ?.let { note ->
+            DetailRow(label = stringResource(R.string.vaccination_field_note), value = note)
           }
       }
     }

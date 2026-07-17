@@ -349,6 +349,7 @@
     <string name="vaccination_status_scheduled">Due in %1$d days</string>
     <string name="vaccination_status_overdue">Overdue by %1$d days</string>
     <string name="vaccination_status_today">Due today</string>
+    <string name="vaccination_history_dose_count">%1$d doses in history</string>
     <string name="vaccination_field_type">Vaccine type *</string>
     <string name="vaccination_field_custom_name">Vaccine name</string>
     <string name="vaccination_field_custom_name_placeholder">E.g.: FIV vaccine</string>
@@ -625,6 +626,8 @@
 
     <!-- Vaccination validation -->
     <string name="vaccination_error_date_future">Date cannot be in the future</string>
+    <string name="vaccination_error_type_not_applicable">This vaccine is not available for this species</string>
+    <string name="vaccination_error_custom_name_required">Vaccine name is required</string>
     <string name="vaccination_error_next_dose_after">Next dose must be after application date</string>
     <string name="vaccination_error_field_max_length">Must be at most %1$d characters</string>
     <string name="vaccination_error_note_max_length">Note must be at most 500 characters</string>
