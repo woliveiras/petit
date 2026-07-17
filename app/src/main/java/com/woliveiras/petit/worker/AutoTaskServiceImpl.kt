@@ -11,6 +11,8 @@ import com.woliveiras.petit.domain.model.TaskKind
 import com.woliveiras.petit.domain.model.TaskStatus
 import com.woliveiras.petit.domain.model.VaccinationEntry
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -25,15 +27,17 @@ import javax.inject.Singleton
 class AutoTaskServiceImpl
 @Inject
 constructor(
-  @ApplicationContext private val context: Context,
+  @param:ApplicationContext private val context: Context,
   private val taskRepository: TaskRepository,
   private val reminderPreferencesRepository: ReminderPreferencesRepository,
   private val taskScheduler: TaskScheduler,
   private val petRepository: PetRepository,
+  private val clock: Clock,
 ) : AutoTaskService {
 
   override suspend fun handleVaccinationSaved(entry: VaccinationEntry) {
     val prefs = reminderPreferencesRepository.getPreferences()
+    val now = clock.instant()
 
     taskRepository.deleteTasksByReferenceEntity(entry.id)
     taskScheduler.cancelTask("auto_vacc_${entry.id}")
@@ -42,7 +46,7 @@ constructor(
       return
     }
 
-    val today = LocalDate.now()
+    val today = LocalDate.ofInstant(now, clock.zone)
     if (entry.nextDueDate.isBefore(today)) {
       return
     }
@@ -60,13 +64,16 @@ constructor(
         description =
           context.getString(R.string.reminder_next_dose_description, prefs.vaccinationDaysBefore),
         scheduledFor =
-          LocalDateTime.of(
-            entry.nextDueDate,
-            LocalTime.of(prefs.defaultNotificationHour, prefs.defaultNotificationMinute),
+          scheduledCareTime(
+            dueDate = entry.nextDueDate,
+            daysBefore = prefs.vaccinationDaysBefore,
+            notificationHour = prefs.defaultNotificationHour,
+            notificationMinute = prefs.defaultNotificationMinute,
+            now = now,
           ),
         status = TaskStatus.PENDING,
-        createdAt = System.currentTimeMillis(),
-        updatedAt = System.currentTimeMillis(),
+        createdAt = now.toEpochMilli(),
+        updatedAt = now.toEpochMilli(),
       )
 
     taskRepository.saveTask(task)
@@ -80,6 +87,7 @@ constructor(
 
   override suspend fun handleDewormingSaved(entry: DewormingEntry) {
     val prefs = reminderPreferencesRepository.getPreferences()
+    val now = clock.instant()
 
     taskRepository.deleteTasksByReferenceEntity(entry.id)
     taskScheduler.cancelTask("auto_deworm_${entry.id}")
@@ -88,7 +96,7 @@ constructor(
       return
     }
 
-    val today = LocalDate.now()
+    val today = LocalDate.ofInstant(now, clock.zone)
     if (entry.nextDueDate.isBefore(today)) {
       return
     }
@@ -106,13 +114,16 @@ constructor(
         description =
           context.getString(R.string.reminder_next_dose_description, prefs.dewormingDaysBefore),
         scheduledFor =
-          LocalDateTime.of(
-            entry.nextDueDate,
-            LocalTime.of(prefs.defaultNotificationHour, prefs.defaultNotificationMinute),
+          scheduledCareTime(
+            dueDate = entry.nextDueDate,
+            daysBefore = prefs.dewormingDaysBefore,
+            notificationHour = prefs.defaultNotificationHour,
+            notificationMinute = prefs.defaultNotificationMinute,
+            now = now,
           ),
         status = TaskStatus.PENDING,
-        createdAt = System.currentTimeMillis(),
-        updatedAt = System.currentTimeMillis(),
+        createdAt = now.toEpochMilli(),
+        updatedAt = now.toEpochMilli(),
       )
 
     taskRepository.saveTask(task)
@@ -126,6 +137,7 @@ constructor(
 
   override suspend fun handleWeightSaved(petId: String, petName: String) {
     val prefs = reminderPreferencesRepository.getPreferences()
+    val now = clock.instant()
 
     if (!prefs.weightRemindersEnabled) {
       return
@@ -136,7 +148,8 @@ constructor(
     taskScheduler.cancelTask(taskId)
     taskRepository.deleteTask(taskId)
 
-    val taskDate = LocalDate.now().plusDays(prefs.weightReminderIntervalDays.toLong())
+    val taskDate =
+      LocalDate.ofInstant(now, clock.zone).plusDays(prefs.weightReminderIntervalDays.toLong())
 
     val task =
       Task(
@@ -152,8 +165,8 @@ constructor(
             LocalTime.of(prefs.defaultNotificationHour, prefs.defaultNotificationMinute),
           ),
         status = TaskStatus.PENDING,
-        createdAt = System.currentTimeMillis(),
-        updatedAt = System.currentTimeMillis(),
+        createdAt = now.toEpochMilli(),
+        updatedAt = now.toEpochMilli(),
       )
 
     taskRepository.saveTask(task)
@@ -164,5 +177,24 @@ constructor(
     val taskId = "auto_weight_$petId"
     taskScheduler.cancelTask(taskId)
     taskRepository.deleteTask(taskId)
+  }
+
+  /**
+   * Uses a single clock instant as the lower bound so a valid upcoming care record is never
+   * persisted with a past schedule when its advance-notice instant has already elapsed.
+   */
+  private fun scheduledCareTime(
+    dueDate: LocalDate,
+    daysBefore: Int,
+    notificationHour: Int,
+    notificationMinute: Int,
+    now: Instant,
+  ): LocalDateTime {
+    val requestedTime =
+      LocalDateTime.of(
+        dueDate.minusDays(daysBefore.toLong()),
+        LocalTime.of(notificationHour, notificationMinute),
+      )
+    return maxOf(requestedTime, LocalDateTime.ofInstant(now, clock.zone))
   }
 }

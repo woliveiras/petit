@@ -20,8 +20,12 @@ import com.google.common.truth.Truth.assertThat
 import com.woliveiras.petit.MainActivity
 import com.woliveiras.petit.R
 import com.woliveiras.petit.data.local.db.PetitDatabase
+import com.woliveiras.petit.data.repository.ReminderPreferencesRepositoryImpl
 import com.woliveiras.petit.domain.model.TaskKind
 import com.woliveiras.petit.domain.model.VaccineType
+import java.time.Instant
+import java.time.LocalTime
+import java.time.ZoneId
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -39,6 +43,7 @@ class VaccinationTaskJourneyTest {
   @Test
   fun addVaccination_persistsLinkedAutomaticTask() {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val daysBefore = 10
     val next = context.getString(R.string.onboarding_next)
     val getStarted = context.getString(R.string.onboarding_get_started)
     val registerPet = context.getString(R.string.home_register_pet)
@@ -52,6 +57,10 @@ class VaccinationTaskJourneyTest {
     val other = context.getString(R.string.vaccine_other)
     val petName = "Luna"
     val expectedTaskTitle = "$petName - ${VaccineType.RABIES.displayName}"
+
+    runBlocking {
+      ReminderPreferencesRepositoryImpl(context).updateVaccinationSettings(true, daysBefore)
+    }
 
     composeRule.onNodeWithText(next).performClick()
     composeRule.onNodeWithText(next).performClick()
@@ -95,11 +104,29 @@ class VaccinationTaskJourneyTest {
     try {
       val tasks = runBlocking { database.taskDao().getPendingTasks().first() }
       assertThat(tasks).hasSize(1)
-      with(tasks.single()) {
+      val task = tasks.single()
+      val vaccination = runBlocking {
+        database
+          .vaccinationEntryDao()
+          .getVaccinationEntryById(requireNotNull(task.referenceEntityId))
+      }
+      with(task) {
         assertThat(kind).isEqualTo(TaskKind.VACCINATION.name)
         assertThat(title).isEqualTo(expectedTaskTitle)
         assertThat(referenceEntityId).isNotNull()
         assertThat(id).isEqualTo("auto_vacc_$referenceEntityId")
+        val dueDate =
+          Instant.ofEpochMilli(requireNotNull(requireNotNull(vaccination).nextDueDate))
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+        val expectedScheduledFor =
+          dueDate
+            .minusDays(daysBefore.toLong())
+            .atTime(LocalTime.of(9, 0))
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+        assertThat(scheduledFor).isEqualTo(expectedScheduledFor)
       }
     } finally {
       database.close()

@@ -2,7 +2,7 @@
 spec: "0005"
 title: Local tasks and reminders
 family: pet-care
-status: In Progress
+status: Completed
 owner: woliveiras
 depends_on: ["0001"]
 ---
@@ -15,7 +15,11 @@ The caregiver needs reminders about pending care even while offline. The origina
 
 ## Current state
 
-Custom and health-linked tasks, WorkManager scheduling, completion, deletion, filters, and reminder preferences are present. Automatic vaccination and deworming tasks are currently scheduled for the next-dose date instead of applying the configured advance-notice interval.
+Custom and health-linked tasks, WorkManager scheduling, completion, deletion,
+filters, and reminder preferences are present. Automatic vaccination and
+deworming tasks now apply the configured advance-notice interval, use a
+clock-controlled immediate fallback when that time has elapsed, and replace or
+cancel their unique work idempotently.
 
 ## Functional requirements
 
@@ -63,9 +67,3 @@ E2E journey is updated to assert the configured advance notice.
 ## Out of scope
 
 - Automatic task recurrence and notification snooze.
-
-## Known limitation
-
-The configured vaccination and deworming advance notice is used in task copy
-but is not applied to the task's scheduled date. Automatic care tasks therefore
-do not yet fully honor reminder preferences.

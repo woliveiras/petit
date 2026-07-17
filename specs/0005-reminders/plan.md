@@ -4,11 +4,11 @@ Spec: [spec.md](./spec.md)
 
 ## Sequence
 
-1. Add unit tests for preference-based dates, overdue records, clock boundaries, and replacement/cancellation.
-2. Extract deterministic scheduling calculation and apply advance notice to vaccination and deworming tasks.
-3. Verify linked-task replacement, deletion, weight intervals, and WorkManager uniqueness at integration boundaries.
-4. Close unit and Compose gaps for custom tasks, filters, completion, and settings.
-5. Update the vaccination E2E journey to assert the configured scheduled instant.
+1. [x] Add unit tests for preference-based dates, overdue records, clock boundaries, and replacement/cancellation.
+2. [x] Extract deterministic scheduling calculation and apply advance notice to vaccination and deworming tasks.
+3. [x] Verify linked-task replacement, deletion, weight intervals, and WorkManager uniqueness at integration boundaries.
+4. [x] Close unit and Compose gaps for custom tasks, filters, completion, and settings.
+5. [x] Update the vaccination E2E journey to assert the configured scheduled instant.
 
 ## Architecture
 
