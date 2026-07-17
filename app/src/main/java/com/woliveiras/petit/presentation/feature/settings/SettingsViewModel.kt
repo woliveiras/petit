@@ -11,10 +11,12 @@ import com.woliveiras.petit.domain.model.AppLanguage
 import com.woliveiras.petit.domain.model.AppTheme
 import com.woliveiras.petit.domain.model.FamilyGroupInfo
 import com.woliveiras.petit.domain.usecase.DeleteAllDataAction
-import com.woliveiras.petit.util.LocaleHelper
+import com.woliveiras.petit.util.LanguageApplyResult
+import com.woliveiras.petit.util.LocaleApplicator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -35,6 +37,9 @@ data class SettingsUiState(
   val isDeletingAllData: Boolean = false,
   val familyGroupInfo: FamilyGroupInfo? = null,
   val lastSyncText: String? = null,
+  val isSavingPreference: Boolean = false,
+  val languageRestartRequired: Boolean = false,
+  val preferenceError: String? = null,
 )
 
 sealed class SettingsEvent {
@@ -51,6 +56,7 @@ constructor(
   private val userPreferencesRepository: UserPreferencesRepository,
   private val familyGroupRepository: FamilyGroupRepository,
   private val deleteAllDataUseCase: DeleteAllDataAction,
+  private val localeApplicator: LocaleApplicator,
 ) : ViewModel() {
 
   private val _uiState = MutableStateFlow(SettingsUiState())
@@ -113,17 +119,42 @@ constructor(
   }
 
   fun updateTheme(theme: AppTheme) {
+    if (_uiState.value.isSavingPreference) return
+    _uiState.update { it.copy(isSavingPreference = true, preferenceError = null) }
     viewModelScope.launch {
-      userPreferencesRepository.updateTheme(theme)
-      hideThemeDialog()
+      try {
+        userPreferencesRepository.updateTheme(theme)
+        _uiState.update { it.copy(showThemeDialog = false) }
+      } catch (exception: CancellationException) {
+        throw exception
+      } catch (_: Exception) {
+        _uiState.update { it.copy(preferenceError = context.getString(R.string.error_saving)) }
+      } finally {
+        _uiState.update { it.copy(isSavingPreference = false) }
+      }
     }
   }
 
   fun updateLanguage(language: AppLanguage) {
+    if (_uiState.value.isSavingPreference) return
+    _uiState.update { it.copy(isSavingPreference = true, preferenceError = null) }
     viewModelScope.launch {
-      userPreferencesRepository.updateLanguage(language)
-      LocaleHelper.applyLanguage(context, language)
-      hideLanguageDialog()
+      try {
+        userPreferencesRepository.updateLanguage(language)
+        val result = localeApplicator.applyLanguage(context, language)
+        _uiState.update {
+          it.copy(
+            showLanguageDialog = false,
+            languageRestartRequired = result == LanguageApplyResult.RESTART_REQUIRED,
+          )
+        }
+      } catch (exception: CancellationException) {
+        throw exception
+      } catch (_: Exception) {
+        _uiState.update { it.copy(preferenceError = context.getString(R.string.error_saving)) }
+      } finally {
+        _uiState.update { it.copy(isSavingPreference = false) }
+      }
     }
   }
 

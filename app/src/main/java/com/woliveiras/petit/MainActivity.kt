@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -23,30 +24,36 @@ import com.woliveiras.petit.presentation.navigation.PetitBottomNavBar
 import com.woliveiras.petit.presentation.navigation.PetitNavGraph
 import com.woliveiras.petit.presentation.navigation.Screen
 import com.woliveiras.petit.ui.theme.PetitTheme
+import com.woliveiras.petit.util.LocaleApplicator
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
   @Inject lateinit var userPreferencesRepository: UserPreferencesRepository
+  @Inject lateinit var localeApplicator: LocaleApplicator
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
+    lifecycleScope.launch {
+      val initialPreferences = userPreferencesRepository.userPreferences.first()
+      localeApplicator.applyLanguageAtStartup(this@MainActivity, initialPreferences.language)
+      showContent()
+    }
+  }
+
+  private fun showContent() {
     setContent {
       val userPreferences by
         userPreferencesRepository.userPreferences.collectAsStateWithLifecycle(initialValue = null)
 
       val prefs = userPreferences
 
-      val isDarkTheme =
-        when (prefs?.theme) {
-          AppTheme.SYSTEM,
-          null -> isSystemInDarkTheme()
-          AppTheme.LIGHT -> false
-          AppTheme.DARK -> true
-        }
+      val isDarkTheme = resolveDarkTheme(prefs?.theme ?: AppTheme.SYSTEM, isSystemInDarkTheme())
 
       PetitTheme(darkTheme = isDarkTheme) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -65,6 +72,13 @@ class MainActivity : ComponentActivity() {
     }
   }
 }
+
+internal fun resolveDarkTheme(theme: AppTheme, systemIsDark: Boolean): Boolean =
+  when (theme) {
+    AppTheme.SYSTEM -> systemIsDark
+    AppTheme.LIGHT -> false
+    AppTheme.DARK -> true
+  }
 
 @Composable
 private fun PetitAppContent(navController: NavHostController, startDestination: String) {

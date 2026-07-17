@@ -6,39 +6,61 @@ import android.os.Build
 import android.os.LocaleList
 import com.woliveiras.petit.domain.model.AppLanguage
 import java.util.Locale
+import javax.inject.Inject
+import javax.inject.Singleton
 
-/** Helper object for managing app locale changes. */
-object LocaleHelper {
+enum class LanguageApplyResult {
+  APPLIED,
+  RESTART_REQUIRED,
+}
 
-  /**
-   * Apply the selected language to the app. On Android 13+, uses the system LocaleManager for
-   * per-app language settings. On older versions, language change requires app restart.
-   */
-  fun applyLanguage(context: Context, language: AppLanguage) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      val localeManager = context.getSystemService(LocaleManager::class.java)
-      localeManager?.applicationLocales =
-        when (language) {
-          AppLanguage.SYSTEM -> LocaleList.getEmptyLocaleList()
-          else -> LocaleList.forLanguageTags(language.code)
-        }
+interface LocaleApplicator {
+  fun applyLanguage(context: Context, language: AppLanguage): LanguageApplyResult
+
+  fun applyLanguageAtStartup(context: Context, language: AppLanguage)
+}
+
+/** Applies app-language choices according to the platform per-app locale capabilities. */
+@Singleton
+class LocaleHelper @Inject constructor() : LocaleApplicator {
+
+  override fun applyLanguage(context: Context, language: AppLanguage): LanguageApplyResult {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+      return LanguageApplyResult.RESTART_REQUIRED
     }
-    // For older Android versions, the language preference is saved
-    // but requires app restart to take effect
+
+    context.getSystemService(LocaleManager::class.java)?.applicationLocales = language.localeList()
+    return LanguageApplyResult.APPLIED
   }
 
-  /** Get the current app locale. */
+  override fun applyLanguageAtStartup(context: Context, language: AppLanguage) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return
+
+    val locale =
+      when (language) {
+        AppLanguage.SYSTEM -> Locale.getDefault()
+        else -> Locale.forLanguageTag(language.code)
+      }
+    Locale.setDefault(locale)
+    val configuration = context.resources.configuration
+    configuration.setLocale(locale)
+    context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
+  }
+
+  /** Returns the locale currently used by the app. */
   fun getCurrentLocale(context: Context): Locale {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      val localeManager = context.getSystemService(LocaleManager::class.java)
-      val locales = localeManager?.applicationLocales
-      if (locales != null && !locales.isEmpty) {
-        locales.get(0) ?: Locale.getDefault()
-      } else {
-        Locale.getDefault()
-      }
+      val locales = context.getSystemService(LocaleManager::class.java)?.applicationLocales
+      if (locales != null && !locales.isEmpty) locales[0] ?: Locale.getDefault()
+      else Locale.getDefault()
     } else {
-      Locale.getDefault()
+      context.resources.configuration.locales[0] ?: Locale.getDefault()
     }
   }
+
+  private fun AppLanguage.localeList(): LocaleList =
+    when (this) {
+      AppLanguage.SYSTEM -> LocaleList.getEmptyLocaleList()
+      else -> LocaleList.forLanguageTags(code)
+    }
 }

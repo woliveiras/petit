@@ -140,6 +140,7 @@ fun SettingsScreen(
         currentTheme = uiState.currentTheme,
         themes = uiState.availableThemes,
         onThemeSelected = viewModel::updateTheme,
+        enabled = !uiState.isSavingPreference,
       )
     }
   }
@@ -154,6 +155,7 @@ fun SettingsScreen(
         currentLanguage = uiState.currentLanguage,
         languages = uiState.availableLanguages,
         onLanguageSelected = viewModel::updateLanguage,
+        enabled = !uiState.isSavingPreference,
       )
     }
   }
@@ -226,6 +228,11 @@ fun SettingsScreen(
             title = stringResource(R.string.settings_language),
             subtitle = getLanguageDisplayName(uiState.currentLanguage),
             onClick = viewModel::showLanguageDialog,
+          )
+
+          LanguagePreferenceFeedback(
+            restartRequired = uiState.languageRestartRequired,
+            error = uiState.preferenceError,
           )
         }
       }
@@ -342,10 +349,11 @@ private fun SettingsItem(
 }
 
 @Composable
-private fun ThemeSelectionContent(
+internal fun ThemeSelectionContent(
   currentTheme: AppTheme,
   themes: List<AppTheme>,
   onThemeSelected: (AppTheme) -> Unit,
+  enabled: Boolean = true,
 ) {
   Column(modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)) {
     Text(
@@ -357,7 +365,13 @@ private fun ThemeSelectionContent(
 
     themes.forEach { theme ->
       ListItem(
-        modifier = Modifier.clickable { onThemeSelected(theme) },
+        modifier =
+          Modifier.selectable(
+            selected = theme == currentTheme,
+            enabled = enabled,
+            role = Role.RadioButton,
+            onClick = { onThemeSelected(theme) },
+          ),
         leadingContent = {
           Icon(
             imageVector = getThemeIcon(theme),
@@ -381,10 +395,32 @@ private fun ThemeSelectionContent(
 }
 
 @Composable
-private fun LanguageSelectionContent(
+internal fun LanguagePreferenceFeedback(restartRequired: Boolean, error: String?) {
+  if (restartRequired) {
+    Text(
+      text = stringResource(R.string.settings_language_restart_message),
+      color = MaterialTheme.colorScheme.primary,
+      style = MaterialTheme.typography.bodySmall,
+      modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+  }
+
+  error?.let {
+    Text(
+      text = it,
+      color = MaterialTheme.colorScheme.error,
+      style = MaterialTheme.typography.bodySmall,
+      modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    )
+  }
+}
+
+@Composable
+internal fun LanguageSelectionContent(
   currentLanguage: AppLanguage,
   languages: List<AppLanguage>,
   onLanguageSelected: (AppLanguage) -> Unit,
+  enabled: Boolean = true,
 ) {
   Column(modifier = Modifier.fillMaxWidth()) {
     Text(
@@ -397,7 +433,13 @@ private fun LanguageSelectionContent(
     LazyColumn(modifier = Modifier.fillMaxWidth().height(400.dp)) {
       items(languages) { language ->
         ListItem(
-          modifier = Modifier.clickable { onLanguageSelected(language) },
+          modifier =
+            Modifier.selectable(
+              selected = language == currentLanguage,
+              enabled = enabled,
+              role = Role.RadioButton,
+              onClick = { onLanguageSelected(language) },
+            ),
           headlineContent = { Text(getLanguageDisplayName(language)) },
           supportingContent =
             if (language != AppLanguage.SYSTEM) {

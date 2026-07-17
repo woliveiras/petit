@@ -2,7 +2,7 @@
 spec: "0009"
 title: App preferences
 family: pet-care
-status: Implemented
+status: Completed
 owner: woliveiras
 depends_on: []
 ---
@@ -16,8 +16,10 @@ The caregiver needs Petit to follow their visual and language preferences across
 ## Current state
 
 Theme and language choices are persisted and applied through the settings
-flow. Pre-Android 13 language changes require a restart, and Spanish resources
-exist without an explicit Spanish option in the selector.
+flow. Android 13 and later apply language changes through `LocaleManager`;
+earlier versions explain that a restart is required and apply the persisted
+locale before rendering the next app session. The platform locale catalog and
+the in-app selector both expose English and Brazilian Portuguese.
 
 ## Functional requirements
 
@@ -49,7 +51,6 @@ Unit tests cover enum/code fallback and ViewModel state; integration and UI test
 ## Known limitations
 
 - On Android versions before 13, the selected language is persisted but is not applied until restart.
-- Spanish resources and locale configuration exist, but Spanish is not exposed as an explicit in-app language choice.
 - App-preference and reminder-preference DataStores are independent and have no shared reset operation.
 
 ## Out of scope

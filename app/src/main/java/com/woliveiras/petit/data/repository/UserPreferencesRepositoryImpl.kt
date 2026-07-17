@@ -20,8 +20,9 @@ private val Context.dataStore: DataStore<Preferences> by
 
 @Singleton
 class UserPreferencesRepositoryImpl
-@Inject
-constructor(@ApplicationContext private val context: Context) : UserPreferencesRepository {
+internal constructor(private val dataStore: DataStore<Preferences>) : UserPreferencesRepository {
+  @Inject constructor(@ApplicationContext context: Context) : this(context.dataStore)
+
   private object PreferencesKeys {
     val THEME = stringPreferencesKey("theme")
     val LANGUAGE = stringPreferencesKey("language")
@@ -29,7 +30,7 @@ constructor(@ApplicationContext private val context: Context) : UserPreferencesR
   }
 
   override val userPreferences: Flow<UserPreferences> =
-    context.dataStore.data.map { preferences ->
+    dataStore.data.map { preferences ->
       val theme =
         preferences[PreferencesKeys.THEME]?.let {
           try {
@@ -51,16 +52,14 @@ constructor(@ApplicationContext private val context: Context) : UserPreferencesR
     }
 
   override suspend fun updateTheme(theme: AppTheme) {
-    context.dataStore.edit { preferences -> preferences[PreferencesKeys.THEME] = theme.name }
+    dataStore.edit { preferences -> preferences[PreferencesKeys.THEME] = theme.name }
   }
 
   override suspend fun updateLanguage(language: AppLanguage) {
-    context.dataStore.edit { preferences -> preferences[PreferencesKeys.LANGUAGE] = language.code }
+    dataStore.edit { preferences -> preferences[PreferencesKeys.LANGUAGE] = language.code }
   }
 
   override suspend fun setOnboardingCompleted() {
-    context.dataStore.edit { preferences ->
-      preferences[PreferencesKeys.HAS_COMPLETED_ONBOARDING] = true
-    }
+    dataStore.edit { preferences -> preferences[PreferencesKeys.HAS_COMPLETED_ONBOARDING] = true }
   }
 }
