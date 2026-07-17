@@ -21,24 +21,36 @@ verificação no código. Neste acervo:
 - **Em espera (holding)**: hipótese preservada, sem compromisso de entrega.
 - **Pendente**: critério sem evidência de conclusão no documento ou no código.
 
+Todos os **46 documentos Markdown** da fonte foram preservados. O antigo agente
+de geração de specs foi arquivado, pois suas instruções foram substituídas pelo
+workflow atual deste repositório.
+
 ## Navegação rápida
 
 - [Requisitos do produto e monetização](REQUIREMENTS.md)
 - [Visão geral das specs](00-overview.md)
 - [Arquitetura](01-architecture.md)
 - [Domínios e entidades](02-domains.md)
+- [Pesquisa sobre protocolos de compartilhamento local](local-sharing-protocols.md)
+- [Plano técnico da Fase 2](development-plan-phase2.md)
+- [Plano de compartilhamento familiar](family-sharing-plan.md)
 
 ## Fases
 
 - [Fase 1 — MVP Local](phase-1/README.md) — concluída historicamente
-- [Fase 2 — Compartilhamento Familiar](phase-2/README.md) — próxima na fonte
+- [Fase 2 — Compartilhamento Familiar](phase-2/README.md) — parcialmente implementada; consulte o estado verificado
 
-## Fases em Holding (pendente demanda de usuarios)
+## Fases em Holding (pendente demanda de usuários)
 
 - [Fase N — Firebase Auth](holding/firebase-auth/README.md) ⏸️
 - [Fase N+1 — Backup Google Drive](holding/backup-gdrive/README.md) ⏸️
 - [Fase N+2 — Cloud Sync](holding/cloud-sync/README.md) ⏸️
 
-## Entregas concluidas
+## Entregas concluídas
 
 - [Registro histórico da Fase 1](completed/phase-1/README.md)
+
+## Arquivo histórico
+
+- [Antigo agente gerador de specs](archive/specs-generator-agent.md) — preservado
+  para proveniência; não é uma instrução ativa

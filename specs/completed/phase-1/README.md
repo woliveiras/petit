@@ -17,9 +17,9 @@ Entregar um app funcional **sem backend obrigatório**, com todas as features co
 - ✅ Lembretes locais
 - ✅ Export JSON
 - ✅ Import JSON
-- ❌ Login (Fase 2)
-- ❌ Sync na nuvem (Fase 4/5)
-- ❌ Backup automático (Fase 3)
+- ❌ Login (proposta em holding)
+- ❌ Sync na nuvem (proposta em holding)
+- ❌ Backup automático na nuvem (proposta em holding)
 
 ---
 

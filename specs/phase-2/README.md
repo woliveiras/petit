@@ -251,10 +251,8 @@ Device A (Transmissor)                Device B (Receptor)
 > **Fora do escopo desta fase e superseded.** O repositório de origem continha
 > o bloco abaixo sobre autenticação, premium e Crashlytics dentro do README de
 > compartilhamento local. Ele foi mantido integralmente para que nada se perca,
-> mas não representa o plano atual do Petit. Os links `us-101-google-login.md`,
-> `us-102-account-management.md`, `us-103-data-ownership.md` e
-> `us-104-premium-gate.md` pertenciam a outro conjunto e não existem nesta
-> pasta migrada.
+> mas não representa o plano atual do Petit. As histórias pertenciam a outro
+> conjunto e agora estão preservadas em [`holding/firebase-auth`](../holding/firebase-auth/README.md).
 
 ## Pré-requisitos legados
 
@@ -268,10 +266,10 @@ Device A (Transmissor)                Device B (Receptor)
 
 | ID | Feature | Prioridade |
 |----|---------|------------|
-| `us-101-google-login.md` (não migrado) | Login com Google | P0 |
-| `us-102-account-management.md` (não migrado) | Gerenciamento de Conta | P0 |
-| `us-103-data-ownership.md` (não migrado) | Vinculação de Dados | P1 |
-| `us-104-premium-gate.md` (não migrado) | Gate Premium | P1 |
+| [us-101-google-login.md](../holding/firebase-auth/us-101-google-login.md) (holding) | Login com Google | P0 |
+| [us-102-account-management.md](../holding/firebase-auth/us-102-account-management.md) (holding) | Gerenciamento de Conta | P0 |
+| [us-103-data-ownership.md](../holding/firebase-auth/us-103-data-ownership.md) (holding) | Vinculação de Dados | P1 |
+| [us-104-premium-gate.md](../holding/firebase-auth/us-104-premium-gate.md) (holding) | Gate Premium | P1 |
 
 ---
 

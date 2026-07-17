@@ -55,7 +55,7 @@ compartilhar com profissionais veterinários.
 | Fase | Escopo | Objetivo | Status |
 |------|--------|----------|--------|
 | 1 | MVP Local | App funcional sem backend, export/import manual | Concluída historicamente na fonte |
-| 2 | Compartilhamento Familiar | Compartilhamento local entre dispositivos da casa | 🔜 Próxima |
+| 2 | Compartilhamento Familiar | Compartilhamento local entre dispositivos da casa | Parcial — consulte o estado verificado da fase |
 | N | 🔒 Firebase Auth | Login Google (opcional) | ⏸️ On Hold |
 | N+1 | 🔒 Backup Google Drive | Backup manual/automático para Google Drive | ⏸️ On Hold |
 | N+2 | 🔒 Cloud Sync | Sync em tempo real via Firestore (premium) | ⏸️ On Hold |
@@ -82,7 +82,7 @@ App funcional 100% offline, sem backend.
 - US-006: Export/Import JSON
 - US-007: Dashboard Home
 
-#### [Fase 2 - Compartilhamento Familiar](./phase-2/README.md) 🔜 NEXT
+#### [Fase 2 - Compartilhamento Familiar](./phase-2/README.md) — parcialmente implementada
 Compartilhamento local entre dispositivos da casa, sem servidor remoto.
 - US-101: Pareamento de Dispositivos
 - US-102: Transferência One-Shot

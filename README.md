@@ -6,6 +6,7 @@ Petit is a multi-pet health tracker — track weight, vaccinations, deworming, a
 
 ## Technical Docs
 
+- [Product specifications](specs/README.md)
 - [Data modeling](docs/data-modeling.md)
 - [Testing guide](docs/running-tests.md)
 - [Accessibility testing guide (TalkBack)](docs/talkback-testing-guide.md)

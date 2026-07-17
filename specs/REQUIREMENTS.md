@@ -27,7 +27,10 @@
 
 Fase 1: sem backend obrigatório, tudo local, export/import manual, sem login, sem sincronização, apenas para ter um app funcional o mais rápido possível ✅ CONCLUÍDA
 
-Fase 2: compartilhamento local entre dispositivos da casa (grupo familiar) — pareamento via Nearby Connections, transferência one-shot, grupo familiar local, sync contínuo na rede local via NSD 🔜 PRÓXIMA
+Fase 2: compartilhamento local entre dispositivos da casa (grupo familiar) —
+pareamento via Nearby Connections, transferência one-shot, grupo familiar
+local e sync contínuo na rede local via NSD. Está **parcialmente implementada**;
+consulte o [estado verificado da Fase 2](phase-2/README.md#estado-verificado-no-petit).
 
 > **Fases abaixo estão em holding até que haja demanda de usuários:**
 >
