@@ -27,6 +27,7 @@ android {
     versionName = "1.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunnerArguments["clearPackageData"] = "true"
   }
 
   signingConfigs {
@@ -65,7 +66,10 @@ android {
     buildConfig = true
   }
 
-  testOptions { unitTests { isIncludeAndroidResources = true } }
+  testOptions {
+    unitTests { isIncludeAndroidResources = true }
+    execution = "ANDROIDX_TEST_ORCHESTRATOR"
+  }
 
   lint { baseline = file("lint-baseline.xml") }
 }
@@ -136,6 +140,7 @@ dependencies {
   androidTestImplementation(libs.kotlinx.coroutines.test)
   androidTestImplementation(libs.turbine)
   androidTestImplementation(libs.truth)
+  androidTestUtil(libs.androidx.test.orchestrator)
 
   // Debug
   debugImplementation(libs.androidx.ui.tooling)
