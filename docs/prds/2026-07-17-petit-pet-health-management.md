@@ -1,4 +1,24 @@
-# App de Gestão de Saúde dos Pets
+# PRD: Gestão de saúde dos pets no Petit
+
+**Status:** Ativo
+
+**Origem:** `getmiw/specs-miw@09b4497`, adaptado para o Petit
+
+**Última reconciliação:** 2026-07-17
+
+## Problema
+
+Pessoas responsáveis por pets precisam lembrar cuidados recorrentes e manter o
+histórico de saúde de cada animal em um lugar fácil de consultar e compartilhar
+com profissionais veterinários.
+
+## Objetivos
+
+1. Evitar que cuidados básicos sejam esquecidos.
+2. Centralizar o histórico de saúde de um ou mais pets.
+3. Manter os dados acessíveis offline e exportáveis quando necessário.
+
+## Documento de requisitos original
 
 ## Especificação Técnica:
 

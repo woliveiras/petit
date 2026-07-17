@@ -1,5 +1,8 @@
 # Arquitetura
 
+> Documento transversal. As decisões e requisitos específicos de cada
+> capacidade ficam nas pastas numeradas em [`specs/`](../specs/README.md).
+
 ## Princípios
 
 ### 1. Local-First

@@ -1,56 +1,87 @@
-# Especificações do Petit
+# Specs Index
 
-Documentação funcional, técnica e de produto do Petit. Estes documentos ajudam
-pessoas contribuidoras a entender o produto, as decisões já tomadas e o escopo
-de cada fase.
+Índice de todas as especificações do Petit. Atualize este arquivo ao criar,
+aprovar, implementar, colocar em espera ou concluir uma spec.
 
-## Proveniência
+Cada capacidade vive em uma pasta global `specs/NNNN-<slug>/` com `spec.md`,
+`plan.md` e `tasks.md`. Família, fase e status ficam no frontmatter de
+`spec.md` e são refletidos nas tabelas abaixo; não existem pastas por fase ou
+status.
 
-Este acervo foi migrado e adaptado em **2026-07-17** a partir do repositório
-privado `getmiw/specs-miw`, no commit `09b4497`. Na origem, o produto se chamava
-MiW e era voltado exclusivamente a gatos. A migração atualiza o nome para Petit,
-generaliza o domínio para pets de diferentes espécies e reconcilia referências
-técnicas com o código presente neste repositório.
+## Numeração
 
-Os status importados descrevem o planejamento histórico e não substituem a
-verificação no código. Neste acervo:
+| Bloco | Família | Reservado para |
+| --- | --- | --- |
+| 0001–0099 | pet-care | Cadastro, saúde, histórico e rotina dos pets |
+| 0100–0199 | local-sharing | Compartilhamento familiar sem servidor remoto |
+| 0200–0299 | identity-access | Identidade, conta e autorização |
+| 0300–0399 | backup-recovery | Backup, restauração e transferência |
+| 0400–0499 | cloud-sync | Sincronização remota e colaboração em nuvem |
 
-- **Concluída historicamente**: assim constava na fonte; critérios individuais
-  ainda podem estar pendentes ou ter evoluído.
-- **Em andamento/próxima**: trabalho planejado ou parcialmente implementado.
-- **Em espera (holding)**: hipótese preservada, sem compromisso de entrega.
-- **Pendente**: critério sem evidência de conclusão no documento ou no código.
+## Status
 
-Todos os **46 documentos Markdown** da fonte foram preservados. O antigo agente
-de geração de specs foi arquivado, pois suas instruções foram substituídas pelo
-workflow atual deste repositório.
+| Status | Significado |
+| --- | --- |
+| Draft | Comportamento proposto; ainda não aprovado |
+| Approved | Spec aprovada para implementação |
+| In Progress | Implementação parcial ou em andamento |
+| Implemented | Comportamento principal disponível no código |
+| Completed | Todos os critérios e tarefas concluídos e verificados |
+| On Hold | Hipótese preservada, sem compromisso atual de implementação |
 
-## Navegação rápida
+## Specs
 
-- [Requisitos do produto e monetização](REQUIREMENTS.md)
-- [Visão geral das specs](00-overview.md)
-- [Arquitetura](01-architecture.md)
-- [Domínios e entidades](02-domains.md)
-- [Pesquisa sobre protocolos de compartilhamento local](local-sharing-protocols.md)
-- [Plano técnico da Fase 2](development-plan-phase2.md)
-- [Plano de compartilhamento familiar](family-sharing-plan.md)
+### pet-care
 
-## Fases
+PRD: [Gestão de saúde dos pets no Petit](../docs/prds/2026-07-17-petit-pet-health-management.md)
 
-- [Fase 1 — MVP Local](phase-1/README.md) — concluída historicamente
-- [Fase 2 — Compartilhamento Familiar](phase-2/README.md) — parcialmente implementada; consulte o estado verificado
+| Spec | Título | Fase | Status | Depende de / Origem |
+| --- | --- | --- | --- | --- |
+| [0001](0001-pet-management/spec.md) | Gerenciamento de pets | 1 | Implemented | PRD Petit |
+| [0002](0002-weight-tracking/spec.md) | Acompanhamento de peso | 1 | Implemented | 0001 |
+| [0003](0003-vaccination/spec.md) | Registro de vacinação | 1 | Implemented | 0001 |
+| [0004](0004-deworming/spec.md) | Registro de desparasitação | 1 | Implemented | 0001 |
+| [0005](0005-reminders/spec.md) | Lembretes locais | 1 | Implemented | 0001 |
+| [0006](0006-export-import/spec.md) | Exportação e importação | 1 | Implemented | 0001–0005 |
+| [0007](0007-home-dashboard/spec.md) | Dashboard inicial | 1 | Implemented | 0001–0005 |
 
-## Fases em Holding (pendente demanda de usuários)
+### local-sharing
 
-- [Fase N — Firebase Auth](holding/firebase-auth/README.md) ⏸️
-- [Fase N+1 — Backup Google Drive](holding/backup-gdrive/README.md) ⏸️
-- [Fase N+2 — Cloud Sync](holding/cloud-sync/README.md) ⏸️
+| Spec | Título | Fase | Status | Depende de / Origem |
+| --- | --- | --- | --- | --- |
+| [0101](0101-device-pairing/spec.md) | Pareamento de dispositivos | 2 | In Progress | PRD Petit |
+| [0102](0102-one-shot-transfer/spec.md) | Transferência pontual | 2 | In Progress | 0101 |
+| [0103](0103-family-group/spec.md) | Grupo familiar local | 2 | In Progress | 0101 |
+| [0104](0104-local-network-sync/spec.md) | Sincronização na rede local | 2 | Draft | 0101, 0103 |
+| [0105](0105-local-conflict-resolution/spec.md) | Resolução de conflitos locais | 2 | In Progress | 0102 |
 
-## Entregas concluídas
+### identity-access
 
-- [Registro histórico da Fase 1](completed/phase-1/README.md)
+| Spec | Título | Fase | Status | Depende de / Origem |
+| --- | --- | --- | --- | --- |
+| [0201](0201-google-login/spec.md) | Login com Google | 3 | On Hold | Roadmap histórico |
+| [0202](0202-account-management/spec.md) | Gerenciamento de conta | 3 | On Hold | 0201 |
+| [0203](0203-data-ownership/spec.md) | Vinculação e propriedade dos dados | 3 | On Hold | 0201 |
+| [0204](0204-premium-gate/spec.md) | Controle de funcionalidades premium | 3 | On Hold | 0201 |
 
-## Arquivo histórico
+### backup-recovery
 
-- [Antigo agente gerador de specs](archive/specs-generator-agent.md) — preservado
-  para proveniência; não é uma instrução ativa
+| Spec | Título | Fase | Status | Depende de / Origem |
+| --- | --- | --- | --- | --- |
+| [0301](0301-manual-backup/spec.md) | Backup manual no Google Drive | 4 | On Hold | 0201 |
+| [0302](0302-restore-backup/spec.md) | Restauração de backup | 4 | On Hold | 0301 |
+| [0303](0303-manage-backups/spec.md) | Gerenciamento de backups | 4 | On Hold | 0301 |
+| [0304](0304-device-transfer/spec.md) | Transferência entre dispositivos | 4 | On Hold | 0101 |
+| [0305](0305-automatic-backup/spec.md) | Backup automático | 4 | On Hold | 0301 |
+| [0306](0306-backup-settings/spec.md) | Configurações de backup | 4 | On Hold | 0305 |
+| [0307](0307-backup-triggers/spec.md) | Gatilhos de backup | 4 | On Hold | 0305, 0306 |
+
+### cloud-sync
+
+| Spec | Título | Fase | Status | Depende de / Origem |
+| --- | --- | --- | --- | --- |
+| [0401](0401-realtime-cloud-sync/spec.md) | Sincronização em nuvem em tempo real | 5 | On Hold | 0201 |
+| [0402](0402-multi-device-sync/spec.md) | Sincronização entre vários dispositivos | 5 | On Hold | 0401 |
+| [0403](0403-cloud-conflict-resolution/spec.md) | Resolução de conflitos na nuvem | 5 | On Hold | 0401 |
+| [0404](0404-offline-cloud-sync/spec.md) | Sincronização offline-first com a nuvem | 5 | On Hold | 0401 |
+| [0405](0405-cloud-family-sharing/spec.md) | Compartilhamento familiar na nuvem | 5 | On Hold | 0201, 0401 |
