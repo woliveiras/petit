@@ -34,3 +34,9 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - desired behavior: cover round-trip, conflicts, corruption, atomicity, and older versions.
   - acceptance criteria: all acceptance criteria have automated coverage.
   - verification: `./gradlew test`
+
+- [x] **Cover backup restoration with an Android E2E journey** (test-type: integration)
+  - blocked-by: analyze and import a backup, integrate document selection, 0010
+  - desired behavior: export through DocumentsUI, delete local pet-care data, and import the saved backup.
+  - acceptance criteria: the pet disappears after deletion and returns after the user confirms import of the exported JSON file.
+  - verification: `./gradlew connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.woliveiras.petit.e2e.BackupRestoreJourneyTest`

@@ -24,6 +24,7 @@ truth = "1.4.5"
 arcCoreTesting = "2.2.0"
 robolectric = "4.16.1"
 androidxTestCore = "1.7.0"
+uiAutomator = "2.3.0"
 playServicesNearby = "19.3.0"
 
 [libraries]
@@ -75,6 +76,7 @@ turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
+androidx-ui-automator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiAutomator" }
 
 # Charts
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
