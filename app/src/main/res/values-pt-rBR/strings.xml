@@ -39,6 +39,9 @@
   <string name="home_welcome_message">Cadastre seu primeiro pet para começar</string>
   <string name="home_register_pet">Cadastrar Pet</string>
   <string name="home_section_alerts">ATENÇÃO NECESSÁRIA</string>
+  <string name="home_all_good">Tudo em dia</string>
+  <string name="home_all_good_description">Todos os pets estão em dia</string>
+  <string name="home_alert_relevant_date">Próximo cuidado: %1$s</string>
   <string name="home_section_pets">MEUS PETS</string>
   <string name="home_section_upcoming">PRÓXIMOS</string>
 
@@ -159,6 +162,7 @@
   <string name="health_status_ok">Em dia</string>
   <string name="health_status_scheduled">Agendado</string>
   <string name="health_status_overdue">Atrasado</string>
+  <string name="health_status_unavailable">Status de saúde indisponível</string>
   <string name="health_status_today">Hoje</string>
   <string name="health_status_tomorrow">Amanhã</string>
   <string name="health_status_days">%1$dd</string>

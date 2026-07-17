@@ -4,11 +4,11 @@ Spec: [spec.md](./spec.md)
 
 ## Sequence
 
-1. Add unit tests for pet summaries, overall status propagation, healthy/alert states, ordering, and limits.
-2. Carry `overallStatus` from `PetWithSummary` into every pet-card layout.
-3. Derive and render the accessible “All good” state or severity-ordered alerts.
-4. Add Compose/integration coverage without regressing tasks, timeline, refresh, or navigation.
-5. Add a focused dashboard E2E journey backed by persisted health data.
+1. [x] Add unit tests for pet summaries, overall status propagation, healthy/alert states, ordering, and limits.
+2. [x] Carry `overallStatus` from `PetWithSummary` into every pet-card layout.
+3. [x] Derive and render the accessible “All good” state or severity-ordered alerts.
+4. [x] Add Compose/integration coverage without regressing tasks, timeline, refresh, or navigation.
+5. [x] Add a focused dashboard E2E journey backed by persisted health data.
 
 ## Architecture
 

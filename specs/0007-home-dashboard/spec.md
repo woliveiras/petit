@@ -2,7 +2,7 @@
 spec: "0007"
 title: Home dashboard
 family: pet-care
-status: In Progress
+status: Completed
 owner: woliveiras
 depends_on: ["0001", "0002", "0003", "0004", "0005"]
 ---
@@ -15,7 +15,11 @@ The caregiver needs a quick view of the pets' health and the care that requires 
 
 ## Current state
 
-The home screen supports the empty state, pet cards, upcoming tasks, recent activity, Quick Add, settings navigation, and refresh. Overall health is calculated in the view model but is not carried into or displayed by the pet cards.
+The home screen supports the empty state, pet cards, upcoming tasks, recent
+activity, Quick Add, settings navigation, and refresh. Pet cards display their
+calculated health with accessible semantics; the dashboard distinguishes an
+all-healthy state from severity-ordered care alerts and remains useful when a
+secondary source fails.
 
 ## Functional requirements
 
@@ -50,9 +54,3 @@ journey verifies that persisted health data reaches the dashboard indicator.
 - `OVERDUE` alerts precede `SCHEDULED`; equal severity is ordered by the next relevant date.
 - Pet cards always receive and display `overallStatus` with text/icon semantics, not color alone.
 - Alerts complement rather than replace upcoming tasks and recent activity.
-
-## Known limitations
-
-- Pet cards do not display the calculated overall health status.
-- The “All good” banner and a separate alerts section have not been implemented.
-- Quick Add replaced the original Speed Dial.

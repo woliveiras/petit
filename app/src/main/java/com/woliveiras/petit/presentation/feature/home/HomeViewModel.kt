@@ -18,12 +18,13 @@ import com.woliveiras.petit.domain.usecase.GetPetHealthSummaryAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** UI State for the Home Dashboard. */
@@ -38,6 +39,8 @@ data class HomeUiState(
   val hasMoreTasks: Boolean = false,
   val recentActivity: List<TimelineEvent> = emptyList(),
   val upcomingTimeline: List<TimelineEvent> = emptyList(),
+  val isAllGood: Boolean = false,
+  val alerts: List<HomeAlert> = emptyList(),
   val isEmpty: Boolean = false,
 ) {
   companion object {
@@ -48,6 +51,7 @@ data class HomeUiState(
 /** Pet with summary information for display. */
 data class PetWithSummary(
   val pet: Pet,
+  val isHealthSummaryAvailable: Boolean = true,
   val latestWeight: WeightEntry? = null,
   val weightStatus: WeightStatus = WeightStatus.NO_DATA,
   val overallStatus: HealthStatus = HealthStatus.OK,
@@ -56,6 +60,53 @@ data class PetWithSummary(
   val nextDewormingType: DewormingType? = null,
   val nextDewormingDate: LocalDate? = null,
 )
+
+/** A pet whose health requires attention on the dashboard. */
+data class HomeAlert(val petWithSummary: PetWithSummary, val relevantDate: LocalDate?)
+
+/**
+ * Health-specific dashboard state derived from pet summaries.
+ *
+ * Keeping this calculation independent from Compose makes the severity and date ordering stable for
+ * all dashboard layouts.
+ */
+data class HomeDashboardState(val isAllGood: Boolean, val alerts: List<HomeAlert>) {
+  companion object {
+    fun from(pets: List<PetWithSummary>): HomeDashboardState {
+      val alerts =
+        pets
+          .asSequence()
+          .filter { it.isHealthSummaryAvailable && it.overallStatus != HealthStatus.OK }
+          .map { pet ->
+            HomeAlert(
+              petWithSummary = pet,
+              relevantDate =
+                listOfNotNull(pet.nextVaccinationDate, pet.nextDewormingDate).minOrNull(),
+            )
+          }
+          .sortedWith(
+            compareBy<HomeAlert>(
+              { it.petWithSummary.overallStatus.alertSeverity() },
+              { it.relevantDate ?: LocalDate.MAX },
+            )
+          )
+          .toList()
+
+      return HomeDashboardState(
+        isAllGood =
+          pets.isNotEmpty() && pets.all { it.isHealthSummaryAvailable } && alerts.isEmpty(),
+        alerts = alerts,
+      )
+    }
+
+    private fun HealthStatus.alertSeverity(): Int =
+      when (this) {
+        HealthStatus.OVERDUE -> 0
+        HealthStatus.SCHEDULED -> 1
+        HealthStatus.OK -> 2
+      }
+  }
+}
 
 @HiltViewModel
 class HomeViewModel
@@ -81,30 +132,40 @@ constructor(
     dashboardJob?.cancel()
     dashboardJob =
       viewModelScope.launch {
-        // Combine cats flow with weight changes trigger and tasks
-        combine(
-            petRepository.getAllPets(),
-            weightEntryRepository.observeWeightChanges(),
-            taskRepository.getTasksDueToday(),
-            taskRepository.getTasksDueThisWeek(),
-            taskRepository.getTasksDueThisMonth(),
-          ) { pets, _, tasksToday, tasksThisWeek, tasksThisMonth ->
-            DashboardData(pets, tasksToday, tasksThisWeek, tasksThisMonth)
+        val timeline =
+          combine(
+            timelineRepository.getRecentActivity().catch { emit(emptyList()) },
+            timelineRepository.getUpcomingEvents(30).catch { emit(emptyList()) },
+          ) { recentActivity, upcomingTimeline ->
+            DashboardTimeline(recentActivity.take(10), upcomingTimeline.take(5))
           }
-          .collect { data ->
+
+        // Combine pet, health-change, and task sources so the dashboard remains current.
+        combine(
+            combine(
+              petRepository.getAllPets().catch { emit(emptyList()) },
+              weightEntryRepository.observeWeightChanges().catch { emit(null) },
+              taskRepository.getTasksDueToday().catch { emit(emptyList()) },
+              taskRepository.getTasksDueThisWeek().catch { emit(emptyList()) },
+              taskRepository.getTasksDueThisMonth().catch { emit(emptyList()) },
+            ) { pets, _, tasksToday, tasksThisWeek, tasksThisMonth ->
+              DashboardData(pets, tasksToday, tasksThisWeek, tasksThisMonth)
+            },
+            timeline,
+          ) { dashboardData, dashboardTimeline ->
+            dashboardData to dashboardTimeline
+          }
+          .collect { (data, dashboardTimeline) ->
             if (data.pets.isEmpty()) {
               _uiState.value = HomeUiState(isLoading = false, isEmpty = true)
               return@collect
             }
 
             val petsWithSummary = data.pets.map { pet -> loadPetSummary(pet) }
-
-            // Load timeline separately to avoid too many combine params
-            val recentActivity = timelineRepository.getRecentActivity().first().take(10)
-            val upcomingTimeline = timelineRepository.getUpcomingEvents(30).first().take(5)
+            val healthDashboard = HomeDashboardState.from(petsWithSummary)
 
             // Also include overdue tasks in the "today" section
-            val overdueTasks = taskRepository.getPastDueTasks()
+            val overdueTasks = safelyLoad { taskRepository.getPastDueTasks() }.orEmpty()
             val tasksDueToday =
               (overdueTasks + data.tasksDueToday).distinctBy { it.id }.sortedBy { it.scheduledFor }
 
@@ -132,8 +193,10 @@ constructor(
                 tasksDueThisMonth = tasksDueThisMonth,
                 nextTasks = nextTasks,
                 hasMoreTasks = hasMoreTasks,
-                recentActivity = recentActivity,
-                upcomingTimeline = upcomingTimeline,
+                recentActivity = dashboardTimeline.recentActivity,
+                upcomingTimeline = dashboardTimeline.upcomingTimeline,
+                isAllGood = healthDashboard.isAllGood,
+                alerts = healthDashboard.alerts,
                 isEmpty = false,
               )
           }
@@ -147,8 +210,20 @@ constructor(
     val tasksDueThisMonth: List<Task>,
   )
 
+  private data class DashboardTimeline(
+    val recentActivity: List<TimelineEvent>,
+    val upcomingTimeline: List<TimelineEvent>,
+  )
+
   private suspend fun loadPetSummary(pet: Pet): PetWithSummary {
-    val summary = getPetHealthSummary.execute(pet.id)
+    val summary =
+      try {
+        getPetHealthSummary.execute(pet.id)
+      } catch (exception: CancellationException) {
+        throw exception
+      } catch (_: Exception) {
+        return PetWithSummary(pet = pet, isHealthSummaryAvailable = false)
+      }
 
     return PetWithSummary(
       pet = pet,
@@ -161,6 +236,15 @@ constructor(
       nextDewormingDate = summary.nextDewormingDate,
     )
   }
+
+  private suspend fun <T> safelyLoad(load: suspend () -> T): T? =
+    try {
+      load()
+    } catch (exception: CancellationException) {
+      throw exception
+    } catch (_: Exception) {
+      null
+    }
 
   fun refresh() {
     _uiState.value = _uiState.value.copy(isRefreshing = true)

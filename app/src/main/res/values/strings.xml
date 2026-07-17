@@ -39,6 +39,9 @@
     <string name="home_welcome_message">Register your first pet to get started</string>
     <string name="home_register_pet">Register Pet</string>
     <string name="home_section_alerts">ATTENTION NEEDED</string>
+    <string name="home_all_good">All good</string>
+    <string name="home_all_good_description">Every pet is up to date</string>
+    <string name="home_alert_relevant_date">Next care: %1$s</string>
     <string name="home_section_pets">MY PETS</string>
     <string name="home_section_upcoming">UPCOMING</string>
 
@@ -159,6 +162,7 @@
     <string name="health_status_ok">Up to date</string>
     <string name="health_status_scheduled">Scheduled</string>
     <string name="health_status_overdue">Overdue</string>
+    <string name="health_status_unavailable">Health status unavailable</string>
     <string name="health_status_today">Today</string>
     <string name="health_status_tomorrow">Tomorrow</string>
     <string name="health_status_days">%1$dd</string>

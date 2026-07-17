@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -56,11 +57,13 @@ import com.woliveiras.petit.R
 import com.woliveiras.petit.domain.model.Task
 import com.woliveiras.petit.domain.model.TaskKind
 import com.woliveiras.petit.presentation.components.EmptyState
+import com.woliveiras.petit.presentation.components.HealthStatusBadge
 import com.woliveiras.petit.presentation.components.PetCard
 import com.woliveiras.petit.presentation.components.PetCardData
 import com.woliveiras.petit.presentation.components.PetitTopAppBar
 import com.woliveiras.petit.presentation.components.TimelineSection
 import com.woliveiras.petit.presentation.feature.tasks.getTaskKindIcon
+import com.woliveiras.petit.presentation.util.localizedName
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -139,7 +142,7 @@ private fun EmptyHomeContent(onNavigateToAddPet: () -> Unit) {
 }
 
 @Composable
-private fun HomeContent(
+internal fun HomeContent(
   uiState: HomeUiState,
   onPetClick: (String) -> Unit,
   onTaskClick: (Task) -> Unit,
@@ -152,6 +155,24 @@ private fun HomeContent(
     contentPadding = PaddingValues(16.dp),
     verticalArrangement = Arrangement.spacedBy(24.dp),
   ) {
+    if (uiState.isAllGood) {
+      item { AllGoodBanner() }
+    }
+
+    if (uiState.alerts.isNotEmpty()) {
+      item {
+        Text(
+          text = stringResource(R.string.home_section_alerts),
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.Bold,
+          color = MaterialTheme.colorScheme.error,
+        )
+      }
+      items(uiState.alerts, key = { it.petWithSummary.pet.id }) { alert ->
+        HomeAlertCard(alert = alert, onClick = { onPetClick(alert.petWithSummary.pet.id) })
+      }
+    }
+
     // Cats Section (always first)
     item {
       Text(
@@ -182,6 +203,8 @@ private fun HomeContent(
               nextVaccinationDate = petWithSummary.nextVaccinationDate,
               nextDewormingType = petWithSummary.nextDewormingType,
               nextDewormingDate = petWithSummary.nextDewormingDate,
+              overallStatus =
+                petWithSummary.overallStatus.takeIf { petWithSummary.isHealthSummaryAvailable },
             ),
           onClick = { onPetClick(petWithSummary.pet.id) },
           compact = true,
@@ -250,6 +273,83 @@ private fun HomeContent(
           )
         }
       }
+    }
+  }
+}
+
+@Composable
+private fun AllGoodBanner() {
+  val title = stringResource(R.string.home_all_good)
+  val description = stringResource(R.string.home_all_good_description)
+  Card(
+    modifier =
+      Modifier.fillMaxWidth().semantics(mergeDescendants = true) {
+        contentDescription = "$title. $description"
+      },
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Icon(
+        imageVector = Icons.Default.CheckCircle,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.tertiary,
+      )
+      Column {
+        Text(
+          text = title,
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.Bold,
+        )
+        Text(
+          text = description,
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onTertiaryContainer,
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun HomeAlertCard(alert: HomeAlert, onClick: () -> Unit) {
+  val status = alert.petWithSummary.overallStatus.localizedName()
+  val date = alert.relevantDate?.format(TaskDateFormatter)
+  val dateText = date?.let { stringResource(R.string.home_alert_relevant_date, it) }
+  val description =
+    listOfNotNull(alert.petWithSummary.pet.name, status, dateText).joinToString(", ")
+
+  Card(
+    modifier =
+      Modifier.fillMaxWidth()
+        .semantics(mergeDescendants = true) { contentDescription = description }
+        .clickable(onClick = onClick),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Column(modifier = Modifier.weight(1f)) {
+        Text(
+          text = alert.petWithSummary.pet.name,
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.Bold,
+        )
+        if (dateText != null) {
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(
+            text = dateText,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onErrorContainer,
+          )
+        }
+      }
+      HealthStatusBadge(status = alert.petWithSummary.overallStatus)
     }
   }
 }
@@ -405,11 +505,19 @@ private fun SeeAllButton(onClick: () -> Unit) {
 @Composable
 private fun HorizontalPetItem(petWithSummary: PetWithSummary, onClick: () -> Unit) {
   val context = LocalContext.current
+  val healthStatus =
+    if (petWithSummary.isHealthSummaryAvailable) {
+      petWithSummary.overallStatus.localizedName()
+    } else {
+      stringResource(R.string.health_status_unavailable)
+    }
 
   Column(
     modifier =
-      Modifier.width(72.dp)
-        .semantics(mergeDescendants = true) { contentDescription = petWithSummary.pet.name }
+      Modifier.width(96.dp)
+        .semantics(mergeDescendants = true) {
+          contentDescription = "${petWithSummary.pet.name}, $healthStatus"
+        }
         .clickable(onClick = onClick),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
@@ -456,5 +564,10 @@ private fun HorizontalPetItem(petWithSummary: PetWithSummary, onClick: () -> Uni
       textAlign = TextAlign.Center,
       modifier = Modifier.fillMaxWidth(),
     )
+
+    Spacer(modifier = Modifier.height(4.dp))
+    if (petWithSummary.isHealthSummaryAvailable) {
+      HealthStatusBadge(status = petWithSummary.overallStatus)
+    }
   }
 }

@@ -44,6 +44,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.woliveiras.petit.R
 import com.woliveiras.petit.domain.model.DewormingType
+import com.woliveiras.petit.domain.model.HealthStatus
 import com.woliveiras.petit.domain.model.Pet
 import com.woliveiras.petit.domain.model.Sex
 import com.woliveiras.petit.domain.model.VaccineType
@@ -61,6 +62,7 @@ data class PetCardData(
   val nextVaccinationDate: LocalDate? = null,
   val nextDewormingType: DewormingType? = null,
   val nextDewormingDate: LocalDate? = null,
+  val overallStatus: HealthStatus? = null,
 )
 
 /**
@@ -88,7 +90,11 @@ private fun CompactPetCard(data: PetCardData, onClick: () -> Unit, modifier: Mod
   val breedText = data.pet.breed?.takeIf { it.isNotBlank() }?.let { localizedBreed(it) }
   val weightText = data.weight
   val infoText = listOfNotNull(breedText, weightText).joinToString(", ")
-  val description = if (infoText.isNotEmpty()) "${data.pet.name}, $infoText" else data.pet.name
+  val healthStatus =
+    data.overallStatus?.localizedName() ?: stringResource(R.string.health_status_unavailable)
+  val description =
+    listOfNotNull(data.pet.name, infoText.takeIf { it.isNotEmpty() }, healthStatus)
+      .joinToString(", ")
 
   Card(
     modifier =
@@ -149,6 +155,9 @@ private fun CompactPetCard(data: PetCardData, onClick: () -> Unit, modifier: Mod
             overflow = TextOverflow.Ellipsis,
           )
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        data.overallStatus?.let { HealthStatusBadge(status = it) }
       }
 
       Icon(
@@ -169,8 +178,11 @@ private fun FullPetCard(data: PetCardData, onClick: () -> Unit, modifier: Modifi
   val sexText = if (data.pet.sex != Sex.UNKNOWN) data.pet.sex.localizedName() else null
   val petTypeText = data.pet.petType.localizedName()
   val ageInfoText = listOfNotNull(ageText, sexText).joinToString(", ")
+  val healthStatus =
+    data.overallStatus?.localizedName() ?: stringResource(R.string.health_status_unavailable)
   val description =
-    if (ageInfoText.isNotEmpty()) "${data.pet.name}, $ageInfoText" else data.pet.name
+    listOfNotNull(data.pet.name, ageInfoText.takeIf { it.isNotEmpty() }, healthStatus)
+      .joinToString(", ")
 
   Card(
     modifier =
@@ -226,6 +238,9 @@ private fun FullPetCard(data: PetCardData, onClick: () -> Unit, modifier: Modifi
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
       )
+
+      Spacer(modifier = Modifier.height(8.dp))
+      data.overallStatus?.let { HealthStatusBadge(status = it) }
 
       val infoText = listOfNotNull(ageText, sexText).joinToString(" • ")
       if (infoText.isNotEmpty()) {
