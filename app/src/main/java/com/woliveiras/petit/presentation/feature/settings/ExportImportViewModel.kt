@@ -36,7 +36,7 @@ data class ExportImportUiState(
 sealed class ExportImportEvent {
   data class ExportReady(val filename: String, val bundle: ExportBundle) : ExportImportEvent()
 
-  data object ExportSuccess : ExportImportEvent()
+  data class ExportSuccess(val uri: Uri) : ExportImportEvent()
 
   data object ImportSuccess : ExportImportEvent()
 
@@ -103,7 +103,7 @@ constructor(
       try {
         exportImportUseCase.writeExportToUri(bundle, uri)
         _uiState.update { it.copy(pendingExportBundle = null) }
-        _events.emit(ExportImportEvent.ExportSuccess)
+        _events.emit(ExportImportEvent.ExportSuccess(uri))
       } catch (e: Exception) {
         _events.emit(
           ExportImportEvent.Error(e.message ?: context.getString(R.string.export_error_save_file))

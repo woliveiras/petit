@@ -1,5 +1,6 @@
 package com.woliveiras.petit.e2e
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
@@ -9,7 +10,9 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
+import androidx.room.Room
 import androidx.test.espresso.Espresso.closeSoftKeyboard
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -20,7 +23,12 @@ import androidx.test.uiautomator.Until
 import com.google.common.truth.Truth.assertThat
 import com.woliveiras.petit.MainActivity
 import com.woliveiras.petit.R
+import com.woliveiras.petit.data.local.db.PetitDatabase
+import com.woliveiras.petit.data.local.entity.TaskEntity
+import com.woliveiras.petit.domain.model.TaskStatus
 import java.util.regex.Pattern
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -51,6 +59,7 @@ class BackupRestoreJourneyTest {
     val exportSuccess = context.getString(R.string.export_success)
     val deleteAllData = context.getString(R.string.settings_delete_all_data)
     val confirmWord = context.getString(R.string.delete_all_data_confirm_word)
+    val confirmInstruction = context.getString(R.string.delete_all_data_confirm_instruction)
     val confirmDelete = context.getString(R.string.pet_delete_confirm_button)
     val deletionSuccess = context.getString(R.string.delete_all_data_success)
     val goHome = context.getString(R.string.pet_delete_go_home)
@@ -64,6 +73,9 @@ class BackupRestoreJourneyTest {
     composeRule.onNodeWithText(next).performClick()
     composeRule.onNodeWithText(next).performClick()
     composeRule.onNodeWithText(getStarted).performClick()
+    composeRule.waitUntil(timeoutMillis = 5_000) {
+      composeRule.onAllNodesWithText(registerPet).fetchSemanticsNodes().isNotEmpty()
+    }
     composeRule.onNodeWithText(registerPet).performClick()
     composeRule.onNodeWithText(namePlaceholder).performTextInput(petName)
     closeSoftKeyboard()
@@ -71,13 +83,43 @@ class BackupRestoreJourneyTest {
     composeRule.waitUntil(timeoutMillis = 5_000) {
       composeRule.onAllNodesWithContentDescription(edit).fetchSemanticsNodes().isNotEmpty()
     }
+    val database =
+      Room.databaseBuilder(context, PetitDatabase::class.java, PetitDatabase.DATABASE_NAME).build()
+    val completedTaskId = "backup-completed-task"
+    try {
+      val petId = runBlocking { database.petDao().getAllPets().first().single().id }
+      runBlocking {
+        database
+          .taskDao()
+          .insertTask(
+            TaskEntity(
+              id = completedTaskId,
+              petId = petId,
+              kind = "CUSTOM",
+              title = "Completed backup task",
+              scheduledFor = System.currentTimeMillis(),
+              status = TaskStatus.COMPLETED.name,
+            )
+          )
+      }
+    } finally {
+      database.close()
+    }
 
     composeRule.onNodeWithText(profile).performClick()
     composeRule.onNodeWithText(exportData).performScrollTo().performClick()
     saveDocument(device, backupName)
+    dismissShareSheet(device)
     composeRule.onNodeWithText(exportSuccess).assertIsDisplayed()
 
-    composeRule.onNodeWithText(deleteAllData).performScrollTo().performClick()
+    composeRule
+      .onNodeWithText(deleteAllData)
+      .performScrollTo()
+      .performSemanticsAction(SemanticsActions.OnClick)
+    composeRule.waitUntil(timeoutMillis = 5_000) {
+      composeRule.onAllNodesWithText(confirmInstruction).fetchSemanticsNodes().isNotEmpty()
+    }
+    composeRule.onNodeWithText(confirmInstruction).performScrollTo().assertIsDisplayed()
     composeRule.onAllNodes(hasSetTextAction())[0].performTextInput(confirmWord)
     closeSoftKeyboard()
     composeRule.onNodeWithText(confirmDelete).performScrollTo().performClick()
@@ -108,6 +150,16 @@ class BackupRestoreJourneyTest {
       composeRule.onAllNodesWithText(petName).fetchSemanticsNodes().isNotEmpty()
     }
     composeRule.onAllNodesWithText(petName)[0].assertIsDisplayed()
+    val restoredDatabase =
+      Room.databaseBuilder(context, PetitDatabase::class.java, PetitDatabase.DATABASE_NAME).build()
+    try {
+      val restoredTask = runBlocking {
+        restoredDatabase.taskDao().getCompletedTasks().first().single { it.id == completedTaskId }
+      }
+      assertThat(restoredTask.status).isEqualTo(TaskStatus.COMPLETED.name)
+    } finally {
+      restoredDatabase.close()
+    }
   }
 
   private fun saveDocument(device: UiDevice, backupName: String) {
@@ -131,6 +183,15 @@ class BackupRestoreJourneyTest {
     assertThat(backupFile).isNotNull()
     backupFile.click()
     device.wait(Until.gone(By.pkg("com.google.android.documentsui")), SYSTEM_UI_TIMEOUT)
+  }
+
+  private fun dismissShareSheet(device: UiDevice) {
+    assertThat(
+        device.wait(Until.hasObject(By.pkg("com.android.intentresolver")), SYSTEM_UI_TIMEOUT)
+      )
+      .isTrue()
+    device.pressBack()
+    device.wait(Until.gone(By.pkg("com.android.intentresolver")), SYSTEM_UI_TIMEOUT)
   }
 
   private companion object {

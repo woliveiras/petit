@@ -63,7 +63,7 @@ constructor(
       val weights = mutableListOf<WeightEntry>()
       val vaccinations = mutableListOf<VaccinationEntry>()
       val dewormings = mutableListOf<DewormingEntry>()
-      val tasks = taskRepository.getPendingTasks().first()
+      val tasks = taskRepository.getAllActiveTasks().first()
 
       pets.forEach { pet ->
         weights.addAll(weightRepository.getWeightEntriesForPet(pet.id).first())
@@ -188,6 +188,9 @@ constructor(
     conflictResolution: ConflictResolution,
   ): MergeResult =
     withContext(Dispatchers.IO) {
+      val validationErrors = ExportBundle.validate(bundle)
+      require(validationErrors.isEmpty()) { "Dados inválidos: ${validationErrors.first()}" }
+
       database.withTransaction {
         var petsAdded = 0
         var petsUpdated = 0

@@ -135,6 +135,7 @@
     <string name="pet_detail_chip_label">Chip</string>
     <string name="pet_detail_section_management">Management</string>
     <string name="pet_detail_section_share_profile">Share profile</string>
+    <string name="pet_detail_share_backup_description">Export this pet’s backup</string>
     <string name="pet_detail_weight_ideal_range">Ideal range</string>
     <string name="pet_detail_records_count">%d records</string>
     <string name="pet_detail_record_count_singular">%d record</string>

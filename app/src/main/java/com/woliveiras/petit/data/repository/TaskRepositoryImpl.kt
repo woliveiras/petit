@@ -24,6 +24,10 @@ class TaskRepositoryImpl @Inject constructor(private val taskDao: TaskDao) : Tas
     return taskDao.getPendingTasks().map { entities -> entities.toDomain() }
   }
 
+  override fun getAllActiveTasks(): Flow<List<Task>> {
+    return taskDao.getAllTasks().map { entities -> entities.toDomain() }
+  }
+
   override fun getTasksForPet(petId: String): Flow<List<Task>> {
     return taskDao.getTasksForPet(petId).map { entities -> entities.toDomain() }
   }

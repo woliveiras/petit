@@ -1,5 +1,6 @@
 package com.woliveiras.petit.presentation.feature.settings
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,6 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -82,6 +84,7 @@ fun SettingsScreen(
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   val exportImportState by exportImportViewModel.uiState.collectAsStateWithLifecycle()
+  val context = LocalContext.current
   val themeSheetState = rememberModalBottomSheetState()
   val languageSheetState = rememberModalBottomSheetState()
   val snackbarHostState = remember { SnackbarHostState() }
@@ -117,6 +120,7 @@ fun SettingsScreen(
           exportLauncher.launch(event.filename)
         }
         is ExportImportEvent.ExportSuccess -> {
+          context.startActivity(Intent.createChooser(createBackupShareIntent(event.uri), null))
           snackbarHostState.showSnackbar(exportSuccessMessage)
         }
         is ExportImportEvent.ImportSuccess -> {

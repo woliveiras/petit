@@ -28,6 +28,7 @@ data class ExportBundle(
 
   companion object {
     private const val MAX_ENTRIES_PER_LIST = 10_000
+    private const val SUPPORTED_SCHEMA_VERSION = 1
 
     fun fromJson(json: JSONObject): ExportBundle {
       val metadata = ExportMetadata.fromJson(json.getJSONObject("metadata"))
@@ -64,14 +65,7 @@ data class ExportBundle(
           (0 until array.length()).map { DewormingEntry.fromExportJson(array.getJSONObject(it)) }
         }
 
-      val tasks =
-        if (json.has("tasks")) {
-          json.getJSONArray("tasks").let { array ->
-            (0 until array.length()).map { Task.fromExportJson(array.getJSONObject(it)) }
-          }
-        } else {
-          emptyList()
-        }
+      val tasks = parseTasks(json)
 
       return ExportBundle(
         metadata = metadata,
@@ -83,9 +77,36 @@ data class ExportBundle(
       )
     }
 
+    /**
+     * Converts the supported pre-task reminder shape before the bundle is validated or imported.
+     */
+    private fun parseTasks(json: JSONObject): List<Task> {
+      val array =
+        when {
+          json.has("tasks") -> json.getJSONArray("tasks")
+          json.has("reminders") -> json.getJSONArray("reminders")
+          else -> return emptyList()
+        }
+      if (array.length() > MAX_ENTRIES_PER_LIST)
+        throw IllegalArgumentException("Too many tasks (max $MAX_ENTRIES_PER_LIST)")
+
+      return (0 until array.length()).map { index ->
+        val entry = array.getJSONObject(index)
+        if (json.has("tasks")) {
+          Task.fromExportJson(entry)
+        } else {
+          entry.toLegacyReminderTask()
+        }
+      }
+    }
+
     /** Validate imported data fields. Returns list of validation error messages. */
     fun validate(bundle: ExportBundle): List<String> {
       val errors = mutableListOf<String>()
+
+      if (bundle.metadata.schemaVersion != SUPPORTED_SCHEMA_VERSION) {
+        errors.add("Versão de backup não suportada: ${bundle.metadata.schemaVersion}")
+      }
 
       bundle.pets.forEach { pet ->
         if (pet.name.isBlank()) errors.add("Pet com nome vazio (id: ${pet.id})")
@@ -129,6 +150,8 @@ data class ExportBundle(
           errors.add("Título de tarefa muito longo: '${entry.title.take(20)}...' (id: ${entry.id})")
         if (entry.description != null && entry.description.length > 500)
           errors.add("Descrição de tarefa muito longa (id: ${entry.id})")
+        if (entry.petId != null && entry.petId !in petIds)
+          errors.add("Tarefa referencia pet inexistente (petId: ${entry.petId})")
       }
 
       return errors
@@ -392,4 +415,23 @@ fun Task.Companion.fromExportJson(json: JSONObject): Task {
 // Helper extension functions
 private fun JSONObject.optStringOrNull(key: String): String? {
   return if (isNull(key)) null else optString(key, null)?.takeIf { it.isNotEmpty() && it != "null" }
+}
+
+private fun JSONObject.toLegacyReminderTask(): Task {
+  val scheduledFor = optStringOrNull("scheduledAt") ?: optStringOrNull("scheduledFor")
+  require(!scheduledFor.isNullOrBlank()) { "Legacy reminder is missing scheduledAt" }
+  val title = optStringOrNull("title")
+  require(!title.isNullOrBlank()) { "Legacy reminder is missing title" }
+
+  return Task(
+    id = getString("id"),
+    petId = optStringOrNull("petId"),
+    kind = TaskKind.CUSTOM,
+    title = title,
+    description = optStringOrNull("description"),
+    scheduledFor = LocalDateTime.parse(scheduledFor, dateTimeFormatter),
+    status = if (optBoolean("completed", false)) TaskStatus.COMPLETED else TaskStatus.PENDING,
+    createdAt = getLong("createdAt"),
+    updatedAt = getLong("updatedAt"),
+  )
 }

@@ -263,6 +263,8 @@ class HomeViewModelTest {
 
     override fun getPendingTasks(): Flow<List<Task>> = MutableStateFlow(emptyList())
 
+    override fun getAllActiveTasks(): Flow<List<Task>> = MutableStateFlow(emptyList())
+
     override fun getTasksForPet(petId: String): Flow<List<Task>> = MutableStateFlow(emptyList())
 
     override suspend fun getTaskById(id: String): Task? = null

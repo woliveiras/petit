@@ -10,6 +10,9 @@ interface TaskRepository {
   /** Get all pending tasks, ordered by scheduled time. */
   fun getPendingTasks(): Flow<List<Task>>
 
+  /** Get complete active task history, including pending and completed tasks. */
+  fun getAllActiveTasks(): Flow<List<Task>>
+
   /** Get all tasks for a specific pet. */
   fun getTasksForPet(petId: String): Flow<List<Task>>
 

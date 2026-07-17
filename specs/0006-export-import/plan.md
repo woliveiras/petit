@@ -4,11 +4,11 @@ Spec: [spec.md](./spec.md)
 
 ## Sequence
 
-1. Add unit tests for pending/completed task round-trip, per-pet filtering, corruption, legacy conversion, and merge.
-2. Export all active tasks and convert supported legacy `reminders` before validation.
-3. Preserve atomic analysis/import behavior and close Room transaction coverage.
-4. Expose per-pet export from the profile and share generated URIs with temporary read permission.
-5. Add ContentResolver/Compose coverage and expand the backup/restore E2E journey with completed-task history.
+1. [x] Add unit tests for pending/completed task round-trip, per-pet filtering, corruption, legacy conversion, and merge.
+2. [x] Export all active tasks and convert supported legacy `reminders` before validation.
+3. [x] Preserve atomic analysis/import behavior and close Room transaction coverage.
+4. [x] Expose per-pet export from the profile and share generated URIs with temporary read permission.
+5. [x] Add ContentResolver/Compose coverage and expand the backup/restore E2E journey with completed-task history.
 
 ## Architecture
 

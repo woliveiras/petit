@@ -135,6 +135,7 @@
   <string name="pet_detail_chip_label">Chip</string>
   <string name="pet_detail_section_management">Gestão</string>
   <string name="pet_detail_section_share_profile">Compartilhar ficha</string>
+  <string name="pet_detail_share_backup_description">Exportar backup deste pet</string>
   <string name="pet_detail_weight_ideal_range">Faixa ideal</string>
   <string name="pet_detail_records_count">%d registros</string>
   <string name="pet_detail_record_count_singular">%d registro</string>

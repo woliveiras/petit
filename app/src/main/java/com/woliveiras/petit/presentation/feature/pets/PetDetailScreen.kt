@@ -1,5 +1,9 @@
 package com.woliveiras.petit.presentation.feature.pets
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,6 +72,9 @@ import com.woliveiras.petit.domain.model.HealthStatus
 import com.woliveiras.petit.domain.model.Sex
 import com.woliveiras.petit.presentation.components.HealthStatusBadge
 import com.woliveiras.petit.presentation.components.PetitTopAppBar
+import com.woliveiras.petit.presentation.feature.settings.ExportImportEvent
+import com.woliveiras.petit.presentation.feature.settings.ExportImportViewModel
+import com.woliveiras.petit.presentation.feature.settings.createBackupShareIntent
 import com.woliveiras.petit.presentation.util.localizedBreed
 import com.woliveiras.petit.presentation.util.localizedColor
 import com.woliveiras.petit.ui.theme.LocalPetitColors
@@ -84,10 +91,17 @@ fun PetDetailScreen(
   onNavigateToDeworming: () -> Unit,
   onNavigateToDelete: () -> Unit,
   viewModel: PetDetailViewModel = hiltViewModel(),
+  exportImportViewModel: ExportImportViewModel = hiltViewModel(),
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   var showMenu by remember { mutableStateOf(false) }
   val snackbarHostState = remember { SnackbarHostState() }
+  val context = LocalContext.current
+  val exportLauncher =
+    rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) {
+      uri: Uri? ->
+      uri?.let(exportImportViewModel::writeExportToUri)
+    }
 
   LaunchedEffect(Unit) {
     viewModel.events.collect { event ->
@@ -98,6 +112,17 @@ fun PetDetailScreen(
         is PetDetailEvent.Error -> {
           snackbarHostState.showSnackbar(event.message)
         }
+      }
+    }
+  }
+  LaunchedEffect(Unit) {
+    exportImportViewModel.events.collect { event ->
+      when (event) {
+        is ExportImportEvent.ExportReady -> exportLauncher.launch(event.filename)
+        is ExportImportEvent.ExportSuccess ->
+          context.startActivity(Intent.createChooser(createBackupShareIntent(event.uri), null))
+        is ExportImportEvent.Error -> snackbarHostState.showSnackbar(event.message)
+        is ExportImportEvent.ImportSuccess -> Unit
       }
     }
   }
@@ -172,6 +197,7 @@ fun PetDetailScreen(
             onWeightClick = onNavigateToWeight,
             onVaccinationsClick = onNavigateToVaccinations,
             onDewormingClick = onNavigateToDeworming,
+            onShareProfile = { exportImportViewModel.startExportForPet(petId) },
           )
         }
       }
@@ -180,11 +206,12 @@ fun PetDetailScreen(
 }
 
 @Composable
-private fun PetDetailContent(
+internal fun PetDetailContent(
   uiState: PetDetailUiState,
   onWeightClick: () -> Unit,
   onVaccinationsClick: () -> Unit,
   onDewormingClick: () -> Unit,
+  onShareProfile: () -> Unit,
 ) {
   val pet = uiState.pet ?: return
   val context = LocalContext.current
@@ -314,6 +341,7 @@ private fun PetDetailContent(
       onWeightClick = onWeightClick,
       onVaccinationsClick = onVaccinationsClick,
       onDewormingClick = onDewormingClick,
+      onShareProfile = onShareProfile,
     )
   }
 }
@@ -327,6 +355,7 @@ private fun ManagementActionsGrid(
   onWeightClick: () -> Unit,
   onVaccinationsClick: () -> Unit,
   onDewormingClick: () -> Unit,
+  onShareProfile: () -> Unit,
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
@@ -372,13 +401,13 @@ private fun ManagementActionsGrid(
       ManagementActionCard(
         icon = Icons.Default.Share,
         title = stringResource(R.string.pet_detail_section_share_profile),
-        subtitle = stringResource(R.string.coming_soon),
+        subtitle = stringResource(R.string.pet_detail_share_backup_description),
         backgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         iconBackgroundColor = MaterialTheme.colorScheme.surfaceContainerLow,
         iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.weight(1f),
-        onClick = null,
+        onClick = onShareProfile,
       )
     }
   }

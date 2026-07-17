@@ -2,7 +2,7 @@
 spec: "0006"
 title: JSON export and import
 family: pet-care
-status: In Progress
+status: Completed
 owner: woliveiras
 depends_on: ["0001", "0002", "0003", "0004", "0005"]
 ---
@@ -15,7 +15,10 @@ The caregiver needs to create a manual backup and restore their data on another 
 
 ## Current state
 
-Versioned JSON export/import, document selection, conflict analysis, and merge strategies are implemented. The export currently includes only pending tasks, so it does not yet preserve completed-task history as required for a complete backup.
+Versioned JSON export/import, document selection, conflict analysis, and merge
+strategies are implemented. Full and per-pet backups preserve active pending
+and completed tasks, supported legacy reminders are converted before
+validation, and generated backup URIs can be shared with temporary read access.
 
 ## Functional requirements
 
