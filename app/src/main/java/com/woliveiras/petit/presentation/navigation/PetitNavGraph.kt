@@ -339,7 +339,14 @@ fun PetitNavGraph(
     composable(Screen.FamilyGroupPairing.route) {
       PairingScreen(
         onNavigateBack = { navController.popBackStack() },
-        onPairingComplete = { navController.popBackStack(Screen.Settings.route, inclusive = false) },
+        onPairingComplete = { isSender ->
+          val mode =
+            if (isSender) Screen.FamilyGroupTransfer.MODE_SEND
+            else Screen.FamilyGroupTransfer.MODE_RECEIVE
+          navController.navigate(Screen.FamilyGroupTransfer.createRoute(mode)) {
+            popUpTo(Screen.FamilyGroupPairing.route) { inclusive = true }
+          }
+        },
       )
     }
 

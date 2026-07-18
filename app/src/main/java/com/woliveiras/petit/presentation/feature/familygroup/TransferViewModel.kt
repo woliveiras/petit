@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.petit.data.repository.NearbyTransferRepository
 import com.woliveiras.petit.domain.model.MergeResult
+import com.woliveiras.petit.domain.model.TransferError
 import com.woliveiras.petit.domain.model.TransferState
 import com.woliveiras.petit.domain.usecase.MergeDataUseCase
 import com.woliveiras.petit.domain.usecase.SendDataUseCase
@@ -22,6 +23,7 @@ data class TransferUiState(
   val mergeResult: MergeResult? = null,
   val isMerging: Boolean = false,
   val isSending: Boolean = false,
+  val showReplaceConfirmation: Boolean = false,
 )
 
 @HiltViewModel
@@ -59,13 +61,44 @@ constructor(
     viewModelScope.launch {
       val endpointId = nearbyTransferRepository.connectedPeerId
       if (endpointId != null) {
-        sendDataUseCase(endpointId)
+        try {
+          sendDataUseCase(endpointId)
+        } catch (_: IllegalArgumentException) {
+          _uiState.update {
+            it.copy(transferState = TransferState.Error(TransferError.PayloadTooLarge))
+          }
+        } catch (_: Exception) {
+          _uiState.update {
+            it.copy(transferState = TransferState.Error(TransferError.TransferFailed))
+          }
+        }
       } else {
         _uiState.update {
-          it.copy(transferState = TransferState.Error("No connected device found"))
+          it.copy(transferState = TransferState.Error(TransferError.NoConnectedDevice))
         }
       }
     }
+  }
+
+  fun retry() {
+    if (_uiState.value.isSending) autoSend()
+  }
+
+  fun cancelTransfer() {
+    nearbyTransferRepository.cancelTransfer()
+  }
+
+  fun requestReplace() {
+    _uiState.update { it.copy(showReplaceConfirmation = true) }
+  }
+
+  fun dismissReplace() {
+    _uiState.update { it.copy(showReplaceConfirmation = false) }
+  }
+
+  fun confirmReplace() {
+    _uiState.update { it.copy(showReplaceConfirmation = false) }
+    mergeReceivedData(replace = true)
   }
 
   fun mergeReceivedData(replace: Boolean = false) {
@@ -82,10 +115,7 @@ constructor(
         _uiState.update { it.copy(mergeResult = result, isMerging = false) }
       } catch (e: Exception) {
         _uiState.update {
-          it.copy(
-            isMerging = false,
-            transferState = TransferState.Error(e.message ?: "Merge failed"),
-          )
+          it.copy(isMerging = false, transferState = TransferState.Error(TransferError.MergeFailed))
         }
       }
     }

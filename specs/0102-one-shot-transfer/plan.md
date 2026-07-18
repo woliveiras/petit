@@ -2,6 +2,11 @@
 
 Spec: [spec.md](./spec.md)
 
+## Implementation status
+
+Steps 1–6 are implemented and covered by local unit/Room tests. Step 7 remains
+open because it requires two physical devices and the real Nearby radio path.
+
 ## Starting point
 
 Serialization, Nearby payload callbacks, merge/replace options, and

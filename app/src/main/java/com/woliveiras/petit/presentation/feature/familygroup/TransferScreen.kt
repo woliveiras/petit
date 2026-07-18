@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -26,18 +27,44 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.petit.R
+import com.woliveiras.petit.domain.model.TransferError
 import com.woliveiras.petit.domain.model.TransferState
 import com.woliveiras.petit.presentation.components.PetitTopAppBar
 
 @Composable
 fun TransferScreen(onNavigateBack: () -> Unit, viewModel: TransferViewModel = hiltViewModel()) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+  val disconnectAndNavigateBack = {
+    viewModel.disconnect()
+    onNavigateBack()
+  }
+
+  if (uiState.showReplaceConfirmation) {
+    AlertDialog(
+      onDismissRequest = viewModel::dismissReplace,
+      title = { Text(stringResource(R.string.family_group_replace_confirm_title)) },
+      text = { Text(stringResource(R.string.family_group_replace_confirm_message)) },
+      confirmButton = {
+        Button(onClick = viewModel::confirmReplace) {
+          Text(stringResource(R.string.action_confirm))
+        }
+      },
+      dismissButton = {
+        OutlinedButton(onClick = viewModel::dismissReplace) {
+          Text(stringResource(R.string.action_cancel))
+        }
+      },
+    )
+  }
 
   Scaffold(
     topBar = {
@@ -50,10 +77,7 @@ fun TransferScreen(onNavigateBack: () -> Unit, viewModel: TransferViewModel = hi
             )
           )
         },
-        onNavigateBack = {
-          viewModel.disconnect()
-          onNavigateBack()
-        },
+        onNavigateBack = disconnectAndNavigateBack,
       )
     }
   ) { padding ->
@@ -63,7 +87,7 @@ fun TransferScreen(onNavigateBack: () -> Unit, viewModel: TransferViewModel = hi
       verticalArrangement = Arrangement.Center,
     ) {
       if (uiState.mergeResult != null) {
-        MergeCompleteContent(result = uiState.mergeResult!!, onDone = onNavigateBack)
+        MergeCompleteContent(result = uiState.mergeResult!!, onDone = disconnectAndNavigateBack)
       } else {
         when (val state = uiState.transferState) {
           is TransferState.Idle -> {
@@ -78,6 +102,7 @@ fun TransferScreen(onNavigateBack: () -> Unit, viewModel: TransferViewModel = hi
               label = stringResource(R.string.family_group_sending),
               bytesTransferred = state.bytesTransferred,
               totalBytes = state.totalBytes,
+              onCancel = viewModel::cancelTransfer,
             )
           }
           is TransferState.Receiving -> {
@@ -85,21 +110,51 @@ fun TransferScreen(onNavigateBack: () -> Unit, viewModel: TransferViewModel = hi
               label = stringResource(R.string.family_group_receiving),
               bytesTransferred = state.bytesTransferred,
               totalBytes = state.totalBytes,
+              onCancel = viewModel::cancelTransfer,
             )
+          }
+          is TransferState.Sent -> {
+            SentContent(onDone = disconnectAndNavigateBack)
           }
           is TransferState.Complete -> {
             TransferCompleteContent(
               onMerge = { viewModel.mergeReceivedData(replace = false) },
-              onReplace = { viewModel.mergeReceivedData(replace = true) },
+              onReplace = viewModel::requestReplace,
               isMerging = uiState.isMerging,
             )
           }
           is TransferState.Error -> {
-            ErrorTransferContent(message = state.message, onBack = onNavigateBack)
+            ErrorTransferContent(
+              message = stringResource(state.reason.messageResource()),
+              onRetry = if (uiState.isSending) viewModel::retry else null,
+              onBack = disconnectAndNavigateBack,
+            )
           }
         }
       }
     }
+  }
+}
+
+@Composable
+private fun SentContent(onDone: () -> Unit) {
+  Icon(
+    imageVector = Icons.Default.CheckCircle,
+    contentDescription = null,
+    modifier = Modifier.size(64.dp),
+    tint = MaterialTheme.colorScheme.primary,
+  )
+  Spacer(modifier = Modifier.height(24.dp))
+  Text(
+    text = stringResource(R.string.family_group_data_sent),
+    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+    style = MaterialTheme.typography.headlineSmall,
+    fontWeight = FontWeight.Bold,
+    textAlign = TextAlign.Center,
+  )
+  Spacer(modifier = Modifier.height(24.dp))
+  Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
+    Text(stringResource(R.string.action_done))
   }
 }
 
@@ -157,7 +212,12 @@ private fun ReceivingIdleContent() {
 }
 
 @Composable
-private fun ProgressContent(label: String, bytesTransferred: Long, totalBytes: Long) {
+private fun ProgressContent(
+  label: String,
+  bytesTransferred: Long,
+  totalBytes: Long,
+  onCancel: () -> Unit,
+) {
   CircularProgressIndicator(modifier = Modifier.size(64.dp))
 
   Spacer(modifier = Modifier.height(24.dp))
@@ -171,8 +231,25 @@ private fun ProgressContent(label: String, bytesTransferred: Long, totalBytes: L
       progress = { bytesTransferred.toFloat() / totalBytes.toFloat() },
       modifier = Modifier.fillMaxWidth(),
     )
+    Spacer(modifier = Modifier.height(8.dp))
+    val percentage = ((bytesTransferred * 100) / totalBytes).coerceIn(0, 100)
+    Text(
+      text =
+        stringResource(
+          R.string.family_group_transfer_progress,
+          bytesTransferred,
+          totalBytes,
+          percentage,
+        ),
+      modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+      style = MaterialTheme.typography.bodySmall,
+    )
   } else {
     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+  }
+  Spacer(modifier = Modifier.height(24.dp))
+  OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
+    Text(stringResource(R.string.action_cancel))
   }
 }
 
@@ -193,6 +270,7 @@ private fun TransferCompleteContent(
 
   Text(
     text = stringResource(R.string.family_group_transfer_complete),
+    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
     style = MaterialTheme.typography.headlineSmall,
     fontWeight = FontWeight.Bold,
     textAlign = TextAlign.Center,
@@ -240,6 +318,7 @@ private fun MergeCompleteContent(
 
   Text(
     text = stringResource(R.string.family_group_merge_complete),
+    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
     style = MaterialTheme.typography.headlineSmall,
     fontWeight = FontWeight.Bold,
     textAlign = TextAlign.Center,
@@ -249,9 +328,45 @@ private fun MergeCompleteContent(
 
   Text(
     text =
-      stringResource(R.string.family_group_merge_summary, result.totalAdded, result.totalUpdated),
+      stringResource(
+        R.string.family_group_merge_summary,
+        result.totalAdded,
+        result.totalUpdated,
+        result.totalRemoved,
+      ),
     style = MaterialTheme.typography.bodyMedium,
     textAlign = TextAlign.Center,
+  )
+
+  ResultRow(
+    R.string.family_group_result_pets,
+    result.petsAdded,
+    result.petsUpdated,
+    result.petsRemoved,
+  )
+  ResultRow(
+    R.string.family_group_result_weights,
+    result.weightsAdded,
+    result.weightsUpdated,
+    result.weightsRemoved,
+  )
+  ResultRow(
+    R.string.family_group_result_vaccinations,
+    result.vaccinationsAdded,
+    result.vaccinationsUpdated,
+    result.vaccinationsRemoved,
+  )
+  ResultRow(
+    R.string.family_group_result_dewormings,
+    result.dewormingsAdded,
+    result.dewormingsUpdated,
+    result.dewormingsRemoved,
+  )
+  ResultRow(
+    R.string.family_group_result_tasks,
+    result.tasksAdded,
+    result.tasksUpdated,
+    result.tasksRemoved,
   )
 
   Spacer(modifier = Modifier.height(24.dp))
@@ -262,7 +377,23 @@ private fun MergeCompleteContent(
 }
 
 @Composable
-private fun ErrorTransferContent(message: String, onBack: () -> Unit) {
+private fun ResultRow(labelResource: Int, added: Int, updated: Int, removed: Int) {
+  Text(
+    text =
+      stringResource(
+        R.string.family_group_result_row,
+        stringResource(labelResource),
+        added,
+        updated,
+        removed,
+      ),
+    style = MaterialTheme.typography.bodySmall,
+    textAlign = TextAlign.Center,
+  )
+}
+
+@Composable
+private fun ErrorTransferContent(message: String, onRetry: (() -> Unit)?, onBack: () -> Unit) {
   Icon(
     imageVector = Icons.Default.Error,
     contentDescription = null,
@@ -274,6 +405,7 @@ private fun ErrorTransferContent(message: String, onBack: () -> Unit) {
 
   Text(
     text = message,
+    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive },
     style = MaterialTheme.typography.bodyLarge,
     color = MaterialTheme.colorScheme.error,
     textAlign = TextAlign.Center,
@@ -281,7 +413,24 @@ private fun ErrorTransferContent(message: String, onBack: () -> Unit) {
 
   Spacer(modifier = Modifier.height(24.dp))
 
-  Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+  if (onRetry != null) {
+    Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
+      Text(stringResource(R.string.action_retry))
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+  }
+  OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
     Text(stringResource(R.string.action_back))
   }
 }
+
+private fun TransferError.messageResource(): Int =
+  when (this) {
+    TransferError.NoConnectedDevice -> R.string.family_group_error_no_endpoint
+    TransferError.PayloadTooLarge -> R.string.family_group_error_payload_too_large
+    TransferError.TransferFailed -> R.string.family_group_error_transfer_failed
+    TransferError.InvalidData -> R.string.family_group_error_invalid_data
+    TransferError.ParseFailed -> R.string.family_group_error_parse_failed
+    TransferError.UnsupportedPayload -> R.string.family_group_error_unsupported_payload
+    TransferError.MergeFailed -> R.string.family_group_error_merge_failed
+  }

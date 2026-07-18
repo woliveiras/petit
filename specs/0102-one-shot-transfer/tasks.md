@@ -4,7 +4,7 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 ## Tasks
 
-- [ ] **Connect successful pairing to data transfer** (test-type: integration)
+- [x] **Connect successful pairing to data transfer** (test-type: integration)
   - blocked-by: spec 0101
   - summary: preserve or explicitly re-establish the authorized endpoint when the user moves from pairing to send/receive.
   - desired behavior: completing pairing leads to an operable transfer instead of returning to a route that may have no connected endpoint.
@@ -25,14 +25,14 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - acceptance criteria: the current merge strategy applies UUID + `updatedAt`.
   - verification: `./gradlew test`
 
-- [ ] **Replace the shareable database transactionally** (test-type: both)
+- [x] **Replace the shareable database transactionally** (test-type: both)
   - blocked-by: bundle validation
   - summary: remove missing local records and import only the received content.
   - desired behavior: replace reflects the bundle exactly or changes nothing on failure.
   - acceptance criteria: missing local records cease to exist; failure rolls back the entire operation.
   - verification: `./gradlew test`
 
-- [ ] **Display reliable progress, results, cancellation, and failures** (test-type: both)
+- [x] **Display reliable progress, results, cancellation, and failures** (test-type: both)
   - blocked-by: bundle sending and import
   - summary: connect transferred bytes and the persisted result to interface states.
   - desired behavior: progress is monotonic, counters are exact, and cancellation or failure discards partial payloads.

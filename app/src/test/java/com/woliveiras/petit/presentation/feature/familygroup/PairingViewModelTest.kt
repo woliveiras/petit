@@ -189,6 +189,8 @@ class PairingViewModelTest {
 
     override suspend fun sendData(endpointId: String, bundle: ExportBundle) = Unit
 
+    override fun cancelTransfer() = Unit
+
     override fun disconnect() {
       disconnectCalls++
     }

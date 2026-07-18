@@ -70,7 +70,7 @@ internal fun requiredNearbyPermissions(apiLevel: Int): List<String> =
 @Composable
 fun PairingScreen(
   onNavigateBack: () -> Unit,
-  onPairingComplete: () -> Unit,
+  onPairingComplete: (isSender: Boolean) -> Unit,
   viewModel: PairingViewModel = hiltViewModel(),
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -147,7 +147,10 @@ fun PairingScreen(
           )
         }
         is PairingState.Paired -> {
-          PairedContent(deviceName = state.deviceName, onContinue = onPairingComplete)
+          PairedContent(
+            deviceName = state.deviceName,
+            onContinue = { onPairingComplete(uiState.isCreatingGroup) },
+          )
         }
         is PairingState.Error -> {
           ErrorContent(

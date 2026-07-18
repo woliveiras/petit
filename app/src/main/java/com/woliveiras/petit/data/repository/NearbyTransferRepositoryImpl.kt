@@ -19,6 +19,7 @@ import com.google.android.gms.nearby.connection.Strategy
 import com.woliveiras.petit.domain.model.ExportBundle
 import com.woliveiras.petit.domain.model.PairingError
 import com.woliveiras.petit.domain.model.PairingState
+import com.woliveiras.petit.domain.model.TransferError
 import com.woliveiras.petit.domain.model.TransferState
 import com.woliveiras.petit.domain.pairing.PairingAuthorizationResult
 import com.woliveiras.petit.domain.pairing.PairingAuthorizationSession
@@ -26,7 +27,12 @@ import com.woliveiras.petit.domain.pairing.PairingCodeGenerator
 import com.woliveiras.petit.domain.pairing.PairingMessage
 import com.woliveiras.petit.domain.pairing.PairingProtocol
 import com.woliveiras.petit.domain.pairing.PairingRejectionReason
+import com.woliveiras.petit.domain.transfer.MonotonicTransferProgress
+import com.woliveiras.petit.domain.transfer.TransferAuthorization
+import com.woliveiras.petit.domain.transfer.TransferPayloadMode
+import com.woliveiras.petit.domain.transfer.TransferPayloadPolicy
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
 import java.time.Clock
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -62,6 +68,7 @@ constructor(@ApplicationContext private val context: Context) : NearbyTransferRe
   override val transferState: Flow<TransferState> = _transferState.asStateFlow()
 
   private val connectedEndpointIdRef = AtomicReference<String?>(null)
+  private val authorizedEndpointIdRef = AtomicReference<String?>(null)
   private val pendingDeviceName = AtomicReference<String?>(null)
   private val pairingRole = AtomicReference<PairingRole?>(null)
   private val localDeviceId = AtomicReference<String?>(null)
@@ -70,12 +77,18 @@ constructor(@ApplicationContext private val context: Context) : NearbyTransferRe
   private val authorizationSession = AtomicReference<PairingAuthorizationSession?>(null)
   private val pendingPairingError = AtomicReference<PairingError?>(null)
   private val receivedPayloadData = StringBuffer()
+  private val incomingPayloadId = AtomicReference<Long?>(null)
+  private val outgoingPayloadId = AtomicReference<Long?>(null)
+  private val incomingFilePayload = AtomicReference<Payload.File?>(null)
+  private val outgoingTempFile = AtomicReference<File?>(null)
+  private val incomingProgress = AtomicReference<MonotonicTransferProgress?>(null)
+  private val outgoingProgress = AtomicReference<MonotonicTransferProgress?>(null)
 
   override val connectedPeerName: String?
     get() = pendingDeviceName.get()
 
   override val connectedPeerId: String?
-    get() = connectedEndpointIdRef.get()
+    get() = authorizedEndpointIdRef.get()
 
   override fun isAvailable(): Boolean =
     GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) ==
@@ -118,45 +131,120 @@ constructor(@ApplicationContext private val context: Context) : NearbyTransferRe
 
       override fun onDisconnected(endpointId: String) {
         connectedEndpointIdRef.compareAndSet(endpointId, null)
+        authorizedEndpointIdRef.compareAndSet(endpointId, null)
+        val transferWasActive = incomingPayloadId.get() != null || outgoingPayloadId.get() != null
+        cleanupIncomingTransfer()
+        cleanupOutgoingTransfer()
         _pairingState.value =
           pendingPairingError.getAndSet(null)?.let(PairingState::Error) ?: PairingState.Idle
-        _transferState.value = TransferState.Idle
+        if (_transferState.value !is TransferState.Error) {
+          _transferState.value =
+            if (transferWasActive) TransferState.Error(TransferError.TransferFailed)
+            else TransferState.Idle
+        }
       }
     }
 
   private val payloadCallback =
     object : PayloadCallback() {
       override fun onPayloadReceived(endpointId: String, payload: Payload) {
-        if (payload.type != Payload.Type.BYTES || endpointId != connectedEndpointIdRef.get()) return
-        payload.asBytes()?.let { bytes ->
-          val data = String(bytes, Charsets.UTF_8)
-          val pairingMessage = PairingProtocol.decode(data)
-          if (pairingMessage != null) {
-            handlePairingMessage(endpointId, pairingMessage)
-          } else if (receivedPayloadData.length + data.length > MAX_PAYLOAD_SIZE) {
-            receivedPayloadData.setLength(0)
-            _transferState.value = TransferState.Error("Received payload too large")
-          } else {
-            receivedPayloadData.append(data)
+        if (endpointId != connectedEndpointIdRef.get()) return
+        when (payload.type) {
+          Payload.Type.BYTES ->
+            payload.asBytes()?.let { bytes ->
+              val data = String(bytes, Charsets.UTF_8)
+              val pairingMessage = PairingProtocol.decode(data)
+              if (pairingMessage != null) {
+                handlePairingMessage(endpointId, pairingMessage)
+              } else if (
+                !TransferAuthorization.acceptsData(
+                  connectedEndpointIdRef.get(),
+                  authorizedEndpointIdRef.get(),
+                  endpointId,
+                )
+              ) {
+                connectionsClient.cancelPayload(payload.id)
+              } else if (bytes.size > MAX_PAYLOAD_SIZE) {
+                failIncomingTransfer(TransferError.PayloadTooLarge)
+              } else {
+                incomingPayloadId.set(payload.id)
+                incomingProgress.set(MonotonicTransferProgress(bytes.size.toLong()))
+                receivedPayloadData.setLength(0)
+                receivedPayloadData.append(data)
+                _transferState.value =
+                  TransferState.Receiving(bytes.size.toLong(), bytes.size.toLong())
+              }
+            }
+          Payload.Type.FILE -> {
+            if (
+              TransferAuthorization.acceptsData(
+                connectedEndpointIdRef.get(),
+                authorizedEndpointIdRef.get(),
+                endpointId,
+              )
+            ) {
+              incomingPayloadId.set(payload.id)
+              incomingFilePayload.set(payload.asFile())
+            } else {
+              connectionsClient.cancelPayload(payload.id)
+            }
+          }
+          else -> {
+            connectionsClient.cancelPayload(payload.id)
+            failIncomingTransfer(TransferError.UnsupportedPayload)
           }
         }
       }
 
       override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
         if (endpointId != connectedEndpointIdRef.get()) return
+        when (update.payloadId) {
+          outgoingPayloadId.get() -> handleOutgoingUpdate(update)
+          incomingPayloadId.get() -> handleIncomingUpdate(update)
+        }
+      }
+
+      private fun handleOutgoingUpdate(update: PayloadTransferUpdate) {
         when (update.status) {
-          PayloadTransferUpdate.Status.IN_PROGRESS ->
-            _transferState.value =
-              TransferState.Receiving(update.bytesTransferred, update.totalBytes)
-          PayloadTransferUpdate.Status.SUCCESS -> finishReceivedPayload()
+          PayloadTransferUpdate.Status.IN_PROGRESS -> {
+            val transferred = outgoingProgress.get()?.update(update.bytesTransferred) ?: 0L
+            _transferState.value = TransferState.Sending(transferred, update.totalBytes)
+          }
+          PayloadTransferUpdate.Status.SUCCESS -> {
+            val total = update.totalBytes.coerceAtLeast(0)
+            _transferState.value = TransferState.Sent(total)
+            cleanupOutgoingTransfer()
+          }
           PayloadTransferUpdate.Status.FAILURE -> {
-            receivedPayloadData.setLength(0)
-            _transferState.value = TransferState.Error("Transfer failed")
+            cleanupOutgoingTransfer()
+            _transferState.value = TransferState.Error(TransferError.TransferFailed)
           }
           PayloadTransferUpdate.Status.CANCELED -> {
-            receivedPayloadData.setLength(0)
+            cleanupOutgoingTransfer()
             _transferState.value = TransferState.Idle
           }
+        }
+      }
+
+      private fun handleIncomingUpdate(update: PayloadTransferUpdate) {
+        when (update.status) {
+          PayloadTransferUpdate.Status.IN_PROGRESS -> {
+            if (update.totalBytes > TransferPayloadPolicy.MAX_TRANSFER_SIZE) {
+              failIncomingTransfer(TransferError.PayloadTooLarge)
+              return
+            }
+            val progress =
+              checkNotNull(
+                incomingProgress.updateAndGet { current ->
+                  current ?: MonotonicTransferProgress(update.totalBytes.coerceAtLeast(0))
+                }
+              )
+            val transferred = progress.update(update.bytesTransferred)
+            _transferState.value = TransferState.Receiving(transferred, update.totalBytes)
+          }
+          PayloadTransferUpdate.Status.SUCCESS -> finishReceivedPayload()
+          PayloadTransferUpdate.Status.FAILURE -> failIncomingTransfer(TransferError.TransferFailed)
+          PayloadTransferUpdate.Status.CANCELED -> failIncomingTransfer(null)
         }
       }
     }
@@ -245,20 +333,45 @@ constructor(@ApplicationContext private val context: Context) : NearbyTransferRe
 
   override suspend fun sendData(endpointId: String, bundle: ExportBundle) {
     require(endpointId == connectedEndpointIdRef.get()) { "Endpoint is not authorized" }
+    require(endpointId == authorizedEndpointIdRef.get()) { "Endpoint is not authorized" }
     val bytes = bundle.toJson().toString().toByteArray(Charsets.UTF_8)
+    val mode = TransferPayloadPolicy.select(bytes.size.toLong())
     _transferState.value = TransferState.Sending(0, bytes.size.toLong())
-    val payload = Payload.fromBytes(bytes)
+    val payload =
+      when (mode) {
+        TransferPayloadMode.Bytes -> Payload.fromBytes(bytes)
+        TransferPayloadMode.File -> {
+          val file = File.createTempFile("petit-transfer-", ".json", context.cacheDir)
+          file.writeBytes(bytes)
+          outgoingTempFile.set(file)
+          Payload.fromFile(file)
+        }
+      }
+    outgoingPayloadId.set(payload.id)
+    outgoingProgress.set(MonotonicTransferProgress(bytes.size.toLong()))
     connectionsClient.sendPayload(endpointId, payload).addOnFailureListener {
-      _transferState.value = TransferState.Error("Transfer failed")
+      cleanupOutgoingTransfer()
+      _transferState.value = TransferState.Error(TransferError.TransferFailed)
     }
   }
 
+  override fun cancelTransfer() {
+    outgoingPayloadId.get()?.let(connectionsClient::cancelPayload)
+    incomingPayloadId.get()?.let(connectionsClient::cancelPayload)
+    cleanupOutgoingTransfer()
+    cleanupIncomingTransfer()
+    disconnect()
+  }
+
   override fun disconnect() {
+    authorizedEndpointIdRef.set(null)
     connectedEndpointIdRef.getAndSet(null)?.let(connectionsClient::disconnectFromEndpoint)
     connectionsClient.stopAdvertising()
     connectionsClient.stopDiscovery()
     pendingDeviceName.set(null)
     receivedPayloadData.setLength(0)
+    cleanupOutgoingTransfer()
+    cleanupIncomingTransfer()
     cleanupPairingReferences()
     _pairingState.value = PairingState.Idle
     _transferState.value = TransferState.Idle
@@ -327,6 +440,7 @@ constructor(@ApplicationContext private val context: Context) : NearbyTransferRe
     connectionsClient.stopAdvertising()
     connectionsClient.stopDiscovery()
     connectedEndpointIdRef.set(endpointId)
+    authorizedEndpointIdRef.set(endpointId)
     pendingDeviceName.set(peerDeviceName)
     _pairingState.value =
       PairingState.Paired(familyGroupKey, peerDeviceName, peerDeviceId, endpointId)
@@ -349,19 +463,47 @@ constructor(@ApplicationContext private val context: Context) : NearbyTransferRe
   }
 
   private fun finishReceivedPayload() {
-    val data = receivedPayloadData.toString()
-    if (data.isEmpty()) return
     try {
+      val data =
+        incomingFilePayload.get()?.let { filePayload ->
+          val uri = requireNotNull(filePayload.asUri())
+          val bytes =
+            requireNotNull(context.contentResolver.openInputStream(uri)).use { input ->
+              input.readNBytes((TransferPayloadPolicy.MAX_TRANSFER_SIZE + 1).toInt())
+            }
+          require(bytes.size.toLong() <= TransferPayloadPolicy.MAX_TRANSFER_SIZE)
+          String(bytes, Charsets.UTF_8)
+        } ?: receivedPayloadData.toString()
+      require(data.isNotEmpty())
       val bundle = ExportBundle.fromJson(JSONObject(data))
       val errors = ExportBundle.validate(bundle)
       _transferState.value =
         if (errors.isEmpty()) TransferState.Complete(bundle)
-        else TransferState.Error("Invalid data received from peer")
+        else TransferState.Error(TransferError.InvalidData)
     } catch (_: Exception) {
-      _transferState.value = TransferState.Error("Failed to parse received data")
+      _transferState.value = TransferState.Error(TransferError.ParseFailed)
     } finally {
-      receivedPayloadData.setLength(0)
+      cleanupIncomingTransfer()
     }
+  }
+
+  private fun failIncomingTransfer(reason: TransferError?) {
+    incomingPayloadId.get()?.let(connectionsClient::cancelPayload)
+    cleanupIncomingTransfer()
+    _transferState.value = if (reason == null) TransferState.Idle else TransferState.Error(reason)
+  }
+
+  private fun cleanupIncomingTransfer() {
+    receivedPayloadData.setLength(0)
+    incomingPayloadId.set(null)
+    incomingFilePayload.set(null)
+    incomingProgress.set(null)
+  }
+
+  private fun cleanupOutgoingTransfer() {
+    outgoingPayloadId.set(null)
+    outgoingProgress.set(null)
+    outgoingTempFile.getAndSet(null)?.delete()
   }
 
   private fun PairingRejectionReason.toPairingError(): PairingError =

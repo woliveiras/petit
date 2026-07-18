@@ -2,7 +2,7 @@
 spec: "0102"
 title: One-shot data transfer
 family: local-sharing
-status: In Progress
+status: Implemented
 owner: woliveiras
 depends_on: ["0101"]
 ---
@@ -31,22 +31,22 @@ and success has not been validated on two devices.
 ### Functional
 
 - [x] Serialize shareable data into an `ExportBundle`.
-- [ ] Carry an authorized Nearby connection from pairing into send/receive.
+- [x] Carry an authorized Nearby connection from pairing into send/receive.
 - [x] Serialize and submit a bundle when a connected endpoint is already available.
 - [x] Offer the receiver merge and replace options.
 - [x] Merge entities by UUID and `updatedAt`.
-- [ ] Make `REPLACE` remove missing local data before import.
-- [ ] Display actual progress and a summary by entity type.
-- [ ] Discard a partial payload when the transfer fails.
-- [ ] Confirm the destructive mode before replacing data.
-- [ ] Allow cancellation to disconnect and discard any partial payload.
+- [x] Make `REPLACE` remove missing local data before import.
+- [x] Display actual progress and a summary by entity type.
+- [x] Discard a partial payload when the transfer fails.
+- [x] Confirm the destructive mode before replacing data.
+- [x] Allow cancellation to disconnect and discard any partial payload.
 
 ### Non-functional
 
-- [ ] Integrity: apply the import atomically.
-- [ ] Security: accept payloads only from the paired endpoint.
-- [ ] Performance: choose BYTES or FILE based on the payload limit without truncating the bundle.
-- [ ] Accessibility and i18n: announce progress and keep text in pt-BR, en, and es.
+- [x] Integrity: apply the import atomically.
+- [x] Security: accept payloads only from the paired endpoint.
+- [x] Performance: choose BYTES or FILE based on the payload limit without truncating the bundle.
+- [x] Accessibility and i18n: announce progress and keep text in pt-BR, en, and es.
 
 ## Test strategy
 
@@ -58,11 +58,11 @@ two devices, including without an internet connection. See the
 ## Acceptance criteria
 
 - [ ] Given a paired device with local data, when it sends the data, then the receiver gets a complete `ExportBundle` and sees progress and completion.
-- [ ] Given a receiver with existing data, when it chooses merge, then UUIDs are matched and the version with the latest `updatedAt` prevails.
-- [ ] Given a receiver with records missing from the bundle, when it confirms replacement, then the shareable database is cleared and reflects only the bundle.
+- [x] Given a receiver with existing data, when it chooses merge, then UUIDs are matched and the version with the latest `updatedAt` prevails.
+- [x] Given a receiver with records missing from the bundle, when it confirms replacement, then the shareable database is cleared and reflects only the bundle.
 - [ ] Given an interrupted connection, when only part of the payload arrives, then no changes are persisted and another attempt is offered.
 - [ ] Given two devices without an internet connection, when they transfer through Nearby, then the flow succeeds.
-- [ ] Given a completed import, when the summary is displayed, then the counters match the entities actually added, updated, and removed.
+- [x] Given a completed import, when the summary is displayed, then the counters match the entities actually added, updated, and removed.
 
 ## Edge cases
 

@@ -211,6 +211,75 @@ class ExportImportUseCaseTest {
     assertThat(database.petDao().getAllPets().first()).isEmpty()
   }
 
+  @Test
+  fun replaceRemovesMissingRecordsAndReportsExactCounters() = runTest {
+    database.petDao().insertPet(PetEntity(id = "local-pet", name = "Local"))
+    database
+      .taskDao()
+      .insertTask(
+        TaskEntity(
+          id = "local-task",
+          petId = "local-pet",
+          kind = "CUSTOM",
+          title = "Local only",
+          scheduledFor = 1L,
+        )
+      )
+
+    val result =
+      useCase.importData(
+        ExportBundle(
+          metadata = ExportMetadata("1.0", "2026-07-17T00:00:00Z"),
+          pets = listOf(Pet(id = "remote-pet", name = "Remote", createdAt = 1L, updatedAt = 1L)),
+          weightEntries = emptyList(),
+          vaccinationEntries = emptyList(),
+          dewormingEntries = emptyList(),
+          tasks = emptyList(),
+        ),
+        ConflictResolution.REPLACE,
+      )
+
+    assertThat(database.petDao().getAllPets().first().map { it.id }).containsExactly("remote-pet")
+    assertThat(database.taskDao().getAllTasks().first()).isEmpty()
+    assertThat(result.petsAdded).isEqualTo(1)
+    assertThat(result.petsRemoved).isEqualTo(1)
+    assertThat(result.tasksRemoved).isEqualTo(1)
+    assertThat(result.totalRemoved).isEqualTo(2)
+  }
+
+  @Test
+  fun replaceRollsBackClearsWhenAnInsertFails() = runTest {
+    database.petDao().insertPet(PetEntity(id = "local-pet", name = "Local"))
+    database.openHelper.writableDatabase.execSQL(
+      """
+      CREATE TRIGGER reject_remote_pet
+      BEFORE INSERT ON pets
+      WHEN NEW.id = 'remote-pet'
+      BEGIN
+        SELECT RAISE(ABORT, 'forced import failure');
+      END
+      """
+        .trimIndent()
+    )
+
+    val failure = runCatching {
+      useCase.importData(
+        ExportBundle(
+          metadata = ExportMetadata("1.0", "2026-07-17T00:00:00Z"),
+          pets = listOf(Pet(id = "remote-pet", name = "Remote", createdAt = 1L, updatedAt = 1L)),
+          weightEntries = emptyList(),
+          vaccinationEntries = emptyList(),
+          dewormingEntries = emptyList(),
+          tasks = emptyList(),
+        ),
+        ConflictResolution.REPLACE,
+      )
+    }
+
+    assertThat(failure.isFailure).isTrue()
+    assertThat(database.petDao().getAllPets().first().map { it.id }).containsExactly("local-pet")
+  }
+
   private fun bundleWithTask(title: String, updatedAt: Long) =
     ExportBundle(
       metadata = ExportMetadata("1.0", "2026-07-17T00:00:00Z"),

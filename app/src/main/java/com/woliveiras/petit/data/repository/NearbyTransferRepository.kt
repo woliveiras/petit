@@ -41,6 +41,9 @@ interface NearbyTransferRepository {
   /** Send an export bundle to the connected device. */
   suspend fun sendData(endpointId: String, bundle: ExportBundle)
 
+  /** Cancel the active payload, discard partial data, and disconnect the peer. */
+  fun cancelTransfer()
+
   /** The name of the currently connected peer device. */
   val connectedPeerName: String?
 
