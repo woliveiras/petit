@@ -19,6 +19,12 @@ import org.json.JSONObject
 
 /** Creates and validates Petit backup archives without depending on a storage provider. */
 class BackupArchiveCodec(private val limits: BackupArchiveLimits = BackupArchiveLimits()) {
+  val supportedArchiveFormatVersion: Int
+    get() = ARCHIVE_FORMAT_VERSION
+
+  val supportedDataSchemaVersion: Int
+    get() = SUPPORTED_DATA_SCHEMA_VERSION
+
   fun create(request: BackupArchiveRequest): BackupArchiveResult {
     validateComponent(request.backupId, "backup ID")
     val outputDirectory = request.outputDirectory.absoluteFile

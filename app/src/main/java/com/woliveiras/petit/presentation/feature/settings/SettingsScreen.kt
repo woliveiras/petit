@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Download
@@ -74,13 +75,13 @@ import com.woliveiras.petit.domain.model.AppLanguage
 import com.woliveiras.petit.domain.model.AppTheme
 import com.woliveiras.petit.domain.model.ConflictResolution
 import com.woliveiras.petit.presentation.components.PetitTopAppBar
-import com.woliveiras.petit.presentation.feature.backup.BackupSettingsCard
 import com.woliveiras.petit.presentation.feature.familygroup.FamilyGroupSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
   onNavigateBack: () -> Unit,
+  onNavigateToSavedBackups: () -> Unit,
   onNavigateToDeleteAllData: () -> Unit,
   onNavigateToFamilyGroup: () -> Unit,
   onNavigateToPairing: () -> Unit,
@@ -254,7 +255,19 @@ fun SettingsScreen(
       // Data section
       SettingsSectionHeader(title = stringResource(R.string.settings_section_data))
 
-      BackupSettingsCard()
+      Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors =
+          CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        shape = RoundedCornerShape(16.dp),
+      ) {
+        SettingsItem(
+          icon = Icons.Default.CloudUpload,
+          title = stringResource(R.string.backup_saved_title),
+          subtitle = stringResource(R.string.backup_saved_description),
+          onClick = onNavigateToSavedBackups,
+        )
+      }
 
       Card(
         modifier = Modifier.fillMaxWidth(),

@@ -4,7 +4,8 @@ Spec: [spec.md](./spec.md)
 
 ## Status
 
-This plan is **Approved** and may be implemented.
+This plan is **In Progress**. Steps 1–6 are implemented behind provider-neutral
+contracts; real `appDataFolder` verification in step 7 remains open.
 
 ## Dependencies
 

@@ -83,6 +83,9 @@ sealed class Screen(val route: String) {
   /** Settings screen. */
   data object Settings : Screen("settings")
 
+  /** Provider-neutral saved backup management. */
+  data object SavedBackups : Screen("settings/backups")
+
   /** Restore one exact provider backup ID. */
   data object RestoreBackup : Screen("settings/backups/{remoteId}/restore") {
     fun createRoute(remoteId: String) = "settings/backups/${Uri.encode(remoteId)}/restore"

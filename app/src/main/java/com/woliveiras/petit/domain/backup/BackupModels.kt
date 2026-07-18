@@ -48,8 +48,21 @@ data class BackupMetadata(
   }
 
   val isRecognized: Boolean
-    get() = contractId == PETIT_BACKUP_CONTRACT_ID
+    get() =
+      contractId == PETIT_BACKUP_CONTRACT_ID &&
+        remoteId.isNotBlank() &&
+        appVersion.isNotBlank() &&
+        archiveSha256.isNotBlank() &&
+        contentCounts.allNonNegative()
 }
+
+private fun BackupContentCounts.allNonNegative(): Boolean =
+  pets >= 0 &&
+    weights >= 0 &&
+    vaccinations >= 0 &&
+    dewormingRecords >= 0 &&
+    tasks >= 0 &&
+    assets >= 0
 
 data class BackupPage(val backups: List<BackupMetadata>, val nextPageToken: String?)
 

@@ -2,7 +2,7 @@
 spec: "0303"
 title: "Manage Google Drive Backups"
 family: backup-recovery
-status: Approved
+status: In Progress
 owner: woliveiras
 depends_on: ["0301"]
 ---
@@ -114,7 +114,7 @@ advance to `Implemented`.
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Status | Approved | The behavior is approved for implementation. |
+| Status | In Progress | Provider-neutral behavior is implemented; real Drive validation remains open. |
 | Retention | Until explicit user deletion | The user owns the storage and controls lifecycle. |
 | Backup count | Unlimited by Petit | Only Google Drive quotas apply. |
 | Disconnect | Preserve remote files | Revoking access is not a deletion request. |

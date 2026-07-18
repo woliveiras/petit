@@ -19,6 +19,7 @@ import com.woliveiras.petit.domain.backup.restore.RestoreRecoveryJournal
 import com.woliveiras.petit.domain.backup.restore.RestoreReminderScheduler
 import com.woliveiras.petit.domain.usecase.ExportImportUseCase
 import com.woliveiras.petit.domain.usecase.backup.BackupArchivePreparer
+import com.woliveiras.petit.domain.usecase.backup.ManageBackupsUseCase
 import com.woliveiras.petit.worker.RestoreReminderSchedulerImpl
 import dagger.Module
 import dagger.Provides
@@ -59,6 +60,18 @@ object BackupModule {
       stagingRoot = context.cacheDir.resolve("backup_staging"),
       appVersion = BuildConfig.VERSION_NAME,
       clock = clock,
+    )
+
+  @Provides
+  @Singleton
+  fun provideManageBackupsUseCase(
+    storageGateway: BackupStorageGateway,
+    codec: BackupArchiveCodec,
+  ): ManageBackupsUseCase =
+    ManageBackupsUseCase(
+      storageGateway = storageGateway,
+      supportedArchiveFormatVersion = codec.supportedArchiveFormatVersion,
+      supportedSchemaVersion = codec.supportedDataSchemaVersion,
     )
 
   @Provides

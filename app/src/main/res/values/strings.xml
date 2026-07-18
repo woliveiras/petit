@@ -864,4 +864,44 @@
     <string name="lan_sync_synced">Synced with %1$s</string>
     <string name="lan_sync_peer_unavailable">No family device found on this network</string>
     <string name="lan_sync_error">Local sync failed. Try again.</string>
+
+    <!-- Provider-neutral backup management -->
+    <string name="backup_trigger_manual">Manual</string>
+    <string name="backup_trigger_automatic">Automatic</string>
+    <string name="backup_trigger_data_change">Data change</string>
+    <string name="backup_compatibility_compatible">Compatible</string>
+    <string name="backup_compatibility_archive_new">Requires a newer Petit archive version</string>
+    <string name="backup_compatibility_schema_new">Requires a newer Petit data version</string>
+    <string name="backup_compatibility_invalid">Invalid backup</string>
+    <string name="backup_saved_title">Saved backups</string>
+    <string name="backup_saved_description">Inspect, restore, or delete backups from the connected storage provider</string>
+    <string name="backup_saved_loading">Loading saved backups</string>
+    <string name="backup_saved_authorization_required">Storage authorization is required to view saved backups.</string>
+    <string name="backup_saved_reconnect">Reconnect</string>
+    <string name="backup_saved_unavailable">Saved backups are temporarily unavailable.</string>
+    <string name="backup_saved_empty">No saved backups are available.</string>
+    <string name="backup_saved_create">Create a backup</string>
+    <string name="backup_saved_retry">Try again</string>
+    <string name="backup_saved_delete_selected">Delete selected</string>
+    <string name="backup_saved_delete_all">Delete all backups</string>
+    <string name="backup_saved_disconnect">Disconnect storage</string>
+    <string name="backup_saved_partial_deletion">Some backups could not be deleted. The successful deletions were kept.</string>
+    <string name="backup_saved_retry_deletion">Retry failed deletions</string>
+    <string name="backup_saved_confirm_title">Permanently delete backups?</string>
+    <string name="backup_saved_confirm_selected">Only the selected backups will be permanently deleted. Local data will not change.</string>
+    <string name="backup_saved_confirm_all">Every recognized Petit backup will be permanently deleted. Local data will not change.</string>
+    <string name="backup_saved_confirm_delete">Delete permanently</string>
+    <string name="backup_saved_close">Close</string>
+    <string name="backup_saved_restore">Restore</string>
+    <string name="backup_saved_delete">Delete</string>
+    <string name="backup_saved_item_title">Backup from %1$s</string>
+    <string name="backup_saved_item_summary">%1$s · app %2$s · %3$d pets · %4$s</string>
+    <string name="backup_saved_select_item">Select backup from %1$s</string>
+    <string name="backup_saved_collection_total">%1$d backups · %2$s total</string>
+    <string name="backup_saved_details">Created: %1$s\nTrigger: %2$s\nApp: %3$s\nArchive version: %4$d\nData version: %5$d\nCompatibility: %6$s\nPets: %7$d\nWeights: %8$d\nVaccinations: %9$d\nDeworming records: %10$d\nTasks: %11$d\nAssets: %12$d\nSize: %13$s</string>
+    <string name="backup_saved_error_authorization">Storage authorization is required.</string>
+    <string name="backup_saved_error_quota">The storage provider quota is exceeded.</string>
+    <string name="backup_saved_error_retryable">The storage provider is temporarily unavailable. Try again.</string>
+    <string name="backup_saved_error_permanent">Saved backups could not be loaded.</string>
+
 </resources>

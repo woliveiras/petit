@@ -35,12 +35,17 @@ class DeterministicBackupStorageGateway(
 
   private val storedByBackupId = linkedMapOf<String, StoredBackup>()
   private val failures = mutableMapOf<Operation, ArrayDeque<BackupProviderException>>()
+  private val deleteFailuresByRemoteId = mutableMapOf<String, ArrayDeque<BackupProviderException>>()
   private val mutableState = MutableStateFlow(initialAuthorization)
   private var nextRemoteId = 1
   private var uploadInterruptAfterBytes: Long? = null
   private var uploadFailureAfterCommit: BackupProviderException? = null
   private var nextReportedUploadTotalBytes: Long? = null
   var nextAuthorizationResult: BackupAuthorizationResult = BackupAuthorizationResult.Authorized
+  var listCalls: Int = 0
+    private set
+
+  val deleteRequests = mutableListOf<String>()
 
   override val state: StateFlow<BackupAuthorizationState> = mutableState
 
@@ -62,6 +67,10 @@ class DeterministicBackupStorageGateway(
 
   fun failNext(operation: Operation, failure: BackupProviderException) {
     failures.getOrPut(operation) { ArrayDeque() }.addLast(failure)
+  }
+
+  fun failDeleteForRemoteIdOnce(remoteId: String, failure: BackupProviderException) {
+    deleteFailuresByRemoteId.getOrPut(remoteId) { ArrayDeque() }.addLast(failure)
   }
 
   fun interruptNextUploadAfter(bytes: Long) {
@@ -151,6 +160,7 @@ class DeterministicBackupStorageGateway(
 
   override suspend fun list(pageToken: String?, pageSize: Int): BackupPage {
     ensureAuthorized()
+    listCalls += 1
     throwScriptedFailure(Operation.LIST)
     require(pageSize > 0) { "Page size must be positive" }
     val offset = pageToken?.toIntOrNull() ?: 0
@@ -191,7 +201,9 @@ class DeterministicBackupStorageGateway(
 
   override suspend fun deleteExact(remoteId: String) {
     ensureAuthorized()
+    deleteRequests += remoteId
     throwScriptedFailure(Operation.DELETE)
+    deleteFailuresByRemoteId[remoteId]?.pollFirst()?.let { throw it }
     val entry = storedByBackupId.entries.firstOrNull { it.value.metadata.remoteId == remoteId }
     if (entry != null) storedByBackupId.remove(entry.key)
   }
