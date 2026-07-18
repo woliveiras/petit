@@ -2,7 +2,7 @@
 spec: "0302"
 title: "Restore Google Drive Backup"
 family: backup-recovery
-status: Draft
+status: Approved
 owner: woliveiras
 depends_on: ["0301"]
 ---
@@ -124,7 +124,7 @@ coverage before the status can advance to `Implemented`.
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Status | Draft | The updated behavior awaits explicit approval. |
+| Status | Approved | The behavior is approved for implementation. |
 | Modes | MERGE and REPLACE | Users can combine data or recreate a snapshot explicitly. |
 | Archive trust | Validate completely before mutation | A remote ZIP is untrusted input. |
 | Device-bound data | Never restored | Cloning identities or authorization would be unsafe. |

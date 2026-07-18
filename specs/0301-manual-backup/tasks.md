@@ -2,12 +2,12 @@
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
-> Spec status: **Draft**. All implementation tasks remain pending until explicit approval.
+> Spec status: **Approved**. Implementation may proceed in dependency order.
 
 ## Tasks
 
 - [ ] **Create a complete portable backup archive** (test-type: both)
-  - blocked-by: spec approval
+  - blocked-by: none
   - desired behavior: one Room snapshot produces a versioned ZIP containing all restorable data and app-owned pet assets.
   - acceptance criteria: manifest payload paths, sizes, counts, SHA-256 checksums, JSON data, assets, exclusions, final archive metadata, and cleanup match the archive contract.
   - verification: `./gradlew test`

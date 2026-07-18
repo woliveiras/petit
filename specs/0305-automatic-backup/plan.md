@@ -4,7 +4,7 @@ Spec: [spec.md](./spec.md)
 
 ## Status
 
-This plan is **Draft**. Do not implement it before explicit spec approval.
+This plan is **Approved** and may be implemented.
 
 ## Dependencies
 

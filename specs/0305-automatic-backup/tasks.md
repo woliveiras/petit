@@ -2,12 +2,12 @@
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
-> Spec status: **Draft**. All implementation tasks remain pending until explicit approval.
+> Spec status: **Approved**. Implementation may proceed in dependency order.
 
 ## Tasks
 
 - [ ] **Schedule one inexact daily backup** (test-type: both)
-  - blocked-by: spec 0301; spec approval
+  - blocked-by: spec 0301
   - desired behavior: explicit opt-in enqueues one unique periodic request and opt-out cancels it.
   - acceptance criteria: duplicate enable calls, app restart, constraint changes, and cancellation preserve one authoritative schedule.
   - verification: `./gradlew test`

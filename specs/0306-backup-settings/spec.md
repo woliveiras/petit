@@ -2,7 +2,7 @@
 spec: "0306"
 title: "Backup Settings"
 family: backup-recovery
-status: Draft
+status: Approved
 owner: woliveiras
 depends_on: ["0305"]
 ---
@@ -126,7 +126,7 @@ before the status can advance to `Implemented`.
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Status | Draft | The updated behavior awaits explicit approval. |
+| Status | Approved | The behavior is approved for implementation. |
 | Automatic default | Off | Remote automation requires explicit opt-in. |
 | Network default | Unmetered | Reduces unexpected mobile-data use. |
 | Schedule presentation | Inexact | WorkManager does not promise a precise execution time. |

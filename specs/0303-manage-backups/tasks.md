@@ -2,12 +2,12 @@
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
-> Spec status: **Draft**. All implementation tasks remain pending until explicit approval.
+> Spec status: **Approved**. Implementation may proceed in dependency order.
 
 ## Tasks
 
 - [ ] **List and inspect every recognized backup** (test-type: both)
-  - blocked-by: spec 0301; spec approval
+  - blocked-by: spec 0301
   - desired behavior: paginated Drive results become a sorted list with compatibility, content counts, trigger, and total size.
   - acceptance criteria: unknown files are ignored and empty, error, retry, and authorization states are distinguishable.
   - verification: `./gradlew test` and `./gradlew connectedDebugAndroidTest`

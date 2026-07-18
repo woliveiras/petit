@@ -2,7 +2,7 @@
 spec: "0305"
 title: "Automatic Google Drive Backup"
 family: backup-recovery
-status: Draft
+status: Approved
 owner: woliveiras
 depends_on: ["0301"]
 ---
@@ -116,7 +116,7 @@ before the status can advance to `Implemented`.
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Status | Draft | The updated behavior awaits explicit approval. |
+| Status | Approved | The behavior is approved for implementation. |
 | Price | Free | Storage is user-owned. |
 | Default | Off | Automatic remote transfer requires explicit opt-in. |
 | Schedule | Daily, inexact WorkManager execution | Android does not guarantee an exact 02:00 run. |

@@ -2,12 +2,12 @@
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
-> Spec status: **Draft**. All implementation tasks remain pending until explicit approval.
+> Spec status: **Approved**. Implementation may proceed in dependency order.
 
 ## Tasks
 
 - [ ] **Download and validate an untrusted backup archive** (test-type: both)
-  - blocked-by: spec 0301; spec approval
+  - blocked-by: spec 0301
   - desired behavior: the archive is streamed to staging and completely validated before local mutation.
   - acceptance criteria: unsafe paths, bombs, limits, schema, manifest, checksums, JSON, and references are covered along with cancellation cleanup.
   - verification: `./gradlew test`

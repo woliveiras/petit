@@ -2,12 +2,12 @@
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
-> Spec status: **Draft**. All implementation tasks remain pending until explicit approval.
+> Spec status: **Approved**. Implementation may proceed in dependency order.
 
 ## Tasks
 
 - [ ] **Classify restorable changes and revisions** (test-type: both)
-  - blocked-by: specs 0305 and 0306; spec approval
+  - blocked-by: specs 0305 and 0306
   - desired behavior: every committed restorable data or asset change advances a revision while backup bookkeeping cannot trigger itself.
   - acceptance criteria: all included and excluded trigger types in `spec.md` have regression coverage.
   - verification: `./gradlew test`

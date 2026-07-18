@@ -2,12 +2,12 @@
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
-> Spec status: **Draft**. All implementation tasks remain pending until explicit approval.
+> Spec status: **Approved**. Implementation may proceed in dependency order.
 
 ## Tasks
 
 - [ ] **Persist free backup preferences** (test-type: both)
-  - blocked-by: spec 0305; spec approval
+  - blocked-by: spec 0305
   - desired behavior: automatic, network, and notification preferences survive restart without credentials, gates, retention, or exact-time fields.
   - acceptance criteria: defaults and every update are covered in DataStore integration tests.
   - verification: `./gradlew test`

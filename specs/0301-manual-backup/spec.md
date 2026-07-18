@@ -2,7 +2,7 @@
 spec: "0301"
 title: "Manual Google Drive Backup"
 family: backup-recovery
-status: Draft
+status: Approved
 owner: woliveiras
 depends_on: ["0006", "0204"]
 ---
@@ -153,7 +153,7 @@ before the status can advance to `Implemented`.
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Status | Draft | The updated behavior awaits explicit approval. |
+| Status | Approved | The behavior is approved for implementation. |
 | Storage | Google Drive `appDataFolder` | User-owned storage with the narrow app-data scope. |
 | Petit account | Not required | Drive authorization is independent from Petit Cloud. |
 | Price | Free | Petit does not operate the storage infrastructure. |
