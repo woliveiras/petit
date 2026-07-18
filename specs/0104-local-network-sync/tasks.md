@@ -44,4 +44,4 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - summary: test the same Wi-Fi network, bidirectional changes, reconnection, background, and an invalid key.
   - desired behavior: devices converge with the expected power usage and lifecycle.
   - acceptance criteria: all spec criteria pass on real hardware.
-  - verification: `./gradlew assembleDebug && ./gradlew installDebug`
+  - verification: [local-sharing physical validation runbook](../../docs/test-runbooks/local-sharing-physical-validation.md), cases `LS-LAN-01` through `LS-LAN-05`

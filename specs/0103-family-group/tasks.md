@@ -37,4 +37,4 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - summary: perform renaming, removal, departure, and an attempt with the old key.
   - desired behavior: both devices converge without deleting pet data.
   - acceptance criteria: the association is revoked on both sides, and the local history remains.
-  - verification: `./gradlew assembleDebug && ./gradlew installDebug`
+  - verification: [local-sharing physical validation runbook](../../docs/test-runbooks/local-sharing-physical-validation.md), cases `LS-GROUP-01` through `LS-GROUP-03`

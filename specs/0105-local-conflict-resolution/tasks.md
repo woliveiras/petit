@@ -51,4 +51,4 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - summary: exercise edit/edit, edit/delete, delete/delete, and tie cases.
   - desired behavior: both databases end in the same state after transfers in both directions.
   - acceptance criteria: all scenarios converge without silent data loss.
-  - verification: `./gradlew assembleDebug && ./gradlew installDebug`
+  - verification: [local-sharing physical validation runbook](../../docs/test-runbooks/local-sharing-physical-validation.md), cases `LS-CONFLICT-01` through `LS-CONFLICT-04`

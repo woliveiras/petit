@@ -44,4 +44,4 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - summary: run merge, replace, and interruption with and without an internet connection.
   - desired behavior: the final databases and interface match the selected option.
   - acceptance criteria: all spec scenarios pass on physical hardware.
-  - verification: `./gradlew assembleDebug && ./gradlew installDebug`
+  - verification: [local-sharing physical validation runbook](../../docs/test-runbooks/local-sharing-physical-validation.md), cases `LS-XFER-01` through `LS-XFER-03`

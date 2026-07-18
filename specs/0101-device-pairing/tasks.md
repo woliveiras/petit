@@ -30,4 +30,4 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
   - summary: run the acceptance matrix on physical hardware.
   - desired behavior: pairing works with and without an internet connection and respects permissions.
   - acceptance criteria: two devices persist the same key; an invalid code and cancellation do not pair them.
-  - verification: `./gradlew assembleDebug && ./gradlew installDebug`
+  - verification: [local-sharing physical validation runbook](../../docs/test-runbooks/local-sharing-physical-validation.md), cases `LS-PAIR-01` through `LS-PAIR-03`
