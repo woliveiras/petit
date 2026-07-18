@@ -239,9 +239,7 @@ class BackupArchiveCodec(private val limits: BackupArchiveLimits = BackupArchive
     }
     snapshot.exportBundle.pets.forEach { pet ->
       val expected = assetsByPet[pet.id]?.let(::assetPath)
-      requireArchive(pet.photoUri == expected) {
-        "A backup asset is associated with the wrong pet"
-      }
+      requireArchive(pet.photoUri == expected) { "A backup asset is associated with the wrong pet" }
     }
     val validationErrors = ExportBundle.validate(snapshot.exportBundle)
     requireArchive(validationErrors.isEmpty()) {

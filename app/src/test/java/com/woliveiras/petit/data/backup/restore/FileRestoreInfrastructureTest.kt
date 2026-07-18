@@ -171,9 +171,7 @@ class FileRestoreInfrastructureTest {
 
     installer.cleanupOrphans(active.operationId)
 
-    assertThat(
-        context.filesDir.resolve("backup_restore/operations/${orphan.operationId}").exists()
-      )
+    assertThat(context.filesDir.resolve("backup_restore/operations/${orphan.operationId}").exists())
       .isFalse()
     assertThat(
         context.filesDir.resolve("backup_restore/operations/${active.operationId}").isDirectory
