@@ -1,202 +1,131 @@
 ---
 spec: "0305"
-title: "Automatic Backup"
+title: "Automatic Google Drive Backup"
 family: backup-recovery
-status: On Hold
+status: Draft
 owner: woliveiras
 depends_on: ["0301"]
 ---
 
-# Spec: Automatic Backup
+# Spec: Automatic Google Drive Backup
 
 ## Context and motivation
 
-> As a signed-in user,
-> I want my data to be saved automatically to Google Drive every day at 2:00 a.m.,
-> So that I do not have to worry about backing it up manually.
-
-This is a historical hypothesis that has not yet been implemented. Product, external provider, availability, and monetization must be revalidated before approval.
+The caregiver can opt into free automatic backups in their own Google Drive.
+Android WorkManager runs durable, deferrable work when system and network
+constraints permit; Petit does not promise an exact clock time.
 
 ## Functional requirements
 
-### Scenario 1: Automatic backup enabled by default (signed-in user)
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 1: Opt in explicitly
 
 ```gherkin
-GIVEN I am signed in with Google
-WHEN I enable automatic backup in settings
-THEN WorkManager schedules a daily backup at 2:00 a.m.
-AND I see "Automatic backup enabled — next backup at 2:00 a.m."
+GIVEN Google Drive is authorized
+AND automatic backup is off by default
+WHEN I enable automatic backup
+THEN Petit enqueues one unique daily periodic work request
+AND explains that Android chooses the exact execution time
+AND no Petit account or entitlement is required
 ```
 
-### Scenario 2: Daily backup runs in the background
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 2: Run while the app is closed
 
 ```gherkin
 GIVEN automatic backup is enabled
-WHEN it is 2:00 a.m.
-THEN the backup runs automatically
-EVEN IF the app is closed
-AND I do not need to open the app
-AND the backup is saved to Google Drive
+AND all configured constraints are satisfied
+WHEN WorkManager runs the periodic request
+THEN Petit creates and uploads the current complete archive
+AND records the attempt even if the app process was previously closed
 ```
 
-### Scenario 3: Backup over Wi-Fi only
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 3: Respect network constraints
 
 ```gherkin
-GIVEN "Back up over Wi-Fi only" is enabled
-AND I am connected to a mobile network (4G/5G)
-WHEN the automatic backup is due to run
-THEN the backup is postponed
-AND it runs when I connect to Wi-Fi
+GIVEN automatic backup requires an unmetered network
+WHEN only a metered network is available
+THEN WorkManager defers the backup
+WHEN an unmetered network becomes available
+THEN the work becomes eligible to run
 ```
 
-### Scenario 4: Back up only when signed in
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 4: Handle revoked authorization in background
 
 ```gherkin
-GIVEN an automatic backup is scheduled
-AND I am no longer signed in (signed out)
-WHEN it is 2:00 a.m.
-THEN the backup does NOT run
-AND I see the notification "Sign in to continue automatic backups"
+GIVEN a scheduled backup starts
+AND Google requires user interaction to authorize again
+WHEN the worker checks authorization
+THEN it does not launch UI from the background
+AND records "Authorization required"
+AND offers a foreground reconnect action through Settings or a notification
 ```
 
-### Scenario 5: Wi-Fi-only setting is respected
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 5: Retry transient failures
 
 ```gherkin
-GIVEN "Back up over Wi-Fi only" is enabled
-AND I am connected to a mobile network (4G/5G) at 2:00 a.m.
-WHEN the automatic backup is due to run
-THEN the backup is postponed
-AND it runs when I connect to Wi-Fi
-AND I see the notification "Waiting for Wi-Fi to back up"
+GIVEN a scheduled backup encounters a transient network or provider failure
+WHEN the worker returns retry
+THEN WorkManager applies exponential backoff
+AND retry reuses the same idempotent operation where possible
+AND no duplicate completed backup is created
 ```
 
-### Scenario 6: No internet
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 6: Preserve every completed backup
 
 ```gherkin
-GIVEN I have no internet connection
-WHEN the automatic backup is due to run
-THEN the backup fails silently
-AND it will be attempted again next time
-AND I can see "Last backup: 2 days ago (failed)" in settings
+GIVEN automatic backups complete repeatedly
+WHEN a new backup is created
+THEN Petit does not delete older automatic or manual backups
+AND only an explicit user deletion removes a completed backup
 ```
 
----
+## Scheduling rules
+
+- Use `enqueueUniquePeriodicWork` for one daily request.
+- Treat the repeat interval as a minimum interval, not an exact appointment.
+- Display "Scheduled" or an execution window rather than an exact next time.
+- Use WorkManager constraints for connected or unmetered network, battery not
+  low, and storage not low as approved by the settings spec.
+- Use exponential backoff for transient errors.
+- Do not use exact alarms for backup.
+- Cancel unique periodic work when automatic backup is disabled.
 
 ## Non-functional requirements
 
-- [ ] Preserve Petit's local operation when authentication, the network, or an external service is unavailable.
-- [ ] Protect personal and pet health data during storage, transfer, and deletion.
-- [ ] Provide accessible and understandable loading, success, empty, and error states.
-- [ ] Prevent silent data loss or duplication during interrupted operations.
+- Reuse the exact archive and Drive upload path from spec 0301.
+- Keep automatic backup free and independent from Petit authentication.
+- Never prompt for authorization from a Worker.
+- Avoid persistent services and unnecessary wakeups.
+- Keep work unique, observable, cancelable, and idempotent.
+- Do not apply automatic retention or count limits.
 
 ## Test strategy
 
 | Scope | Expected coverage |
 | --- | --- |
-| Unit | Eligibility, validation, state, conflict, and data transformation rules. |
-| Integration | Flows that cross the interface, repositories, local database, and external providers. |
-| Both | Each vertical task uses unit tests for rules and integration tests for I/O boundaries. |
+| Unit | Scheduling policy, constraints, backoff mapping, authorization state, and idempotency. |
+| Integration | WorkManager, Hilt worker, archive creation, Drive gateway, and history. |
+| Instrumented | Settings opt-in/out and foreground reauthorization. |
+| Manual | Real background execution, process death, Doze, network changes, and revocation. |
 
 ## Acceptance criteria
 
-The scenarios in **Functional requirements** are this spec's testable criteria and must have traceable coverage before the status advances to `Implemented`.
-
-## Preserved product notes
-
-### UI/UX
-
-### Backup Settings
-
-```
-┌────────────────────────────────┐
-│ ← Automatic Backup             │
-├────────────────────────────────┤
-│                                │
-│ ☁️ AUTOMATIC BACKUP            │
-│ ┌────────────────────────────┐ │
-│ │ Enabled               [ON] │ │
-│ └────────────────────────────┘ │
-│                                │
-│ 📊 STATUS                      │
-│ ┌────────────────────────────┐ │
-│ │ Last backup:               │ │
-│ │ Today at 10:30 ✅          │ │
-│ │                            │ │
-│ │ Next backup:               │ │
-│ │ Tomorrow at 10:30          │ │
-│ └────────────────────────────┘ │
-│                                │
-│ ⚙️ SETTINGS                    │
-│ ┌────────────────────────────┐ │
-│ │ Frequency           24h  ▶ │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ Wi-Fi only           [ON]  │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ Notify on success    [OFF] │ │
-│ └────────────────────────────┘ │
-│                                │
-│ ┌────────────────────────────┐ │
-│ │    BACK UP NOW             │ │
-│ └────────────────────────────┘ │
-│                                │
-└────────────────────────────────┘
-```
-
-### Backup Notification
-
-```
-┌────────────────────────────────┐
-│ 🐱 Petit                         │
-│ Backup completed successfully  │
-│ 2 pets saved • 15.4 KB        │
-│                                │
-│                      [Dismiss] │
-└────────────────────────────────┘
-```
-
----
-
-### Available Frequencies
-
-| Option | Hours | Description |
-|-------|-------|-----------|
-| Frequent | 6 | Every 6 hours |
-| Daily | 24 | Once a day |
-| Weekly | 168 | Once a week |
-
----
-
-## Edge cases
-
-- The device loses connectivity or the process is interrupted midway through the operation.
-- The session expires, switches accounts, or lacks sufficient authorization.
-- Local and remote data diverge, are incomplete, or were created by different app versions.
-- The external provider is unavailable, enforces a quota, or changes its API.
+Every functional scenario and scheduling rule requires traceable coverage
+before the status can advance to `Implemented`.
 
 ## Decisions
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Proposal status | On Hold | Demand and the product model still need to be validated. |
-| External technology | Undecided | Firebase, Google Drive, and the cited APIs are historical options, not current commitments. |
-| Local source of truth | Preserve Room as the offline foundation | Keeps Petit useful without an account or connectivity. |
+| Status | Draft | The updated behavior awaits explicit approval. |
+| Price | Free | Storage is user-owned. |
+| Default | Off | Automatic remote transfer requires explicit opt-in. |
+| Schedule | Daily, inexact WorkManager execution | Android does not guarantee an exact 02:00 run. |
+| Retention | No automatic deletion | Users control their backups. |
+| Background authorization | No UI; report reauthorization required | Background work cannot complete interactive consent. |
 
 ## Out of scope
 
-- Implementing this proposal before review, explicit approval, and an index update.
-- Treating historical examples of pricing, tiers, providers, or schedules as current decisions.
-- Features covered by the specs declared in `depends_on`.
+- Exact-time alarms.
+- Petit Cloud backup or synchronization.
+- Automatic deletion based on age or count.
+- Change-triggered debounce; owned by spec 0307.

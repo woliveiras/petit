@@ -1,212 +1,111 @@
 ---
 spec: "0201"
-title: "Google Login"
+title: "Google Account Authentication"
 family: identity-access
 status: On Hold
 owner: woliveiras
 depends_on: []
 ---
 
-# Spec: Google Login
+# Spec: Google Account Authentication
 
 ## Context and motivation
 
-> As an app user,
-> I want to log in with my Google account,
-> So that I can back up my data to Google Drive and access premium features.
+Petit may eventually use a Google account as one authentication option for
+Petit Cloud. This capability identifies a person to Petit-managed services; it
+does not grant Google Drive access and is not required for user-owned backup.
 
-This is a historical hypothesis that has not yet been implemented. The product, external provider, availability, and monetization must be revalidated before it is approved.
+Google Drive backup uses a separate, just-in-time Google authorization owned by
+spec 0301. A user can authorize Drive without creating or authenticating a
+Petit account.
 
 ## Functional requirements
 
-### Scenario 1: Successful login
-
-- [ ] This scenario is fulfilled and verified at the boundary defined by the test strategy.
+### Scenario 1: Authenticate to Petit Cloud with Google
 
 ```gherkin
-GIVEN that I am using the app without being logged in
-WHEN I tap "Sign in with Google"
-THEN I see the system Google account picker
-WHEN I select my account
-AND authorize the app
-THEN I am successfully authenticated
-AND I see my name/photo on the settings screen
-AND the state changes to "Authenticated"
+GIVEN Petit Cloud is available
+AND I am not authenticated to Petit Cloud
+WHEN I choose "Continue with Google"
+AND complete the Google account flow
+THEN Petit establishes a Petit Cloud identity
+AND the UI identifies the session as "Petit Cloud"
 ```
 
-### Scenario 2: First login associates existing data
-
-- [ ] This scenario is fulfilled and verified at the boundary defined by the test strategy.
+### Scenario 2: Continue using Petit without authentication
 
 ```gherkin
-GIVEN that I have local data (pets, weights, etc.)
-AND I have never logged in before
-WHEN I sign in with Google for the first time
-THEN my local data is associated with my userId
-AND I can continue using the app normally
+GIVEN I do not have a Petit Cloud account
+WHEN I use Petit Local or a user-owned Google Drive capability
+THEN no Petit authentication is required
+AND all local data remains available
 ```
 
-### Scenario 3: Login canceled
-
-- [ ] This scenario is fulfilled and verified at the boundary defined by the test strategy.
+### Scenario 3: Keep Drive authorization independent
 
 ```gherkin
-GIVEN that I start the login process
-WHEN I cancel the account picker
-OR close the dialog
-THEN I return to the previous state (anonymous)
-AND I do not see an error message
+GIVEN Google Drive is authorized
+AND I am not authenticated to Petit Cloud
+WHEN I create, restore, or manage a Drive backup
+THEN the capability remains available
+AND Drive authorization does not create a Petit account
+AND Drive authorization does not imply a paid entitlement
+```
+
+### Scenario 4: Sign out without affecting local data or Drive
+
+```gherkin
+GIVEN I am authenticated to Petit Cloud
+AND Google Drive is independently authorized
+WHEN I sign out of Petit Cloud
+THEN my local data remains available
+AND Google Drive remains authorized until I explicitly disconnect or Google revokes access
+```
+
+### Scenario 5: Handle cancellation and authentication failure
+
+```gherkin
+GIVEN I start Petit Cloud authentication
+WHEN I cancel or the provider fails
+THEN I remain unauthenticated
+AND local and Google Drive capabilities continue to work according to their own state
 AND I can try again
 ```
 
-### Scenario 4: Network error during login
-
-- [ ] This scenario is fulfilled and verified at the boundary defined by the test strategy.
-
-```gherkin
-GIVEN that I have no internet connection
-WHEN I try to log in
-THEN I see the message "No connection. Try again."
-AND I remain in anonymous mode
-AND the app continues to work normally offline
-```
-
-### Scenario 5: Login triggered when attempting a backup
-
-- [ ] This scenario is fulfilled and verified at the boundary defined by the test strategy.
-
-```gherkin
-GIVEN that I am using the app without being logged in
-AND I have local data (pets, weights, etc.)
-WHEN I try to "Back up to Google Drive"
-THEN I see a dialog explaining that login is required
-AND I have a "Sign in with Google" option
-WHEN I log in successfully
-THEN the backup starts automatically
-```
-
----
-
 ## Non-functional requirements
 
-- [ ] Preserve Petit's local operation when authentication, the network, or an external service is unavailable.
-- [ ] Protect personal and pet health data during storage, transfer, and deletion.
-- [ ] Provide accessible and understandable loading, success, empty, and error states.
-- [ ] Prevent silent data loss or duplication during interrupted operations.
+- Preserve offline and account-free use of Petit Local.
+- Keep Petit authentication, Google Drive authorization, and Petit Cloud
+  entitlement as three independent states.
+- Store no long-lived Google credential directly in app storage.
+- Provide accessible loading, cancellation, success, and error states.
+- Do not make Firebase or any specific identity backend a product requirement.
 
 ## Test strategy
 
 | Scope | Expected coverage |
 | --- | --- |
-| Unit | Eligibility, validation, state, conflict, and data transformation rules. |
-| Integration | Flows that cross the interface, repositories, local database, and external providers. |
-| Both | Each vertical task uses unit tests for rules and integration tests for I/O boundaries. |
+| Unit | State separation, cancellation, sign-out, and entitlement independence. |
+| Integration | Identity provider boundary and coexistence with Drive authorization. |
+| Manual | Provider account picker, cancellation, revocation, and account switching. |
 
 ## Acceptance criteria
 
-The scenarios in **Functional requirements** are the testable criteria for this spec and must have traceable coverage before the status advances to `Implemented`.
-
-## Preserved product notes
-
-### UI/UX
-
-### Settings Screen (Logged Out)
-
-```
-┌────────────────────────────────┐
-│ ← Settings                     │
-├────────────────────────────────┤
-│                                │
-│ 👤 ACCOUNT                     │
-│ ┌────────────────────────────┐ │
-│ │        🔒                  │ │
-│ │  You are not logged in     │ │
-│ │                            │ │
-│ │  Log in to protect your    │ │
-│ │  data and access premium   │ │
-│ │  features.                 │ │
-│ │                            │ │
-│ │ ┌────────────────────────┐ │ │
-│ │ │ 🔵 Sign in with Google│ │ │
-│ │ └────────────────────────┘ │ │
-│ └────────────────────────────┘ │
-│                                │
-│ 📦 DATA                        │
-│ ...                            │
-└────────────────────────────────┘
-```
-
-### Settings Screen (Logged In)
-
-```
-┌────────────────────────────────┐
-│ ← Settings                     │
-├────────────────────────────────┤
-│                                │
-│ 👤 ACCOUNT                     │
-│ ┌────────────────────────────┐ │
-│ │ ┌────┐                     │ │
-│ │ │ 📷 │ Person A            │ │
-│ │ └────┘ pessoa-a@example.com │ │
-│ │        Plan: Free          │ │
-│ │                            │ │
-│ │ [Manage account] [Log out] │ │
-│ └────────────────────────────┘ │
-│                                │
-│ ⭐ PREMIUM                     │
-│ ┌────────────────────────────┐ │
-│ │ Unlock cloud sync,         │ │
-│ │ automatic backup, and more!│ │
-│ │ [View plans]              │ │
-│ └────────────────────────────┘ │
-└────────────────────────────────┘
-```
-
-### Login Flow
-
-```
-┌──────────────────────────────────────────────────┐
-│                                                  │
-│  ┌────────────────────────────────────────────┐  │
-│  │                                            │  │
-│  │  Choose an account                         │  │
-│  │                                            │  │
-│  │  ┌────┐  pessoa-a@example.com              │  │
-│  │  │ 📷 │  Person A                          │  │
-│  │  └────┘                                    │  │
-│  │                                            │  │
-│  │  ┌────┐  pessoa-b@example.com              │  │
-│  │  │ 📷 │  Person B                          │  │
-│  │  └────┘                                    │  │
-│  │                                            │  │
-│  │  ┌────────────────────────────────────┐   │  │
-│  │  │ + Use another account              │   │  │
-│  │  └────────────────────────────────────┘   │  │
-│  │                                            │  │
-│  └────────────────────────────────────────────┘  │
-│                                                  │
-└──────────────────────────────────────────────────┘
-```
-
----
-
-## Edge cases
-
-- The device loses connectivity or the process is interrupted midway through the operation.
-- The session expires, switches accounts, or lacks sufficient authorization.
-- Local and remote data diverges, is incomplete, or was created by different app versions.
-- The external provider is unavailable, limits quotas, or changes its API.
+The functional scenarios define the testable boundary. They require traceable
+coverage before this spec can advance after being resumed and approved.
 
 ## Decisions
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Proposal status | On Hold | Demand and the product model still need to be validated. |
-| External technology | Undecided | Firebase, Google Drive, and the cited APIs are historical options, not current commitments. |
-| Local source of truth | Preserve Room as the offline foundation | Keeps Petit useful without an account or connectivity. |
+| Proposal status | On Hold | Petit Cloud identity is not required for the current local or user-owned cloud roadmap. |
+| Google Drive relationship | Separate authorization owned by 0301 | Authentication and authorization are different grants. |
+| Firebase | Not selected | The eventual Petit Cloud identity backend remains an implementation decision. |
+| Local source of truth | Room | Identity availability must not compromise local access. |
 
 ## Out of scope
 
-- Implementing this proposal before review, explicit approval, and an index update.
-- Treating historical examples of pricing, tiers, providers, or schedules as current decisions.
-- Functionality covered by the specs declared in `depends_on`.
+- Google Drive authorization, backup, restore, or backup management.
+- Treating Google authentication as proof of purchase.
+- Selecting or implementing a Petit Cloud identity backend before this spec is
+  revalidated and approved.

@@ -2,7 +2,7 @@
 spec: "0306"
 title: "Backup Settings"
 family: backup-recovery
-status: On Hold
+status: Draft
 owner: woliveiras
 depends_on: ["0305"]
 ---
@@ -11,235 +11,130 @@ depends_on: ["0305"]
 
 ## Context and motivation
 
-> As a signed-in user,
-> I want to configure how automatic backup works,
-> So that I can optimize data and battery usage.
-
-This is a historical hypothesis that has not yet been implemented. Product, external provider, availability, and monetization must be revalidated before approval.
+The caregiver needs clear control over Google Drive connection, automatic
+backup, network constraints, notifications, manual execution, and history. No
+setting is gated by a Petit account or payment.
 
 ## Functional requirements
 
-### Scenario 1: Enable/disable automatic backup
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 1: See independent service state
 
 ```gherkin
-GIVEN I am signed in with Google
-WHEN I open Settings > Automatic Backup
-AND I enable the "Automatic backup" toggle
-THEN the daily backup at 2:00 a.m. is scheduled
-AND I see "Next backup: today/tomorrow at 2:00 a.m."
-
-WHEN I disable the toggle
-THEN the schedule is canceled
-AND I see "Automatic backup disabled"
+GIVEN I open Backup settings
+THEN I see whether Google Drive is disconnected, authorizing, connected, needs authorization, or unavailable
+AND I do not see the state described as Petit Cloud login or premium
 ```
 
-### Scenario 2: Configure Wi-Fi only
+### Scenario 2: Enable and disable automatic backup
 
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+```gherkin
+GIVEN Google Drive is authorized
+WHEN I enable automatic backup
+THEN one daily periodic request is scheduled
+AND the UI says Android runs it when conditions permit
+WHEN I disable automatic backup
+THEN the periodic request is canceled
+AND manual backup remains available
+```
+
+### Scenario 3: Configure network usage
 
 ```gherkin
 GIVEN automatic backup is enabled
-AND "Wi-Fi only" is disabled
-WHEN I enable "Wi-Fi only"
-THEN future backups run only over Wi-Fi
-AND the current schedule is adjusted
-
-GIVEN I am on a mobile network at 2:00 a.m.
-AND "Wi-Fi only" is enabled
-WHEN the backup is due to run
-THEN it is postponed until I connect to Wi-Fi
+WHEN I enable "Unmetered networks only"
+THEN WorkManager requires NetworkType.UNMETERED
+WHEN I disable it
+THEN WorkManager requires NetworkType.CONNECTED
+AND the unique schedule is updated without duplication
 ```
 
-### Scenario 3: View backup history
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 4: Configure completion notifications
 
 ```gherkin
-GIVEN I have completed automatic backups
-WHEN I open "View history"
-THEN I see a list of the latest backups
-AND each item shows:
-  - Date/time
-  - Whether it was automatic or manual
-  - Status (success/failure)
+GIVEN I can change "Notify after backup"
+WHEN it is enabled and an automatic backup succeeds
+THEN I receive a silent localized notification with non-clinical counts
+WHEN it is disabled
+THEN success produces no notification
+AND authorization-required and actionable failure notifications remain permitted
 ```
 
-### Scenario 4: Backup notification
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 5: Back up now independently
 
 ```gherkin
-GIVEN "Notify after backup" is enabled
-WHEN an automatic backup completes successfully
-THEN I receive a silent notification
-"Backup completed: 2 pets, 15 KB"
-
-GIVEN "Notify after backup" is disabled
-WHEN a backup is completed
-THEN I do NOT receive a notification
+GIVEN Google Drive is authorized
+WHEN I choose "Back up now"
+THEN a manual backup begins immediately through the shared backup use case
+AND it does not reset, duplicate, or replace the periodic schedule
 ```
 
-### Scenario 5: Back up now
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 6: View accurate history and schedule state
 
 ```gherkin
-GIVEN I am on the backup settings screen
-WHEN I tap "Back up now"
-THEN a backup runs immediately
-AND the timer for the next automatic backup is reset
+GIVEN backup attempts exist
+WHEN I open Backup settings or history
+THEN I see trigger, start time, completion time, status, size, and non-clinical counts
+AND scheduled work is described as inexact
+AND failures provide an actionable category without sensitive data
 ```
 
----
+### Scenario 7: Disconnect Google Drive
+
+```gherkin
+GIVEN Google Drive is connected
+WHEN I disconnect and confirm
+THEN Drive access is revoked
+AND automatic work is canceled
+AND local data and remote backups are not deleted
+AND I can reconnect later
+```
+
+## Settings model
+
+- Google Drive connection state.
+- Automatic backup enabled, default `false`.
+- Network requirement: connected or unmetered, default unmetered.
+- Notify after successful automatic backup, default `false`.
+- Last attempt and last success summaries.
+
+The settings model does not contain a retention period, maximum backup count,
+premium flag, exact run time, or provider credential.
 
 ## Non-functional requirements
 
-- [ ] Preserve Petit's local operation when authentication, the network, or an external service is unavailable.
-- [ ] Protect personal and pet health data during storage, transfer, and deletion.
-- [ ] Provide accessible and understandable loading, success, empty, and error states.
-- [ ] Prevent silent data loss or duplication during interrupted operations.
+- Persist preferences in DataStore.
+- Update unique WorkManager requests atomically with preference changes.
+- Localize all visible copy and content descriptions.
+- Do not show an exact future execution time WorkManager cannot guarantee.
+- Keep actionable errors distinct from transient background retries.
+- Never expose pet names, clinical values, access tokens, or file contents in history or notifications.
 
 ## Test strategy
 
 | Scope | Expected coverage |
 | --- | --- |
-| Unit | Eligibility, validation, state, conflict, and data transformation rules. |
-| Integration | Flows that cross the interface, repositories, local database, and external providers. |
-| Both | Each vertical task uses unit tests for rules and integration tests for I/O boundaries. |
+| Unit | Defaults, persistence mapping, state copy, notification policy, and schedule descriptions. |
+| Integration | DataStore, WorkManager update/cancel, history, manual action, and disconnect. |
+| Instrumented | Settings accessibility, authorization launcher, toggles, history, and confirmations. |
 
 ## Acceptance criteria
 
-The scenarios in **Functional requirements** are this spec's testable criteria and must have traceable coverage before the status advances to `Implemented`.
-
-## Preserved product notes
-
-### UI/UX
-
-### Screen: Automatic Backup Settings
-
-```
-┌────────────────────────────────┐
-│ ← Automatic Backup             │
-├────────────────────────────────┤
-│                                │
-│ ☁️ AUTOMATIC BACKUP            │
-│ ┌────────────────────────────┐ │
-│ │ Enable                [ON] │ │
-│ └────────────────────────────┘ │
-│                                │
-│ ℹ️ Your data is saved          │
-│ automatically to Firebase     │
-│ Storage, even when the app    │
-│ is closed.                    │
-│                                │
-├────────────────────────────────┤
-│                                │
-│ 📊 STATUS                      │
-│ ┌────────────────────────────┐ │
-│ │ ✅ Last: Today 10:30       │ │
-│ │ ⏰ Next: Tomorrow 10:30    │ │
-│ └────────────────────────────┘ │
-│                                │
-├────────────────────────────────┤
-│                                │
-│ ⚙️ SETTINGS                    │
-│                                │
-│ ┌────────────────────────────┐ │
-│ │ Frequency                 │ │
-│ │ Every 24 hours          ▶ │ │
-│ └────────────────────────────┘ │
-│                                │
-│ ┌────────────────────────────┐ │
-│ │ Wi-Fi only           [ON]  │ │
-│ │ Saves mobile data          │ │
-│ └────────────────────────────┘ │
-│                                │
-│ ┌────────────────────────────┐ │
-│ │ Notify on success   [OFF]  │ │
-│ │ Shows notification after   │ │
-│ │ each backup                │ │
-│ └────────────────────────────┘ │
-│                                │
-├────────────────────────────────┤
-│                                │
-│ ┌────────────────────────────┐ │
-│ │    BACK UP NOW             │ │
-│ └────────────────────────────┘ │
-│                                │
-│ View backup history         ▶  │
-│                                │
-└────────────────────────────────┘
-```
-
-### Bottom Sheet: Frequency
-
-```
-┌────────────────────────────────┐
-│                    ─────       │
-│                                │
-│ Backup frequency               │
-│                                │
-│ ○ Every 6 hours                │
-│   More protection, more data   │
-│                                │
-│ ● Every 24 hours               │
-│   Recommended                  │
-│                                │
-│ ○ Once a week                  │
-│   Lower usage                  │
-│                                │
-└────────────────────────────────┘
-```
-
-### Screen: Backup History
-
-```
-┌────────────────────────────────┐
-│ ← Backup History               │
-├────────────────────────────────┤
-│                                │
-│ March 2026                     │
-│ ┌────────────────────────────┐ │
-│ │ ✅ 18/03 10:30  Automatic  │ │
-│ │    2 pets • 15.4 KB       │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ ✅ 17/03 10:30  Automatic  │ │
-│ │    2 pets • 15.2 KB       │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ ✅ 16/03 14:00  Manual     │ │
-│ │    2 pets • 15.1 KB       │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ ❌ 15/03 10:30  Automatic  │ │
-│ │    Failed: No connection   │ │
-│ └────────────────────────────┘ │
-│                                │
-└────────────────────────────────┘
-```
-
----
-
-## Edge cases
-
-- The device loses connectivity or the process is interrupted midway through the operation.
-- The session expires, switches accounts, or lacks sufficient authorization.
-- Local and remote data diverge, are incomplete, or were created by different app versions.
-- The external provider is unavailable, enforces a quota, or changes its API.
+Every functional scenario and settings-model rule requires traceable coverage
+before the status can advance to `Implemented`.
 
 ## Decisions
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Proposal status | On Hold | Demand and the product model still need to be validated. |
-| External technology | Undecided | Firebase, Google Drive, and the cited APIs are historical options, not current commitments. |
-| Local source of truth | Preserve Room as the offline foundation | Keeps Petit useful without an account or connectivity. |
+| Status | Draft | The updated behavior awaits explicit approval. |
+| Automatic default | Off | Remote automation requires explicit opt-in. |
+| Network default | Unmetered | Reduces unexpected mobile-data use. |
+| Schedule presentation | Inexact | WorkManager does not promise a precise execution time. |
+| Manual backup | Always available with Drive authorization | Automation settings must not gate basic backup. |
+| Retention controls | None | Petit does not delete user-owned backups automatically. |
 
 ## Out of scope
 
-- Implementing this proposal before review, explicit approval, and an index update.
-- Treating historical examples of pricing, tiers, providers, or schedules as current decisions.
-- Features covered by the specs declared in `depends_on`.
+- Selecting exact clock times.
+- Configuring automatic retention or backup-count limits.
+- Petit Cloud billing or entitlement settings.

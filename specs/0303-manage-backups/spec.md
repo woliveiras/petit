@@ -1,240 +1,127 @@
 ---
 spec: "0303"
-title: "Manage Backups"
+title: "Manage Google Drive Backups"
 family: backup-recovery
-status: On Hold
+status: Draft
 owner: woliveiras
 depends_on: ["0301"]
 ---
 
-# Spec: Manage Backups
+# Spec: Manage Google Drive Backups
 
 ## Context and motivation
 
-> As a signed-in user,
-> I want to manage my backups in Google Drive,
-> So that I can view the history and clean up old backups if necessary.
-
-This is a historical hypothesis that has not yet been implemented. The product, external provider, availability, and monetization must be revalidated before approval.
+The caregiver owns the backups stored in their Google Drive and needs complete
+control over listing, inspecting, restoring, and permanently deleting them.
+Petit does not impose backup-count, age, retention, or plan limits.
 
 ## Functional requirements
 
-### Scenario 1: View the backup list
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 1: List every backup
 
 ```gherkin
-GIVEN I am signed in with Google
-AND I have multiple saved backups
+GIVEN Google Drive is authorized
+AND backups exist in appDataFolder
 WHEN I open "Saved backups"
-THEN I see a list of all backups
-AND each item shows:
-  - Backup date and time
-  - Number of pets
-  - File size
-  - App version
+THEN Petit loads every result through pagination
+AND sorts backups by creation time
+AND shows date, trigger, app version, pet count, and archive size
 ```
 
-### Scenario 2: View backup details
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 2: Inspect backup details
 
 ```gherkin
-GIVEN I am on the backup list
-WHEN I tap a backup
-THEN I see full details:
-  - Date and time
-  - Contents (X pets, Y weigh-ins, Z vaccinations)
-  - Size
-  - Version of the app that created it
-AND I see the options: Restore, Delete
+GIVEN I select a backup
+WHEN its details open
+THEN I see archive and schema versions, creation time, trigger, content counts, size, and compatibility
+AND I can choose Restore or Delete
+AND no clinical values are exposed in provider metadata or logs
 ```
 
-### Scenario 3: Delete a specific backup
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 3: Delete one or multiple backups
 
 ```gherkin
-GIVEN I am viewing a backup's details
-WHEN I tap "Delete"
-AND confirm the deletion
-THEN the backup is removed from Google Drive
-AND no longer appears in the list
+GIVEN I select one or more backups
+WHEN I choose Delete and confirm permanent deletion
+THEN Petit permanently deletes only the selected Drive files
+AND refreshes the list and total size
+AND a retry treats already-missing selected files as deleted
 ```
 
-### Scenario 4: Delete multiple backups
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 4: Keep backups until the user deletes them
 
 ```gherkin
-GIVEN I am on the backup list
-WHEN I enable selection mode (long press)
-AND select multiple backups
-AND tap "Delete selected"
-AND confirm
-THEN all selected backups are removed
+GIVEN backups of any age or count exist
+WHEN Petit lists or creates backups
+THEN Petit does not remove them automatically
+AND no Petit Cloud plan changes their availability
+AND provider quota errors are explained without deleting a backup
 ```
 
-### Scenario 5: Manual backup limit
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 5: Disconnect without deleting
 
 ```gherkin
-GIVEN I have 10 saved manual backups (the limit)
-WHEN I create a new manual backup
-THEN the oldest manual backup is removed automatically
-AND the new backup is added
-AND I see the notification "Old backup removed to free up space"
+GIVEN Google Drive is authorized and contains backups
+WHEN I disconnect or revoke Drive access
+THEN Petit stops accessing Drive
+AND remote backups remain in the user's Drive
+AND reconnecting the same account makes them available again
 ```
 
-### Scenario 6: Backups after account deletion
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 6: Delete all backups explicitly
 
 ```gherkin
-GIVEN I have saved backups
-WHEN I delete my account
-THEN the backups are scheduled for purging in 30 days
-AND after 30 days, all files in the user's bucket are permanently removed
+GIVEN one or more backups exist
+WHEN I choose "Delete all backups" and confirm the destructive action
+THEN Petit permanently deletes every backup created by this app
+AND reports any files that could not be deleted
+AND local data remains unchanged
 ```
 
-### Scenario 7: Total space used
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 7: Show empty and authorization-required states
 
 ```gherkin
-GIVEN I am on the backup screen
-WHEN I view the "Saved backups" section
-THEN I see the total number of backups
-AND the total space used (e.g., "3 backups • 45.2 KB")
+GIVEN no backup is available or Drive needs authorization
+WHEN I open Saved backups
+THEN I see the correct empty or authorization-required state
+AND I can create a backup or reconnect without a Petit account
 ```
-
----
 
 ## Non-functional requirements
 
-- [ ] Preserve Petit's local operation when authentication, the network, or an external service is unavailable.
-- [ ] Protect personal and pet health data during storage, transfer, and deletion.
-- [ ] Provide accessible and understandable loading, success, empty, and error states.
-- [ ] Prevent silent data loss or duplication during interrupted operations.
+- List only files recognized by the versioned Petit backup contract.
+- Handle pagination and bounded parallel metadata reads.
+- Minimize requested Drive fields and provider calls.
+- Confirm every permanent deletion accessibly.
+- Keep deletion idempotent and never delete by an unvalidated broad query.
+- Never add automatic retention or a product-owned quota.
 
 ## Test strategy
 
 | Scope | Expected coverage |
 | --- | --- |
-| Unit | Eligibility, validation, state, conflict, and data transformation rules. |
-| Integration | Flows that cross the UI, repositories, local database, and external providers. |
-| Both | Each vertical task uses unit tests for rules and integration tests for I/O boundaries. |
+| Unit | Filtering, pagination, sorting, totals, compatibility, selection, and deletion state. |
+| Integration | Drive list/get/delete contracts, partial bulk failure, and ViewModels. |
+| Instrumented | List, details, selection, destructive confirmation, empty, and reconnect UI. |
+| Manual | Real appDataFolder listing, disconnect/reconnect, and permanent deletion. |
 
 ## Acceptance criteria
 
-The scenarios under **Functional requirements** are this spec's testable criteria and must have traceable coverage before the status advances to `Implemented`.
-
-## Preserved product notes
-
-### UI/UX
-
-### Screen: Backup Details
-
-```
-┌────────────────────────────────┐
-│ ← Backup Details               │
-├────────────────────────────────┤
-│                                │
-│ 📦 BACKUP                      │
-│                                │
-│ 18/03/2026 at 10:30            │
-│ App version: 1.0.0             │
-│                                │
-├────────────────────────────────┤
-│                                │
-│ 📊 CONTENTS                    │
-│ ┌────────────────────────────┐ │
-│ │ 🐱 Pets           2       │ │
-│ │ ⚖️ Weigh-ins      15       │ │
-│ │ 💉 Vaccinations    8       │ │
-│ │ 🪱 Dewormers       6       │ │
-│ │ 🔔 Reminders       3       │ │
-│ └────────────────────────────┘ │
-│                                │
-│ 📁 Size: 15.4 KB               │
-│                                │
-├────────────────────────────────┤
-│                                │
-│ ┌────────────────────────────┐ │
-│ │        RESTORE             │ │
-│ └────────────────────────────┘ │
-│                                │
-│ ┌────────────────────────────┐ │
-│ │         DELETE             │ │
-│ └────────────────────────────┘ │
-│                                │
-└────────────────────────────────┘
-```
-
-### List with Multiple Selection
-
-```
-┌────────────────────────────────┐
-│ ← Saved Backups     [🗑️] [✓]   │
-├────────────────────────────────┤
-│ 2 selected                     │
-├────────────────────────────────┤
-│ ┌────────────────────────────┐ │
-│ │ ☑️ 18/03/2026 10:30        │ │
-│ │ 2 pets • 15.4 KB          │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ ☐ 15/03/2026 14:20         │ │
-│ │ 2 pets • 14.8 KB          │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ ☑️ 10/03/2026 09:15        │ │
-│ │ 1 pet • 8.2 KB            │ │
-│ └────────────────────────────┘ │
-│                                │
-└────────────────────────────────┘
-```
-
-### Dialog: Confirm Deletion
-
-```
-┌────────────────────────────────┐
-│      Delete Backup?            │
-├────────────────────────────────┤
-│                                │
-│ ⚠️ This action cannot be       │
-│ undone.                        │
-│                                │
-│ The backup will be permanently │
-│ removed from Firebase          │
-│ Storage.                       │
-│                                │
-│ ┌──────────┐  ┌──────────────┐ │
-│ │  CANCEL  │  │    DELETE    │ │
-│ └──────────┘  └──────────────┘ │
-└────────────────────────────────┘
-```
-
----
-
-## Edge cases
-
-- The device loses connectivity or the process is interrupted during the operation.
-- The session expires, switches accounts, or lacks sufficient authorization.
-- Local and remote data diverge, are incomplete, or were created by different app versions.
-- The external provider is unavailable, restricts quota, or changes its API.
+Every functional scenario requires traceable coverage before the status can
+advance to `Implemented`.
 
 ## Decisions
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Proposal status | On Hold | Demand and the product model still need to be validated. |
-| External technology | Undecided | Firebase, Google Drive, and the referenced APIs are historical options, not current commitments. |
-| Local source of truth | Preserve Room as the offline foundation | Keeps Petit useful without an account or connectivity. |
+| Status | Draft | The updated behavior awaits explicit approval. |
+| Retention | Until explicit user deletion | The user owns the storage and controls lifecycle. |
+| Backup count | Unlimited by Petit | Only Google Drive quotas apply. |
+| Disconnect | Preserve remote files | Revoking access is not a deletion request. |
+| Account deletion purge | Removed | Drive backup does not depend on a Petit account or bucket. |
 
 ## Out of scope
 
-- Implementing this proposal before review, explicit approval, and an index update.
-- Treating historical pricing, tier, provider, or timeline examples as current decisions.
-- Capabilities covered by the specs declared in `depends_on`.
+- Automatically deleting backups because of age, count, billing, or account state.
+- Managing non-Petit files.
+- Moving or sharing appDataFolder files.

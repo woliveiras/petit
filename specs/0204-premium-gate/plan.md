@@ -4,12 +4,11 @@ Spec: [spec.md](./spec.md)
 
 ## Status
 
-This plan is **Draft**. No step authorizes implementation until the spec has
-been explicitly approved.
+This plan is **Approved** and may be implemented through its vertical tasks.
 
 ## Dependencies
 
-- Spec `0201` for persistent Petit identity when a hosted service requires it.
+- Spec `0201` only if Petit Cloud later adopts Google as an authentication provider.
 - Specs `0301`–`0307` for user-owned Google Drive backup and recovery.
 - Specs `0401`–`0405` for Petit-hosted synchronization and collaboration.
 - Validation of hosted-provider costs, data retention, billing policy, and
@@ -39,6 +38,8 @@ been explicitly approved.
 - Google Drive authorization cannot activate Petit Cloud.
 - Petit Cloud expiration cannot disable local capabilities or Google Drive
   backup.
+- Petit cannot impose backup-count, retention, restore, management, or
+  automation gates on the user's Google Drive.
 - UI language must explain whether the user is authorizing their own provider
   or purchasing infrastructure operated by Petit.
 - Hosted-provider types and billing SDKs remain behind interfaces until their

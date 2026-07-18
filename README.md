@@ -14,6 +14,7 @@ Petit is a multi-pet health tracker — track weight, vaccinations, deworming, a
 - [Accessibility testing guide (TalkBack)](docs/talkback-testing-guide.md)
 - [Design system](docs/design-system.md)
 - [Public release/compliance checklist](docs/release-compliance-checklist.md)
+- [Google Drive Cloud Console setup runbook](docs/test-runbooks/google-drive-cloud-console-setup.md)
 
 ## Development
 

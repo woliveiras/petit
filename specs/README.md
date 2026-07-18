@@ -60,23 +60,23 @@ PRD: [Pet health management in Petit](../prds/2026-07-17-petit-pet-health-manage
 
 ### identity-access
 
-| Spec                                    | Title              | Status   | Depends on |
-| --------------------------------------- | ------------------ | -------- | ---------- |
-| [0201](0201-google-login/spec.md)       | Google Login       | On Hold  | —          |
-| [0202](0202-account-management/spec.md) | Account management | On Hold  | 0201       |
-| [0203](0203-data-ownership/spec.md)     | Data ownership     | On Hold  | 0201       |
-| [0204](0204-premium-gate/spec.md)       | Petit Cloud gate   | Approved | 0201       |
+| Spec                                    | Title                         | Status   | Depends on |
+| --------------------------------------- | ----------------------------- | -------- | ---------- |
+| [0201](0201-google-login/spec.md)       | Google Account Authentication | On Hold  | —          |
+| [0202](0202-account-management/spec.md) | Account management            | On Hold  | 0201       |
+| [0203](0203-data-ownership/spec.md)     | Data ownership                | On Hold  | 0201       |
+| [0204](0204-premium-gate/spec.md)       | Petit Cloud gate              | Approved | —          |
 
 ### backup-recovery
 
-| Spec                                  | Title                | Status  | Depends on |
-| ------------------------------------- | -------------------- | ------- | ---------- |
-| [0301](0301-manual-backup/spec.md)    | Manual cloud backup  | On Hold | 0201       |
-| [0302](0302-restore-backup/spec.md)   | Restore cloud backup | On Hold | 0301       |
-| [0303](0303-manage-backups/spec.md)   | Manage Backups       | On Hold | 0301       |
-| [0305](0305-automatic-backup/spec.md) | Automatic backup     | On Hold | 0301       |
-| [0306](0306-backup-settings/spec.md)  | Backup settings      | On Hold | 0305       |
-| [0307](0307-backup-triggers/spec.md)  | Backup triggers      | On Hold | 0305, 0306 |
+| Spec                                  | Title                         | Status | Depends on |
+| ------------------------------------- | ----------------------------- | ------ | ---------- |
+| [0301](0301-manual-backup/spec.md)    | Manual Google Drive backup    | Draft  | 0006, 0204 |
+| [0302](0302-restore-backup/spec.md)   | Restore Google Drive backup   | Draft  | 0301       |
+| [0303](0303-manage-backups/spec.md)   | Manage Google Drive backups   | Draft  | 0301       |
+| [0305](0305-automatic-backup/spec.md) | Automatic Google Drive backup | Draft  | 0301       |
+| [0306](0306-backup-settings/spec.md)  | Backup settings               | Draft  | 0305       |
+| [0307](0307-backup-triggers/spec.md)  | Backup triggers               | Draft  | 0305, 0306 |
 
 ### cloud-sync
 

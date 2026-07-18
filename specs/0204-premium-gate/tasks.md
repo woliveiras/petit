@@ -2,7 +2,7 @@
 
 Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
-> Spec status: **Draft**. All tasks remain pending until explicit approval.
+> Spec status: **Approved**. Tasks remain pending until implementation begins.
 
 ## Tasks
 
@@ -15,9 +15,9 @@ Spec: [spec.md](./spec.md) · Plan: [plan.md](./plan.md)
 
 - [ ] **Connect Google Drive independently from Petit Cloud** (test-type: both)
   - blocked-by: previous task; specs 0301–0307
-  - summary: model Drive authorization separately and keep backup, restore, management, and automation free.
-  - desired behavior: connecting Drive never requests a purchase or activates a Petit Cloud entitlement.
-  - acceptance criteria: Scenario 2 in `spec.md`.
+  - summary: model Drive authorization separately and keep backup, restore, management, retention choices, and automation free.
+  - desired behavior: connecting Drive never requests a purchase, activates a Petit Cloud entitlement, or applies a Petit-owned quota.
+  - acceptance criteria: Scenario 2 and the entitlement rules in `spec.md`.
   - verification: `./gradlew test` and `./gradlew connectedDebugAndroidTest`
 
 - [ ] **Gate only Petit-managed cloud capabilities** (test-type: both)

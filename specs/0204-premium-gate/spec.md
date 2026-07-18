@@ -4,7 +4,7 @@ title: "Petit Cloud Gate"
 family: identity-access
 status: Approved
 owner: woliveiras
-depends_on: ["0201"]
+depends_on: []
 ---
 
 # Spec: Petit Cloud Gate
@@ -153,6 +153,9 @@ AND continuous remote collaboration through Petit-managed infrastructure require
 - A login or Google authorization must never automatically imply a paid entitlement.
 - A paid entitlement must never be required for a capability that runs locally
   or stores data only in a user-owned provider.
+- Petit must not impose backup-count, retention, scheduling, restore, or
+  management gates on data stored in the user's Google Drive. Provider quotas
+  and platform constraints may still apply and must be explained accurately.
 - Petit Cloud entitlement must be determined independently from the user's
   Google Drive authorization state.
 - If a capability changes from user-owned storage to Petit-managed
@@ -208,7 +211,7 @@ logging in to Petit Cloud.
 
 | Decision                                 | Current choice                                                 | Rationale                                                                             |
 | ---------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Proposal status                          | Draft                                                          | The service model is defined and awaits explicit approval.                            |
+| Proposal status                          | Approved                                                       | The service model and gate boundary were explicitly approved.                         |
 | Charging principle                       | Charge only for Petit-managed infrastructure with ongoing cost | Login and convenience alone do not justify payment.                                   |
 | Local capabilities                       | Free without a Petit account                                   | Petit remains useful offline and local-first.                                         |
 | Google Drive backup                      | Free with separate Google authorization                        | Storage belongs to the user and is not hosted by Petit.                               |

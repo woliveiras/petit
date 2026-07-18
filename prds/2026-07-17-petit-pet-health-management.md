@@ -38,8 +38,9 @@ professionals.
 - Planned local network synchronization: NSD (Network Service Discovery / mDNS) + TCP Sockets
 - Device-to-device transfer: Nearby Connections API (`P2P_STAR`)
 
-> **Firebase and cloud services are on hold** until there is user demand.
-> When resumed: Firebase Auth, Google Drive API, Firestore, Analytics, Crashlytics, FCM, Remote Config.
+> **Petit-managed cloud services are on hold** until there is user demand.
+> User-owned Google Drive backup is a separate free capability that uses Google
+> authorization without requiring Firebase or a Petit account.
 
 ## Delivery status
 
@@ -50,14 +51,15 @@ professionals.
   one-shot transfer, and local family-group components still under validation.
   Continuous local-network synchronization through NSD and TCP remains a
   draft. See the [local-sharing family specs](../specs/README.md#local-sharing).
-- **identity-access, backup-recovery, and cloud-sync:** on hold until there is
-  demonstrated user demand. Their specifications remain available for review.
+- **identity-access and cloud-sync:** on hold until there is demonstrated user
+  demand for Petit-managed services. **backup-recovery:** under renewed design
+  for free user-owned Google Drive backup; its updated specs require approval.
 
 ---
 
 ## Target Architecture
 
-**Native Android + Room + WorkManager + Firebase/Google Cloud Platform**
+**Native Android + Room + WorkManager + optional user-owned Google Drive**
 
 ### Role of each component
 
@@ -66,9 +68,11 @@ professionals.
 * **Nearby Connections API** = device pairing + local P2P transfer
 * **NSD (mDNS) + TCP** = discovery and continuous synchronization over the local network (home Wi-Fi)
 * **JSON Export/Import** = free universal fallback
+* **Google Drive appDataFolder** = optional free user-owned backup storage
 
-> **Components on hold (Firebase/Cloud):**
-> Firebase Auth, Google Drive API, Firestore, Analytics, Crashlytics, FCM, Remote Config
+> **Petit-managed components on hold:**
+> hosted identity, Firestore, Analytics, Crashlytics, FCM, Remote Config, and
+> other Petit Cloud infrastructure
 
 ---
 
@@ -86,17 +90,18 @@ Freemium model
 - local reminders
 - JSON export
 - JSON import
+- PDF export
 - local sharing between household devices (family group)
 - continuous synchronization over the local network (home Wi-Fi)
 - data transfer between devices (nearby, one-shot)
+- manual and automatic backup in the user's Google Drive
+- restore and management of the user's Google Drive backups
 
-### Premium (future — when there is demand)
+### Petit Cloud (future — when there is demand)
 
 - real-time cloud synchronization (Firebase Firestore)
 - automatic remote multi-device synchronization
-- Google Drive backup
 - data sharing with a veterinarian (optional at a later stage)
-- PDF export (optional at a later stage)
 
 ---
 
@@ -556,10 +561,10 @@ The exported file must include:
 The risk is low because this is a pet data app, but I would still include:
 
 * an encrypted local database later, if the product evolves
-* authentication tokens stored securely (automatic Firebase Auth token management)
+* short-lived Google authorization tokens managed by Google Identity Services and never stored in backup archives
 * no sensitive data in basic preferences
-* Firebase Storage with Firestore Security Rules to isolate data by user
-* Firebase Auth with Firestore Security Rules
+* Google Drive `appDataFolder` with the narrow `drive.appdata` scope for user-owned backups
+* no Petit account, client-side encryption, or Firebase dependency for Google Drive backup
 
 ---
 
@@ -599,7 +604,7 @@ Below is a documentation outline that I would use as the project foundation.
 * import data
 * optional Google sign-in
 * optional cloud synchronization (Firebase Firestore)
-* optional backup to Firebase Storage
+* optional complete ZIP backup to the user's Google Drive `appDataFolder`
 * local notifications for weighing and upcoming events
 
 ## 3. Non-functional Requirements
@@ -645,14 +650,16 @@ Layers:
 ## 7. Monetization Strategy
 
 * free: all local functionality
-* premium: sign-in + cloud (Firebase) + automatic backups
+* free: local capabilities and user-owned Google Drive backup, restore, management, and automation
+* paid Petit Cloud: only capabilities that use infrastructure operated by Petit
 
 ## 8. Roadmap
 
 The canonical roadmap is the family-based [specs index](../specs/README.md),
-where each capability has its own status. Current priorities are pet care and
-local sharing. Identity, remote backup, and cloud synchronization remain on
-hold until there is demonstrated user demand.
+where each capability has its own status. Current priorities are pet care,
+local sharing, and approval of the revised user-owned backup design. Petit
+identity and hosted cloud synchronization remain on hold until there is
+demonstrated user demand.
 
 ---
 

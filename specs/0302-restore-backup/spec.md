@@ -1,262 +1,137 @@
 ---
 spec: "0302"
-title: "Restore Cloud Backup"
+title: "Restore Google Drive Backup"
 family: backup-recovery
-status: On Hold
+status: Draft
 owner: woliveiras
 depends_on: ["0301"]
 ---
 
-# Spec: Restore Cloud Backup
+# Spec: Restore Google Drive Backup
 
 ## Context and motivation
 
-> As a signed-in user,
-> I want to restore my data from a backup in Google Drive,
-> So that I can recover my data on a new phone or after reinstalling the app.
-
-This is a historical cloud-restore hypothesis that has not yet been implemented. Local JSON import is already covered by spec 0006; this proposal concerns discovering and downloading authenticated backups from an external provider. The product, provider, availability, and monetization must be revalidated before approval.
+The caregiver needs to restore a complete Google Drive backup on the same or a
+different device without a Petit account or paid entitlement. Restore must
+validate the entire ZIP archive before changing local state and must preserve
+device-bound security identities.
 
 ## Functional requirements
 
-### Scenario 1: Successfully restore a backup
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 1: Restore on a new device
 
 ```gherkin
-GIVEN I am signed in with Google
-AND I have backups saved in Google Drive
-WHEN I open "Saved backups"
-AND select a backup to restore
-AND confirm the restore
-THEN I see the download progress
-AND the data is restored to the local database
-AND I see the message "Data restored successfully"
+GIVEN Petit has no local user data
+AND Google Drive is authorized
+AND a compatible backup exists
+WHEN I select the backup and confirm restore
+THEN Petit downloads and validates the complete archive
+AND restores all restorable data, preferences, reminder state, and pet assets
+AND rebuilds device-local schedules and asset URIs
 ```
 
-### Scenario 2: Restore on a new device
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 2: Reject an invalid archive before mutation
 
 ```gherkin
-GIVEN I installed the app on a new phone
-AND signed in with my Google account
-WHEN I open "Restore from backup"
-THEN I see a list of available backups
-AND I can select which one to restore
+GIVEN an archive is truncated, oversized, unsafe, incompatible, or has a checksum mismatch
+WHEN I attempt to restore it
+THEN Petit rejects the archive before changing Room or installed assets
+AND explains the failure
+AND local data remains unchanged
 ```
 
-### Scenario 3: Restore replaces local data
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 3: Replace local data exactly
 
 ```gherkin
-GIVEN I have local data
-AND restore a backup
-WHEN I confirm "Replace local data"
-THEN ALL local data is deleted
-AND the backup data is imported
-AND I see the backup data on the home screen
+GIVEN I have local restorable data
+WHEN I choose REPLACE and confirm the destructive action
+THEN the backup becomes the exact restorable local state
+AND records and app-owned assets absent from the backup are removed
+AND Google authorization, device identity, pairing keys, and family authorization are preserved
 ```
 
-### Scenario 4: Restore with merge
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 4: Merge with local data
 
 ```gherkin
-GIVEN I have local data
-AND restore a backup
-WHEN I choose "Merge with local data"
-THEN the data is merged (last-write-wins)
+GIVEN I have local data and select a backup
+WHEN I choose MERGE
+THEN entities use the shared deterministic conflict resolver
 AND unique data from both sources is retained
+AND assets follow the winning entity version
+AND current-device preferences remain unless the user explicitly chooses to apply backup preferences
 ```
 
-### Scenario 5: Restore with no backups
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 5: Handle interruption and retry
 
 ```gherkin
-GIVEN I have no backups in Google Drive
-WHEN I open "Saved backups"
-THEN I see the message "No backups found"
-AND I see a suggestion to create my first backup
+GIVEN a restore download or validation is in progress
+WHEN the operation is interrupted or canceled
+THEN no partial database or asset state is installed
+AND temporary files are removed
+AND I can retry safely
 ```
 
-### Scenario 6: Download error
-
-- [ ] This scenario is implemented and verified at the boundary defined by the test strategy.
+### Scenario 6: Require foreground authorization when necessary
 
 ```gherkin
-GIVEN I select a backup to restore
-WHEN the connection fails during the download
-THEN I see an error message
-AND the local data is not changed
-AND I can try again
+GIVEN Drive authorization was revoked or requires new consent
+WHEN I start restore
+THEN Petit requests authorization in foreground
+AND does not treat Petit Cloud authentication as a substitute
 ```
 
----
+## Validation and installation rules
+
+- Download into an app-private temporary location.
+- Enforce compressed size, total uncompressed size, entry count, per-entry size,
+  canonical path, media type, and schema limits.
+- Reject absolute paths, traversal segments, duplicate paths, undeclared files,
+  missing files, checksum mismatches, and unsupported schemas.
+- Parse and validate all JSON and referential integrity before mutation.
+- Stage assets under unique app-private paths that are not referenced by active
+  rows, then install their references inside the Room transaction.
+- If the Room transaction fails, discard newly staged assets. After a successful
+  commit, remove old unreferenced assets through idempotent cleanup.
+- Persist enough installation state to remove orphaned staging files safely
+  after process death; user-visible data must resolve to either the complete old
+  state or the complete restored state.
+- Reschedule restored reminders after commit.
 
 ## Non-functional requirements
 
-- [ ] Preserve Petit's local operation when authentication, the network, or an external service is unavailable.
-- [ ] Protect personal and pet health data during storage, transfer, and deletion.
-- [ ] Provide accessible and understandable loading, success, empty, and error states.
-- [ ] Prevent silent data loss or duplication during interrupted operations.
+- Preserve Room as the source of truth.
+- Use the exact same entity conflict resolver as local sharing.
+- Never overwrite device-bound credentials from a backup.
+- Never execute, render, or trust archive filenames as paths.
+- Report download and validation progress accessibly.
+- Keep retry idempotent and cleanup idempotent.
 
 ## Test strategy
 
 | Scope | Expected coverage |
 | --- | --- |
-| Unit | Eligibility, validation, state, conflict, and data transformation rules. |
-| Integration | Flows that cross the UI, repositories, local database, and external providers. |
-| Both | Each vertical task uses unit tests for rules and integration tests for I/O boundaries. |
+| Unit | ZIP safety, manifest validation, schema compatibility, mode rules, and error mapping. |
+| Integration | Download, filesystem staging, Room transaction, two-phase asset installation, recovery cleanup, and reminder rescheduling. |
+| Instrumented | Restore UI, destructive confirmation, authorization, and new-device journey. |
+| Manual | Real Drive download, interruption, revocation, and second-device restoration. |
 
 ## Acceptance criteria
 
-The scenarios under **Functional requirements** are this spec's testable criteria and must have traceable coverage before the status advances to `Implemented`.
-
-## Preserved product notes
-
-### UI/UX
-
-### Screen: Backup List
-
-```
-┌────────────────────────────────┐
-│ ← Saved Backups                │
-├────────────────────────────────┤
-│                                │
-│ Select a backup to             │
-│ restore:                       │
-│                                │
-├────────────────────────────────┤
-│ ┌────────────────────────────┐ │
-│ │ 📦 18/03/2026 10:30        │ │
-│ │ 2 pets • 15.4 KB          │ │
-│ │ v1.0.0                     │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ 📦 15/03/2026 14:20        │ │
-│ │ 2 pets • 14.8 KB          │ │
-│ │ v1.0.0                     │ │
-│ └────────────────────────────┘ │
-│ ┌────────────────────────────┐ │
-│ │ 📦 10/03/2026 09:15        │ │
-│ │ 1 pet • 8.2 KB            │ │
-│ │ v1.0.0                     │ │
-│ └────────────────────────────┘ │
-│                                │
-└────────────────────────────────┘
-```
-
-### Dialog: Confirm Restore
-
-```
-┌────────────────────────────────┐
-│       Restore Backup           │
-├────────────────────────────────┤
-│                                │
-│ Backup from 18/03/2026 10:30   │
-│ 2 pets • 15.4 KB              │
-│                                │
-│ ⚠️ You have local data.        │
-│ What would you like to do?     │
-│                                │
-│ ○ Replace local data           │
-│   (deletes all and restores)   │
-│                                │
-│ ● Merge with local data        │
-│   (keeps the latest data)      │
-│                                │
-│ ┌──────────┐  ┌──────────────┐ │
-│ │  CANCEL  │  │   RESTORE    │ │
-│ └──────────┘  └──────────────┘ │
-└────────────────────────────────┘
-```
-
-### State: Restoring
-
-```
-┌────────────────────────────────┐
-│                                │
-│                                │
-│         ┌─────────┐            │
-│         │  ████░░ │            │
-│         └─────────┘            │
-│                                │
-│      Restoring backup...       │
-│      Downloading data          │
-│                                │
-│      Do not close the app      │
-│                                │
-│                                │
-└────────────────────────────────┘
-```
-
-### State: No Backups
-
-```
-┌────────────────────────────────┐
-│ ← Saved Backups                │
-├────────────────────────────────┤
-│                                │
-│                                │
-│         📭                     │
-│                                │
-│   No backups found             │
-│                                │
-│   Create your first backup     │
-│   to protect your data.        │
-│                                │
-│ ┌────────────────────────────┐ │
-│ │        BACK UP NOW         │ │
-│ └────────────────────────────┘ │
-│                                │
-│                                │
-└────────────────────────────────┘
-```
-
----
-
-### Onboarding Flow (New Device)
-
-```kotlin
-class OnboardingViewModel(...) {
-
-    fun checkForBackups() {
-        viewModelScope.launch {
-            // Check whether the user has backups
-            backupStorageRepository.listBackups()
-                .onSuccess { backups ->
-                    if (backups.isNotEmpty()) {
-                        // Show restore option
-                        _showRestoreOption.value = true
-                    }
-                }
-        }
-    }
-}
-```
-
----
-
-## Edge cases
-
-- The device loses connectivity or the process is interrupted during the operation.
-- The session expires, switches accounts, or lacks sufficient authorization.
-- Local and remote data diverge, are incomplete, or were created by different app versions.
-- The external provider is unavailable, restricts quota, or changes its API.
+Every functional scenario and validation/installation rule requires traceable
+coverage before the status can advance to `Implemented`.
 
 ## Decisions
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Proposal status | On Hold | Demand and the product model still need to be validated. |
-| External technology | Undecided | Firebase, Google Drive, and the referenced APIs are historical options, not current commitments. |
-| Local source of truth | Preserve Room as the offline foundation | Keeps Petit useful without an account or connectivity. |
+| Status | Draft | The updated behavior awaits explicit approval. |
+| Modes | MERGE and REPLACE | Users can combine data or recreate a snapshot explicitly. |
+| Archive trust | Validate completely before mutation | A remote ZIP is untrusted input. |
+| Device-bound data | Never restored | Cloning identities or authorization would be unsafe. |
+| Client encryption | None | Restore relies on Google Drive protection per 0301. |
 
 ## Out of scope
 
-- Implementing this proposal before review, explicit approval, and an index update.
-- Treating historical pricing, tier, provider, or timeline examples as current decisions.
-- Capabilities covered by the specs declared in `depends_on`.
+- Automatically selecting a backup without user confirmation.
+- Restoring Petit Cloud credentials, Google tokens, device identities, or local-sharing keys.
+- Deleting the remote archive after restore.
