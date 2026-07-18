@@ -2,7 +2,7 @@
 spec: "0305"
 title: "Automatic Google Drive Backup"
 family: backup-recovery
-status: Approved
+status: In Progress
 owner: woliveiras
 depends_on: ["0301"]
 ---
@@ -116,7 +116,7 @@ before the status can advance to `Implemented`.
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Status | Approved | The behavior is approved for implementation. |
+| Status | In Progress | Provider-independent scheduling and execution are implemented; real Google and physical-device criteria remain open. |
 | Price | Free | Storage is user-owned. |
 | Default | Off | Automatic remote transfer requires explicit opt-in. |
 | Schedule | Daily, inexact WorkManager execution | Android does not guarantee an exact 02:00 run. |

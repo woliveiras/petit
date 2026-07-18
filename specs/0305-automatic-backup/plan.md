@@ -4,7 +4,9 @@ Spec: [spec.md](./spec.md)
 
 ## Status
 
-This plan is **Approved** and may be implemented.
+This plan is **In Progress**. The provider-independent scheduler, worker, and
+attempt history are implemented. Real Google authorization and physical-device
+background validation remain open.
 
 ## Dependencies
 
@@ -29,6 +31,14 @@ This plan is **Approved** and may be implemented.
 5. Add exponential backoff and idempotent retry tests.
 6. Expose observable status and foreground reconnect action.
 7. Verify process death, network changes, and Doze on physical hardware.
+
+## Progress
+
+- Steps 1-5 are implemented and verified with WorkManager and deterministic
+  provider tests.
+- Step 6 has a provider-neutral authorization-required state; the foreground
+  reconnect UI is completed with spec 0306.
+- Step 7 remains pending for physical-device validation.
 
 ## Planned verification
 

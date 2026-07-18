@@ -1,6 +1,8 @@
 package com.woliveiras.petit.di
 
 import com.woliveiras.petit.data.backup.ProviderUnavailableBackupAuthorizationGateway
+import com.woliveiras.petit.data.repository.BackupAttemptRepository
+import com.woliveiras.petit.data.repository.BackupAttemptRepositoryImpl
 import com.woliveiras.petit.data.repository.DewormingEntryRepository
 import com.woliveiras.petit.data.repository.DewormingEntryRepositoryImpl
 import com.woliveiras.petit.data.repository.PetRepository
@@ -26,8 +28,10 @@ import com.woliveiras.petit.domain.usecase.backup.CreateBackupAction
 import com.woliveiras.petit.domain.usecase.backup.ProviderUnavailableCreateBackupAction
 import com.woliveiras.petit.worker.AutoTaskService
 import com.woliveiras.petit.worker.AutoTaskServiceImpl
+import com.woliveiras.petit.worker.BackupScheduler
 import com.woliveiras.petit.worker.TaskScheduler
 import com.woliveiras.petit.worker.TaskSchedulerImpl
+import com.woliveiras.petit.worker.WorkManagerBackupScheduler
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -44,6 +48,18 @@ abstract class RepositoryModule {
   abstract fun bindBackupAuthorizationGateway(
     providerUnavailableBackupAuthorizationGateway: ProviderUnavailableBackupAuthorizationGateway
   ): BackupAuthorizationGateway
+
+  @Binds
+  @Singleton
+  abstract fun bindBackupAttemptRepository(
+    backupAttemptRepositoryImpl: BackupAttemptRepositoryImpl
+  ): BackupAttemptRepository
+
+  @Binds
+  @Singleton
+  abstract fun bindBackupScheduler(
+    workManagerBackupScheduler: WorkManagerBackupScheduler
+  ): BackupScheduler
 
   /** This session intentionally has no production cloud provider adapter. */
   @Binds
