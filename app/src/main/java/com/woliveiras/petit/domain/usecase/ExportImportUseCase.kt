@@ -110,6 +110,27 @@ constructor(
       )
     }
 
+  /** Captures all restorable Room versions in one transaction for a portable backup. */
+  suspend fun exportBackupSnapshot(): ExportBundle =
+    withContext(Dispatchers.IO) {
+      database.withTransaction {
+        ExportBundle(
+          metadata =
+            ExportMetadata(
+              appVersion = BuildConfig.VERSION_NAME,
+              exportDate = Instant.now().toString(),
+              schemaVersion = 1,
+            ),
+          pets = database.petDao().getAllIncludingDeleted().toDomain(),
+          weightEntries = database.weightEntryDao().getAllIncludingDeleted().toDomain(),
+          vaccinationEntries = database.vaccinationEntryDao().getAllIncludingDeleted().toDomain(),
+          dewormingEntries = database.dewormingEntryDao().getAllIncludingDeleted().toDomain(),
+          tasks = database.taskDao().getAllIncludingDeleted().toDomain(),
+          membershipChanges = emptyList(),
+        )
+      }
+    }
+
   /** Export versions at or beyond an acknowledged cursor, including parent rows for validation. */
   suspend fun exportShareableSince(sinceInclusive: Long): ExportBundle =
     withContext(Dispatchers.IO) {

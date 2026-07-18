@@ -66,7 +66,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.petit.R
 import com.woliveiras.petit.data.lan.LanSyncState
@@ -74,6 +74,7 @@ import com.woliveiras.petit.domain.model.AppLanguage
 import com.woliveiras.petit.domain.model.AppTheme
 import com.woliveiras.petit.domain.model.ConflictResolution
 import com.woliveiras.petit.presentation.components.PetitTopAppBar
+import com.woliveiras.petit.presentation.feature.backup.BackupSettingsCard
 import com.woliveiras.petit.presentation.feature.familygroup.FamilyGroupSection
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -252,6 +253,8 @@ fun SettingsScreen(
 
       // Data section
       SettingsSectionHeader(title = stringResource(R.string.settings_section_data))
+
+      BackupSettingsCard()
 
       Card(
         modifier = Modifier.fillMaxWidth(),

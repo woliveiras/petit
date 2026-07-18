@@ -433,6 +433,18 @@
 
   <!-- Export/Import -->
   <string name="settings_section_data">Datos</string>
+  <string name="backup_settings_title">Copia de seguridad en Google Drive</string>
+  <string name="backup_ready">Lista para guardarse en tu propio almacenamiento de Google Drive</string>
+  <string name="backup_authorization_required">Conecta Google Drive para crear una copia portátil. No necesitas una cuenta de Petit ni pagar.</string>
+  <string name="backup_authorizing">Esperando la autorización de Google Drive…</string>
+  <string name="backup_unavailable">La copia en Google Drive no está configurada en esta compilación</string>
+  <string name="backup_in_progress">Creando y subiendo una copia portátil…</string>
+  <string name="backup_complete">Copia completada (%1$d bytes)</string>
+  <string name="backup_quota_exceeded">Google Drive no tiene suficiente espacio disponible</string>
+  <string name="backup_retryable_error">La copia se interrumpió. Inténtalo de nuevo para reanudarla de forma segura.</string>
+  <string name="backup_permanent_error">No se pudo completar la copia</string>
+  <string name="backup_now">Crear copia ahora</string>
+  <string name="backup_cancel">Cancelar copia</string>
   <string name="settings_export">Exportar datos</string>
   <string name="settings_export_description">Guardar todos tus datos en un archivo JSON</string>
   <string name="settings_import">Importar datos</string>

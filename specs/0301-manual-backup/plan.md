@@ -30,13 +30,13 @@ Spec 0201 and Petit Cloud authentication are explicitly not dependencies.
 
 ## Implementation sequence
 
-1. Characterize the current JSON export/import and enumerate every restorable field and asset.
-2. Define the versioned manifest, safe ZIP paths, checksums, and resource limits.
-3. Build a transactionally consistent snapshot and portable asset staging area.
-4. Add Google Drive authorization without Firebase or Petit authentication.
-5. Implement appDataFolder resumable upload with deterministic backup IDs.
-6. Deliver Settings UI, cancellation, progress, retry, and accessible error states.
-7. Validate the real Google Cloud project and physical-device flow.
+1. [x] Characterize the current JSON export/import and enumerate every restorable field and asset.
+2. [x] Define the versioned manifest, safe ZIP paths, checksums, and resource limits.
+3. [x] Build a transactionally consistent snapshot and portable asset staging area.
+4. [ ] Add Google Drive authorization without Firebase or Petit authentication. The replaceable contract is implemented; the real adapter is not.
+5. [ ] Implement appDataFolder resumable upload with deterministic backup IDs. Idempotency is verified with a test-only provider; the real adapter is not.
+6. [~] Deliver Settings UI, cancellation, progress, retry, and accessible error states. Provider-neutral states are implemented; real authorization remains open.
+7. [ ] Validate the real Google Cloud project and physical-device flow.
 
 ## Error and cleanup rules
 

@@ -1,5 +1,6 @@
 package com.woliveiras.petit.di
 
+import com.woliveiras.petit.data.backup.ProviderUnavailableBackupAuthorizationGateway
 import com.woliveiras.petit.data.repository.DewormingEntryRepository
 import com.woliveiras.petit.data.repository.DewormingEntryRepositoryImpl
 import com.woliveiras.petit.data.repository.PetRepository
@@ -16,10 +17,13 @@ import com.woliveiras.petit.data.repository.VaccinationEntryRepository
 import com.woliveiras.petit.data.repository.VaccinationEntryRepositoryImpl
 import com.woliveiras.petit.data.repository.WeightEntryRepository
 import com.woliveiras.petit.data.repository.WeightEntryRepositoryImpl
+import com.woliveiras.petit.domain.backup.BackupAuthorizationGateway
 import com.woliveiras.petit.domain.usecase.DeleteAllDataAction
 import com.woliveiras.petit.domain.usecase.DeleteAllDataUseCase
 import com.woliveiras.petit.domain.usecase.GetPetHealthSummaryAction
 import com.woliveiras.petit.domain.usecase.GetPetHealthSummaryUseCase
+import com.woliveiras.petit.domain.usecase.backup.CreateBackupAction
+import com.woliveiras.petit.domain.usecase.backup.ProviderUnavailableCreateBackupAction
 import com.woliveiras.petit.worker.AutoTaskService
 import com.woliveiras.petit.worker.AutoTaskServiceImpl
 import com.woliveiras.petit.worker.TaskScheduler
@@ -34,6 +38,19 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+
+  @Binds
+  @Singleton
+  abstract fun bindBackupAuthorizationGateway(
+    providerUnavailableBackupAuthorizationGateway: ProviderUnavailableBackupAuthorizationGateway
+  ): BackupAuthorizationGateway
+
+  /** This session intentionally has no production cloud provider adapter. */
+  @Binds
+  @Singleton
+  abstract fun bindCreateBackupAction(
+    providerUnavailableCreateBackupAction: ProviderUnavailableCreateBackupAction
+  ): CreateBackupAction
 
   @Binds
   @Singleton

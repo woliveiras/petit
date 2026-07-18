@@ -437,6 +437,18 @@
 
     <!-- Export/Import -->
     <string name="settings_section_data">Data</string>
+    <string name="backup_settings_title">Google Drive backup</string>
+    <string name="backup_ready">Ready to back up to your own Google Drive storage</string>
+    <string name="backup_authorization_required">Connect Google Drive to create a portable backup. A Petit account or payment is not required.</string>
+    <string name="backup_authorizing">Waiting for Google Drive authorization…</string>
+    <string name="backup_unavailable">Google Drive backup is not configured in this build</string>
+    <string name="backup_in_progress">Creating and uploading a portable backup…</string>
+    <string name="backup_complete">Backup complete (%1$d bytes)</string>
+    <string name="backup_quota_exceeded">Google Drive does not have enough available storage</string>
+    <string name="backup_retryable_error">Backup was interrupted. Try again to resume safely.</string>
+    <string name="backup_permanent_error">Backup could not be completed</string>
+    <string name="backup_now">Back up now</string>
+    <string name="backup_cancel">Cancel backup</string>
     <string name="settings_export">Export data</string>
     <string name="settings_export_description">Save all your data to a JSON file</string>
     <string name="settings_import">Import data</string>

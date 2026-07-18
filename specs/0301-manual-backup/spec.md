@@ -2,7 +2,7 @@
 spec: "0301"
 title: "Manual Google Drive Backup"
 family: backup-recovery
-status: Approved
+status: In Progress
 owner: woliveiras
 depends_on: ["0006", "0204"]
 ---
