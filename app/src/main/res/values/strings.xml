@@ -904,4 +904,37 @@
     <string name="backup_saved_error_retryable">The storage provider is temporarily unavailable. Try again.</string>
     <string name="backup_saved_error_permanent">Saved backups could not be loaded.</string>
 
+    <!-- Backup preferences and history -->
+    <string name="backup_notification_success">Backup completed: %1$d pets, %2$d tasks, %3$d bytes.</string>
+    <string name="backup_preferences_title">Backup settings</string>
+    <string name="backup_preferences_service_state">Storage service</string>
+    <string name="backup_preferences_disconnected">Disconnected</string>
+    <string name="backup_preferences_authorizing">Authorizing</string>
+    <string name="backup_preferences_connected">Connected%1$s</string>
+    <string name="backup_preferences_authorization_required">Authorization required</string>
+    <string name="backup_preferences_unavailable">Unavailable</string>
+    <string name="backup_preferences_connect">Connect storage</string>
+    <string name="backup_preferences_automatic">Automatic backup</string>
+    <string name="backup_preferences_automatic_description">Keep one inexact daily backup schedule when enabled</string>
+    <string name="backup_preferences_inexact">Android runs automatic backups when the selected conditions permit; no exact time is guaranteed.</string>
+    <string name="backup_preferences_unmetered">Unmetered networks only</string>
+    <string name="backup_preferences_unmetered_description">Wait for Wi-Fi or another unmetered connection</string>
+    <string name="backup_preferences_notify">Notify after automatic backup</string>
+    <string name="backup_preferences_notify_description">Show a silent notification after a successful automatic backup</string>
+    <string name="backup_preferences_history">Backup history</string>
+    <string name="backup_preferences_no_history">No backup attempts have been recorded.</string>
+    <string name="backup_preferences_attempt">%1$s · started %2$s · completed %3$s · %4$s · %5$s · %6$d pets · %7$d tasks</string>
+    <string name="backup_preferences_disconnect">Disconnect storage</string>
+    <string name="backup_preferences_disconnect_title">Disconnect storage?</string>
+    <string name="backup_preferences_disconnect_message">Automatic backup will be disabled. Local data and remote backups will not be deleted.</string>
+    <string name="backup_preferences_disconnect_confirm">Disconnect</string>
+    <string name="backup_preferences_error_update">Backup settings could not be updated.</string>
+    <string name="backup_preferences_error_authorization">Storage authorization is unavailable in this build.</string>
+    <string name="backup_preferences_error_disconnect">Storage could not be disconnected.</string>
+    <string name="backup_status_running">Running</string>
+    <string name="backup_status_succeeded">Succeeded</string>
+    <string name="backup_status_retrying">Waiting to retry</string>
+    <string name="backup_status_failed">Failed</string>
+    <string name="backup_status_cancelled">Cancelled</string>
+    <string name="backup_status_authorization_required">Authorization required</string>
 </resources>

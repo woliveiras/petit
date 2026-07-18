@@ -19,12 +19,31 @@ enum class AutomaticBackupOutcome {
 }
 
 class AutomaticBackupRunner
-@Inject
-constructor(
+internal constructor(
   private val createBackupAction: CreateBackupAction,
   private val attemptRepository: BackupAttemptRepository,
   private val clock: Clock,
+  private val notificationDispatcher: BackupNotificationDispatcher,
 ) {
+  @Inject
+  constructor(
+    createBackupAction: CreateBackupAction,
+    attemptRepository: BackupAttemptRepository,
+    clock: Clock,
+    notificationDispatcher: AndroidBackupNotificationDispatcher,
+  ) : this(
+    createBackupAction,
+    attemptRepository,
+    clock,
+    notificationDispatcher as BackupNotificationDispatcher,
+  )
+
+  constructor(
+    createBackupAction: CreateBackupAction,
+    attemptRepository: BackupAttemptRepository,
+    clock: Clock,
+  ) : this(createBackupAction, attemptRepository, clock, NoOpBackupNotificationDispatcher)
+
   suspend fun run(attemptId: String): AutomaticBackupOutcome {
     val existing = attemptRepository.getAttempt(attemptId)
     val startedAt = existing?.startedAt ?: clock.instant()
@@ -117,7 +136,7 @@ constructor(
     contentCounts: com.woliveiras.petit.domain.backup.BackupContentCounts? = null,
     failureCategory: BackupFailureCategory? = null,
   ) {
-    attemptRepository.upsert(
+    val attempt =
       BackupAttempt(
         id = attemptId,
         trigger = BackupTrigger.AUTOMATIC,
@@ -128,6 +147,11 @@ constructor(
         contentCounts = contentCounts,
         failureCategory = failureCategory,
       )
-    )
+    attemptRepository.upsert(attempt)
+    try {
+      notificationDispatcher.dispatch(attempt)
+    } catch (_: Exception) {
+      // Notification delivery must never change a completed backup outcome.
+    }
   }
 }

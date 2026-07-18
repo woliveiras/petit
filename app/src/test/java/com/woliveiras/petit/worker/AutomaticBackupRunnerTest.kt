@@ -41,6 +41,43 @@ class AutomaticBackupRunnerTest {
   }
 
   @Test
+  fun terminalAttemptIsDispatchedAfterItIsPersisted() = runTest {
+    val history = RecordingAttemptRepository()
+    val dispatched = mutableListOf<BackupAttempt>()
+    val dispatcher = BackupNotificationDispatcher { dispatched += it }
+    val runner =
+      AutomaticBackupRunner(
+        FakeCreateBackupAction(mutableListOf(BackupCreationResult.Success(metadata()))),
+        history,
+        clock,
+        dispatcher,
+      )
+
+    runner.run("work-1")
+
+    assertThat(dispatched.map { it.status }).containsExactly(BackupAttemptStatus.SUCCEEDED)
+    assertThat(history.current.single()).isEqualTo(dispatched.single())
+  }
+
+  @Test
+  fun notificationFailureCannotChangeTheCompletedBackupOutcome() = runTest {
+    val history = RecordingAttemptRepository()
+    val dispatcher = BackupNotificationDispatcher { error("notifications unavailable") }
+    val runner =
+      AutomaticBackupRunner(
+        FakeCreateBackupAction(mutableListOf(BackupCreationResult.Success(metadata()))),
+        history,
+        clock,
+        dispatcher,
+      )
+
+    val outcome = runner.run("work-1")
+
+    assertThat(outcome).isEqualTo(AutomaticBackupOutcome.SUCCESS)
+    assertThat(history.current.single().status).isEqualTo(BackupAttemptStatus.SUCCEEDED)
+  }
+
+  @Test
   fun retryReusesStableIdAndPreservesTheOriginalAttemptStart() = runTest {
     val action =
       FakeCreateBackupAction(

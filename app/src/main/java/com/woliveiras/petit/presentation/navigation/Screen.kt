@@ -83,6 +83,9 @@ sealed class Screen(val route: String) {
   /** Settings screen. */
   data object Settings : Screen("settings")
 
+  /** Provider-neutral backup controls, history, and connection state. */
+  data object BackupSettings : Screen("settings/backup")
+
   /** Provider-neutral saved backup management. */
   data object SavedBackups : Screen("settings/backups")
 

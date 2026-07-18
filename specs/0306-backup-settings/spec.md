@@ -2,7 +2,7 @@
 spec: "0306"
 title: "Backup Settings"
 family: backup-recovery
-status: Approved
+status: In Progress
 owner: woliveiras
 depends_on: ["0305"]
 ---
@@ -126,7 +126,7 @@ before the status can advance to `Implemented`.
 
 | Decision | Current choice | Rationale |
 | --- | --- | --- |
-| Status | Approved | The behavior is approved for implementation. |
+| Status | In Progress | Provider-neutral settings are implemented; real Drive disconnect validation remains open. |
 | Automatic default | Off | Remote automation requires explicit opt-in. |
 | Network default | Unmetered | Reduces unexpected mobile-data use. |
 | Schedule presentation | Inexact | WorkManager does not promise a precise execution time. |

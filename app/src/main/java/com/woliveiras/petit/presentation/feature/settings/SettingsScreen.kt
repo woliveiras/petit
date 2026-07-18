@@ -81,6 +81,7 @@ import com.woliveiras.petit.presentation.feature.familygroup.FamilyGroupSection
 @Composable
 fun SettingsScreen(
   onNavigateBack: () -> Unit,
+  onNavigateToBackupSettings: () -> Unit,
   onNavigateToSavedBackups: () -> Unit,
   onNavigateToDeleteAllData: () -> Unit,
   onNavigateToFamilyGroup: () -> Unit,
@@ -261,6 +262,18 @@ fun SettingsScreen(
           CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         shape = RoundedCornerShape(16.dp),
       ) {
+        SettingsItem(
+          icon = Icons.Default.CloudUpload,
+          title = stringResource(R.string.backup_preferences_title),
+          subtitle = stringResource(R.string.backup_preferences_automatic_description),
+          onClick = onNavigateToBackupSettings,
+        )
+
+        HorizontalDivider(
+          modifier = Modifier.padding(horizontal = 16.dp),
+          color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+        )
+
         SettingsItem(
           icon = Icons.Default.CloudUpload,
           title = stringResource(R.string.backup_saved_title),

@@ -4,6 +4,8 @@ import com.woliveiras.petit.data.backup.ProviderUnavailableBackupAuthorizationGa
 import com.woliveiras.petit.data.backup.ProviderUnavailableBackupStorageGateway
 import com.woliveiras.petit.data.repository.BackupAttemptRepository
 import com.woliveiras.petit.data.repository.BackupAttemptRepositoryImpl
+import com.woliveiras.petit.data.repository.BackupSettingsRepository
+import com.woliveiras.petit.data.repository.BackupSettingsRepositoryImpl
 import com.woliveiras.petit.data.repository.DewormingEntryRepository
 import com.woliveiras.petit.data.repository.DewormingEntryRepositoryImpl
 import com.woliveiras.petit.data.repository.PetRepository
@@ -62,6 +64,12 @@ abstract class RepositoryModule {
   abstract fun bindBackupAttemptRepository(
     backupAttemptRepositoryImpl: BackupAttemptRepositoryImpl
   ): BackupAttemptRepository
+
+  @Binds
+  @Singleton
+  abstract fun bindBackupSettingsRepository(
+    backupSettingsRepositoryImpl: BackupSettingsRepositoryImpl
+  ): BackupSettingsRepository
 
   @Binds
   @Singleton

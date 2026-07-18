@@ -4,7 +4,8 @@ Spec: [spec.md](./spec.md)
 
 ## Status
 
-This plan is **Approved** and may be implemented.
+This plan is **In Progress**. Provider-neutral implementation and automated
+verification are complete; real authorization and disconnect verification remain open.
 
 ## Dependencies
 

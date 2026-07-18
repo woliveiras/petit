@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.woliveiras.petit.presentation.feature.backup.BackupSettingsRoute
 import com.woliveiras.petit.presentation.feature.backup.RestoreBackupRoute
 import com.woliveiras.petit.presentation.feature.backup.SavedBackupsRoute
 import com.woliveiras.petit.presentation.feature.deworming.DewormingFormScreen
@@ -308,14 +309,19 @@ fun PetitNavGraph(
         onNavigateToDeleteAllData = { navController.navigate(Screen.DeleteAllData.route) },
         onNavigateToFamilyGroup = { navController.navigate(Screen.FamilyGroup.route) },
         onNavigateToPairing = { navController.navigate(Screen.FamilyGroupPairing.route) },
+        onNavigateToBackupSettings = { navController.navigate(Screen.BackupSettings.route) },
         onNavigateToSavedBackups = { navController.navigate(Screen.SavedBackups.route) },
       )
+    }
+
+    composable(Screen.BackupSettings.route) {
+      BackupSettingsRoute(onNavigateBack = { navController.popBackStack() })
     }
 
     composable(Screen.SavedBackups.route) {
       SavedBackupsRoute(
         onNavigateBack = { navController.popBackStack() },
-        onCreateBackup = { navController.popBackStack() },
+        onCreateBackup = { navController.navigate(Screen.BackupSettings.route) },
         onRestore = { remoteId ->
           navController.navigate(Screen.RestoreBackup.createRoute(remoteId))
         },
