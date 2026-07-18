@@ -34,7 +34,7 @@ Reference the full testing guide at `docs/talkback-testing-guide.md`.
 IconButton(onClick = onNavigateToSettings) {
     Icon(
         imageVector = Icons.Default.Settings,
-        contentDescription = "Configurações"
+        contentDescription = "Settings"
     )
 }
 
@@ -55,7 +55,7 @@ IconButton(onClick = onDelete) {
 // BAD — generic description
 Icon(
     imageVector = Icons.Default.Add,
-    contentDescription = "Ícone" // not helpful!
+    contentDescription = "Icon" // not helpful!
 )
 ```
 
@@ -63,8 +63,8 @@ Icon(
 
 - **Interactive icons** (in `IconButton`): ALWAYS provide `contentDescription`
 - **Decorative icons**: Set `contentDescription = null` explicitly
-- **Descriptions**: Use the action, not the visual (e.g., "Excluir gato" not "Ícone de lixeira")
-- **Language**: Portuguese (pt-BR) for all descriptions, matching the app language
+- **Descriptions**: Use the action, not the visual (e.g., "Delete cat" not "Trash can icon")
+- **Language**: English for all descriptions, matching the project language
 
 ### Images
 
@@ -72,7 +72,7 @@ Icon(
 // Cat photo with description
 AsyncImage(
     model = cat.photoUri,
-    contentDescription = "Foto de ${cat.name}",
+    contentDescription = "Photo of ${cat.name}",
     modifier = Modifier.size(80.dp)
 )
 
@@ -95,7 +95,7 @@ IconButton(
 ) {
     Icon(
         imageVector = Icons.Default.Delete,
-        contentDescription = "Excluir",
+        contentDescription = "Delete",
         modifier = Modifier.size(24.dp) // icon is smaller, button is 48dp
     )
 }
@@ -114,7 +114,7 @@ IconButton(
     onClick = onEdit,
     modifier = Modifier.size(24.dp) // too small for accessibility!
 ) {
-    Icon(Icons.Default.Edit, contentDescription = "Editar")
+    Icon(Icons.Default.Edit, contentDescription = "Edit")
 }
 ```
 
@@ -145,7 +145,7 @@ Card(
 // GOOD — clearAndSetSemantics for custom announcement
 Row(
     modifier = Modifier.clearAndSetSemantics {
-        contentDescription = "Peso: ${weight}g, registrado em $date"
+        contentDescription = "Weight: ${weight}g, recorded on $date"
     }
 ) {
     Icon(Icons.Default.Scale, contentDescription = null)
@@ -161,7 +161,7 @@ Row(
 Box {
     // Header reads first
     Text(
-        text = "Perfil do Pet",
+        text = "Pet Profile",
         modifier = Modifier.semantics { traversalIndex = 0f }
     )
 
@@ -177,7 +177,7 @@ Box {
             .align(Alignment.BottomEnd)
             .semantics { traversalIndex = 2f }
     ) {
-        Icon(Icons.Default.Add, contentDescription = "Adicionar registro")
+        Icon(Icons.Default.Add, contentDescription = "Add record")
     }
 }
 ```
@@ -264,7 +264,7 @@ fun EmptyState(message: String, actionLabel: String, onAction: () -> Unit) {
 OutlinedTextField(
     value = name,
     onValueChange = onNameChange,
-    label = { Text("Nome do gato") },
+    label = { Text("Cat name") },
     isError = nameError != null,
     supportingText = nameError?.let { { Text(it) } },
     modifier = Modifier.fillMaxWidth()
@@ -314,13 +314,13 @@ Button(
     onClick = { showDatePicker = true },
     modifier = Modifier.semantics {
         contentDescription = if (selectedDate != null) {
-            "Data de nascimento: $formattedDate. Toque para alterar"
+            "Date of birth: $formattedDate. Tap to change"
         } else {
-            "Selecionar data de nascimento"
+            "Select date of birth"
         }
     }
 ) {
-    Text(selectedDate?.let { formattedDate } ?: "Selecionar data")
+    Text(selectedDate?.let { formattedDate } ?: "Select date")
 }
 ```
 
@@ -330,16 +330,16 @@ Button(
 // GOOD — accessible confirmation dialog
 AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Excluir ${cat.name}?") },
-    text = { Text("Esta ação não pode ser desfeita. Todos os dados do gato serão removidos.") },
+    title = { Text("Delete ${cat.name}?") },
+    text = { Text("This action cannot be undone. All cat data will be removed.") },
     confirmButton = {
         TextButton(onClick = onConfirm) {
-            Text("Excluir", color = MaterialTheme.colorScheme.error)
+            Text("Delete", color = MaterialTheme.colorScheme.error)
         }
     },
     dismissButton = {
         TextButton(onClick = onDismiss) {
-            Text("Cancelar")
+            Text("Cancel")
         }
     }
 )
@@ -358,11 +358,11 @@ Column {
             .height(200.dp)
             .semantics {
                 contentDescription = buildString {
-                    append("Gráfico de peso. ")
-                    append("${weightEntries.size} registros. ")
+                    append("Weight chart. ")
+                    append("${weightEntries.size} records. ")
                     if (weightEntries.isNotEmpty()) {
-                        append("Peso mais recente: ${weightEntries.first().weightGrams}g. ")
-                        append("Período: ${firstDate} a ${lastDate}.")
+                        append("Most recent weight: ${weightEntries.first().weightGrams}g. ")
+                        append("Period: ${firstDate} to ${lastDate}.")
                     }
                 }
             }
@@ -372,7 +372,7 @@ Column {
     weightEntries.forEach { entry ->
         Row(
             modifier = Modifier.clearAndSetSemantics {
-                contentDescription = "${entry.formattedDate}: ${entry.weightGrams} gramas"
+                contentDescription = "${entry.formattedDate}: ${entry.weightGrams} grams"
             }
         ) {
             Text(entry.formattedDate)
@@ -412,9 +412,9 @@ Row {
     )
     Text(
         text = when (status) {
-            HealthStatus.OK -> "Em dia"
-            HealthStatus.WARNING -> "Atenção necessária"
-            HealthStatus.OVERDUE -> "Atrasado"
+            HealthStatus.OK -> "On track"
+            HealthStatus.WARNING -> "Attention required"
+            HealthStatus.OVERDUE -> "Overdue"
         },
         color = statusColor
     )

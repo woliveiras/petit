@@ -28,15 +28,15 @@ fun onSaveCat(name: String, notes: String?) {
     val trimmedName = name.trim()
 
     if (trimmedName.isEmpty()) {
-        _uiState.update { it.copy(nameError = "Nome é obrigatório") }
+        _uiState.update { it.copy(nameError = "Name is required") }
         return
     }
     if (trimmedName.length > 50) {
-        _uiState.update { it.copy(nameError = "Máximo 50 caracteres") }
+        _uiState.update { it.copy(nameError = "Maximum 50 characters") }
         return
     }
     if (notes != null && notes.length > 500) {
-        _uiState.update { it.copy(notesError = "Máximo 500 caracteres") }
+        _uiState.update { it.copy(notesError = "Maximum 500 characters") }
         return
     }
 

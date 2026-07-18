@@ -11,7 +11,7 @@ English is the default language for:
 - Commit messages
 - Documentation updates
 
-If needed, Portuguese notes are welcome as supplementary context, but include an English summary.
+Write all contribution content in English, including supplementary notes.
 
 ## Before You Start
 

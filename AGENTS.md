@@ -77,5 +77,7 @@ app/src/main/java/com/woliveiras/petit/
 
 ## Documentation Policy
 
+- All repository documentation, including embedded code comments and examples,
+  must be written in English.
 - Public technical documentation stays in docs/.
 - Product strategy and planning are maintained in a separate repository.

@@ -1,60 +1,60 @@
-# Runbook: validação física de compartilhamento local
+# Runbook: local sharing physical validation
 
-## Controle do documento
+## Document control
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
-| Família | `local-sharing` |
-| Specs | 0101, 0102, 0103, 0104 e 0105 |
-| Tipo | Teste manual em dois dispositivos Android físicos |
-| Estado inicial esperado | Specs em `Implemented`; tarefas físicas abertas |
-| Resultado permitido | `Pass`, `Fail` ou `Blocked` |
+| Family | `local-sharing` |
+| Specs | 0101, 0102, 0103, 0104, and 0105 |
+| Type | Manual test on two physical Android devices |
+| Expected initial status | Specs in `Implemented`; physical tasks open |
+| Allowed result | `Pass`, `Fail`, or `Blocked` |
 
-## Objetivo
+## Objective
 
-Validar em hardware real os comportamentos que não podem ser comprovados apenas
-com testes locais, emulador ou dois processos: Nearby Connections, permissões e
-rádios reais, ausência de internet, NSD em uma rede Wi-Fi real, interrupções de
-transporte, background e convergência entre dois bancos independentes.
+Validate on real hardware the behaviors that cannot be proven solely with local
+tests, an emulator, or two processes: Nearby Connections, real permissions and
+radios, lack of internet access, NSD on a real Wi-Fi network, transport
+interruptions, background execution, and convergence between two independent
+databases.
 
-Este runbook não substitui `./gradlew spotlessCheck`, `./gradlew test` ou os
-testes instrumentados. Execute-o somente sobre um commit que já tenha passado
-essas verificações.
+This runbook does not replace `./gradlew spotlessCheck`, `./gradlew test`, or
+instrumented tests. Run it only against a commit that has already passed those
+checks.
 
-## Critério de conclusão
+## Completion criteria
 
-A família pode mudar de `Implemented` para `Completed` somente quando:
+The family may move from `Implemented` to `Completed` only when:
 
-1. todos os casos obrigatórios deste runbook estiverem em `Pass`;
-2. não houver defeito aberto que invalide um critério de aceitação;
-3. as evidências identificarem commit, APK, dispositivos e resultado;
-4. as tarefas físicas de 0101–0105 estiverem marcadas como concluídas;
-5. os critérios físicos correspondentes nas specs estiverem reconciliados.
+1. all mandatory cases in this runbook have a `Pass` result;
+2. no open defect invalidates an acceptance criterion;
+3. the evidence identifies the commit, APK, devices, and result;
+4. the physical tasks for 0101–0105 are marked as completed;
+5. the corresponding physical criteria in the specs are reconciled.
 
-Não use `Pass` para um passo não executado. Use `Blocked` quando o ambiente não
-permitir a execução e registre a causa.
+Do not use `Pass` for a step that was not executed. Use `Blocked` when the
+environment does not allow execution, and record the reason.
 
-## Responsabilidades
+## Responsibilities
 
-- **Executor:** opera os dispositivos e registra evidências sem alterar o fluxo.
-- **Observador:** confere os resultados nos dois dispositivos e registra tempos,
-  contadores e divergências.
-- Uma pessoa pode exercer ambos os papéis, mas as verificações devem cobrir os
-  dois lados.
+- **Executor:** operates the devices and records evidence without changing the flow.
+- **Observer:** verifies results on both devices and records times, counters, and
+  discrepancies.
+- One person may perform both roles, but the checks must cover both sides.
 
-## Pré-condições
+## Preconditions
 
-- Dois dispositivos Android físicos, chamados **A** e **B**.
-- Versões de Android e modelos registrados na folha de execução.
-- Mesmo APK debug, gerado a partir do mesmo commit, instalado nos dois.
-- Cabo/ADB ou depuração sem fio disponível para coleta de logs.
-- Bluetooth e Wi-Fi funcionais nos dois dispositivos.
-- Uma rede Wi-Fi local em que os clientes possam se comunicar entre si.
-- Capacidade de bloquear o acesso à internet sem desligar a rede local.
-- Android Studio Database Inspector disponível para o caso de empate exato.
-- Dados usados no teste não podem conter informações clínicas reais.
+- Two physical Android devices, referred to as **A** and **B**.
+- Android versions and device models recorded in the execution worksheet.
+- The same debug APK, built from the same commit, installed on both devices.
+- Cable/ADB or wireless debugging available for log collection.
+- Bluetooth and Wi-Fi working on both devices.
+- A local Wi-Fi network on which clients can communicate with each other.
+- The ability to block internet access without disabling the local network.
+- Android Studio Database Inspector available for the exact-tie case.
+- Test data must not contain real clinical information.
 
-## Preparação do build
+## Build preparation
 
 ```bash
 git status --short
@@ -64,38 +64,38 @@ git rev-parse --short HEAD
 ./gradlew assembleDebug && ./gradlew installDebug
 ```
 
-O APK fica em:
+The APK is located at:
 
 ```text
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Instale o mesmo arquivo em A e B. Se `installDebug` selecionar apenas um
-dispositivo, instale explicitamente no outro:
+Install the same file on A and B. If `installDebug` selects only one device,
+install it explicitly on the other device:
 
 ```bash
 adb -s <serial-A> install -r app/build/outputs/apk/debug/app-debug.apk
 adb -s <serial-B> install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## Registro e evidências
+## Records and evidence
 
-Crie uma pasta fora do repositório ou ignorada pelo Git:
+Create a folder outside the repository or ignored by Git:
 
 ```text
-local-sharing-<commit>-<AAAA-MM-DD-HHMM>/
+local-sharing-<commit>-<YYYY-MM-DD-HHMM>/
 ```
 
-Para cada caso, registre:
+For each case, record:
 
-- resultado (`Pass`, `Fail` ou `Blocked`);
-- horário de início e fim;
-- captura ou gravação dos dois dispositivos;
-- logcat relevante, sem chaves ou dados sensíveis;
-- estado e contadores exibidos;
-- observações e ID do bugfix, se houver falha.
+- result (`Pass`, `Fail`, or `Blocked`);
+- start and end times;
+- screenshots or recordings from both devices;
+- relevant logcat output, without keys or sensitive data;
+- displayed state and counters;
+- notes and the bugfix ID, if the case fails.
 
-Comandos úteis:
+Useful commands:
 
 ```bash
 adb -s <serial-A> logcat -c
@@ -106,314 +106,319 @@ adb -s <serial-B> logcat -v threadtime > device-B.log
 
 ## Fixtures
 
-Depois de limpar os dados do app nos dois dispositivos, crie:
+After clearing app data on both devices, create:
 
-| Dispositivo | Pet | Registro exclusivo | Nome do dispositivo |
+| Device | Pet | Unique record | Device name |
 | --- | --- | --- | --- |
-| A | `Mimi-A` | peso identificável como `A` | `Petit A` |
-| B | `Mimi-B` | tarefa identificável como `B` | `Petit B` |
+| A | `Mimi-A` | weight identifiable as `A` | `Petit A` |
+| B | `Mimi-B` | task identifiable as `B` | `Petit B` |
 
-Anote a quantidade inicial de pets, pesos, vacinas, vermífugos e tarefas em
-cada dispositivo. Esses valores serão usados nos contadores de MERGE e REPLACE.
+Record the initial number of pets, weights, vaccines, deworming treatments, and
+tasks on each device. These values will be used for the MERGE and REPLACE
+counters.
 
-## Casos de teste
+## Test cases
 
-### LS-PAIR-01 — código incorreto e pareamento correto
+### LS-PAIR-01 — incorrect code and successful pairing
 
-**Cobre:** 0101; autorização, retry e persistência pós-autorização.
+**Covers:** 0101; authorization, retry, and post-authorization persistence.
 
-1. Em A, inicie o modo que anuncia o código de quatro dígitos.
-2. Em B, inicie a descoberta e selecione A.
-3. Digite um código diferente do exibido em A.
-4. Confirme que B mostra rejeição e permite nova tentativa.
-5. Confirme que nenhum grupo incompleto aparece em A ou B.
-6. Digite o código correto.
-7. Confirme o pareamento nos dois dispositivos.
-8. Feche e reabra o app nos dois.
+1. On A, start the mode that advertises the four-digit code.
+2. On B, start discovery and select A.
+3. Enter a code different from the one displayed on A.
+4. Confirm that B shows a rejection and allows another attempt.
+5. Confirm that no incomplete group appears on A or B.
+6. Enter the correct code.
+7. Confirm pairing on both devices.
+8. Close and reopen the app on both devices.
 
-**Resultado esperado:** o código incorreto não autoriza nem persiste associação;
-o correto persiste o mesmo grupo e as identidades estáveis nos dois lados.
+**Expected result:** the incorrect code neither authorizes nor persists an
+association; the correct code persists the same group and stable identities on
+both sides.
 
-**Evidência mínima:** vídeo do código incorreto, retry, sucesso e estado após
-reinício.
+**Minimum evidence:** a video showing the incorrect code, retry, success, and
+state after restart.
 
-### LS-PAIR-02 — cancelamento e perda do endpoint
+### LS-PAIR-02 — cancellation and endpoint loss
 
-**Cobre:** 0101; cleanup idempotente.
+**Covers:** 0101; idempotent cleanup.
 
-1. Inicie anúncio em A e descoberta em B.
-2. Cancele em B antes de informar o código.
-3. Repita e desligue Bluetooth ou Wi-Fi em A enquanto B aguarda.
-4. Restaure os rádios e repita o pareamento desde o início.
+1. Start advertising on A and discovery on B.
+2. Cancel on B before entering the code.
+3. Repeat, then disable Bluetooth or Wi-Fi on A while B is waiting.
+4. Restore the radios and repeat pairing from the beginning.
 
-**Resultado esperado:** anúncio, descoberta e conexão são encerrados sem grupo
-parcial; uma nova tentativa funciona sem reiniciar o dispositivo.
+**Expected result:** advertising, discovery, and connection are stopped without
+a partial group; a new attempt works without restarting the device.
 
-### LS-PAIR-03 — pareamento sem internet
+### LS-PAIR-03 — pairing without internet access
 
-**Cobre:** 0101; operação local sem servidor remoto.
+**Covers:** 0101; local operation without a remote server.
 
-1. Mantenha Bluetooth e a rede Wi-Fi local ativos.
-2. Bloqueie internet móvel e acesso WAN nos dois dispositivos.
-3. Confirme em navegador que não há acesso à internet.
-4. Execute LS-PAIR-01 com o código correto.
+1. Keep Bluetooth and the local Wi-Fi network enabled.
+2. Block mobile internet and WAN access on both devices.
+3. Use a browser to confirm there is no internet access.
+4. Run LS-PAIR-01 with the correct code.
 
-**Resultado esperado:** pareamento concluído normalmente sem acesso à internet.
+**Expected result:** pairing completes normally without internet access.
 
-### LS-XFER-01 — MERGE autorizado
+### LS-XFER-01 — authorized MERGE
 
-**Cobre:** 0102 e 0105; transferência, merge e contadores.
+**Covers:** 0102 and 0105; transfer, merge, and counters.
 
-1. Use um grupo pareado e mantenha as fixtures diferentes em A e B.
-2. Inicie a transferência A → B.
-3. Em B, escolha MERGE.
-4. Observe o progresso até 100%.
-5. Compare o banco visível de B com as fixtures.
-6. Confira adicionados, atualizados e removidos por tipo.
+1. Use a paired group and keep different fixtures on A and B.
+2. Start the A → B transfer.
+3. On B, select MERGE.
+4. Observe progress until it reaches 100%.
+5. Compare B's visible database with the fixtures.
+6. Verify added, updated, and removed counters by type.
 
-**Resultado esperado:** B conserva seus dados e recebe os dados de A; progresso
-é monotônico e os contadores correspondem às diferenças anotadas.
+**Expected result:** B retains its data and receives A's data; progress is
+monotonic, and the counters match the recorded differences.
 
-### LS-XFER-02 — REPLACE destrutivo
+### LS-XFER-02 — destructive REPLACE
 
-**Cobre:** 0102; confirmação e substituição exata.
+**Covers:** 0102; confirmation and exact replacement.
 
-1. Crie em B um registro que não existe em A.
-2. Inicie A → B e selecione REPLACE.
-3. Cancele a primeira confirmação e confirme que nada mudou.
-4. Repita e confirme a ação destrutiva.
-5. Compare todos os tipos de entidade em A e B.
+1. On B, create a record that does not exist on A.
+2. Start A → B and select REPLACE.
+3. Cancel the first confirmation and verify that nothing changed.
+4. Repeat and confirm the destructive action.
+5. Compare all entity types on A and B.
 
-**Resultado esperado:** sem confirmação, nada muda; após confirmação, B reflete
-exatamente o bundle de A e remove os registros ausentes, com contadores corretos.
+**Expected result:** nothing changes without confirmation; after confirmation,
+B exactly reflects A's bundle and removes missing records, with correct
+counters.
 
-### LS-XFER-03 — interrupção, cancelamento e retry
+### LS-XFER-03 — interruption, cancellation, and retry
 
-**Cobre:** 0102; payload parcial e recuperação.
+**Covers:** 0102; partial payload and recovery.
 
-1. Prepare dados suficientes para que o progresso seja visível.
-2. Inicie A → B.
-3. Durante a transferência, desligue Bluetooth/Wi-Fi em um dispositivo.
-4. Confirme que B não persistiu um payload parcial.
-5. Restaure os rádios e execute novamente até concluir.
-6. Repita usando o botão de cancelamento da interface.
-7. Repita sem acesso à internet.
+1. Prepare enough data to make progress visible.
+2. Start A → B.
+3. During the transfer, disable Bluetooth/Wi-Fi on one device.
+4. Confirm that B did not persist a partial payload.
+5. Restore the radios and run the transfer again until it completes.
+6. Repeat using the interface's cancel button.
+7. Repeat without internet access.
 
-**Resultado esperado:** interrupção e cancelamento não alteram o banco; retry
-conclui sem duplicação; internet não é necessária.
+**Expected result:** interruption and cancellation do not change the database;
+retry completes without duplication; internet access is not required.
 
-### LS-GROUP-01 — rename e último sync
+### LS-GROUP-01 — rename and last sync
 
-**Cobre:** 0103; identidade estável e estados da UI.
+**Covers:** 0103; stable identity and UI states.
 
-1. Anote o UUID, chave/grupo e nome de A.
-2. Renomeie A para `Petit A Renamed`.
-3. Confirme o novo nome localmente e reinicie o app.
-4. Sincronize com B.
-5. Confirme o novo nome em B e o horário de último sync nos dois.
+1. Record A's UUID, key/group, and name.
+2. Rename A to `Petit A Renamed`.
+3. Confirm the new name locally and restart the app.
+4. Sync with B.
+5. Confirm the new name on B and the last-sync time on both devices.
 
-**Resultado esperado:** somente o nome muda; UUID, grupo e autorização permanecem.
+**Expected result:** only the name changes; UUID, group, and authorization remain.
 
-### LS-GROUP-02 — remoção e revogação da chave antiga
+### LS-GROUP-02 — removal and revocation of the old key
 
-**Cobre:** 0103; remoção idempotente e revogação.
+**Covers:** 0103; idempotent removal and revocation.
 
-1. Em A, remova B e confirme a ação.
-2. Sincronize ou permita a propagação do evento.
-3. Em B, tente iniciar sync usando a associação antiga.
-4. Repita a remoção em A, se a interface ainda permitir.
-5. Confira que os pets permanecem em ambos.
+1. On A, remove B and confirm the action.
+2. Sync or allow the event to propagate.
+3. On B, try to start a sync using the old association.
+4. Repeat the removal on A if the interface still allows it.
+5. Verify that pets remain on both devices.
 
-**Resultado esperado:** B desaparece da associação, não acessa dados com a chave
-antiga, a repetição não cria efeitos adicionais e os dados clínicos permanecem.
+**Expected result:** B disappears from the association and cannot access data
+with the old key; repeating the operation has no additional effects, and
+clinical data remains intact.
 
-### LS-GROUP-03 — saída offline e novo grupo
+### LS-GROUP-03 — offline leave and new group
 
-**Cobre:** 0103 e 0104; outbox de saída e isolamento multi-grupo.
+**Covers:** 0103 and 0104; leave outbox and multi-group isolation.
 
-1. Pareie novamente A e B, se necessário.
-2. Deixe A offline e faça A sair do grupo.
-3. Confirme que a chave visível é removida e os pets de A permanecem.
-4. Em A, entre em um novo grupo com um terceiro peer ou recrie a associação em B.
-5. Restabeleça a rede antiga e execute tentativas manuais até o `LEAVE` ser entregue.
-6. Confirme que o grupo atual continua sincronizando mesmo se o peer antigo não
-   estiver disponível.
-7. Reinicie A e repita uma tentativa.
+1. Pair A and B again if necessary.
+2. Take A offline and make A leave the group.
+3. Confirm that the visible key is removed and A's pets remain.
+4. On A, join a new group with a third peer or recreate the association on B.
+5. Restore the old network and run manual attempts until the `LEAVE` is delivered.
+6. Confirm that the current group continues syncing even if the old peer is
+   unavailable.
+7. Restart A and repeat an attempt.
 
-**Resultado esperado:** o `LEAVE` antigo é entregue uma única vez, não vaza dados
-clínicos, não bloqueia o grupo atual e sua credencial restrita é descartada após ACK.
+**Expected result:** the old `LEAVE` is delivered exactly once, does not leak
+clinical data, does not block the current group, and its restricted credential
+is discarded after ACK.
 
 ### LS-CONFLICT-01 — edit/edit
 
-**Cobre:** 0105; determinismo e simetria.
+**Covers:** 0105; determinism and symmetry.
 
-1. Sincronize um registro-base nos dois dispositivos.
-2. Desative o sync e desconecte a rede.
-3. Edite o mesmo registro com valores diferentes em A e B, anotando a ordem.
-4. Reconecte e sincronize nos dois sentidos.
-5. Repita a sincronização sem novas alterações.
+1. Sync a baseline record to both devices.
+2. Disable sync and disconnect the network.
+3. Edit the same record with different values on A and B, recording the order.
+4. Reconnect and sync in both directions.
+5. Repeat the sync without making new changes.
 
-**Resultado esperado:** ambos terminam com a versão realmente mais recente; o
-retry não muda estado nem contadores novamente.
+**Expected result:** both devices end with the truly most recent version; retry
+does not change state or increment counters again.
 
 ### LS-CONFLICT-02 — edit/delete
 
-1. Sincronize um registro-base.
-2. Offline, edite-o em A e exclua-o em B.
-3. Execute uma vez com a edição mais recente e outra com a exclusão mais recente.
-4. Sincronize nos dois sentidos.
+1. Sync a baseline record.
+2. While offline, edit it on A and delete it on B.
+3. Run once with the edit being newer, and once with the deletion being newer.
+4. Sync in both directions.
 
-**Resultado esperado:** a operação com timestamp efetivamente mais recente vence;
-ambos convergem sem ressuscitar tombstone indevidamente.
+**Expected result:** the operation with the genuinely newer timestamp wins;
+both devices converge without improperly resurrecting the tombstone.
 
 ### LS-CONFLICT-03 — delete/delete
 
-1. Sincronize um registro-base.
-2. Offline, exclua-o em A e B.
-3. Reconecte, sincronize nos dois sentidos e repita.
+1. Sync a baseline record.
+2. While offline, delete it on A and B.
+3. Reconnect, sync in both directions, and repeat.
 
-**Resultado esperado:** ambos mantêm um resultado excluído convergente e
-idempotente, sem duplicação de histórico.
+**Expected result:** both devices retain a convergent and idempotent deleted
+result, without duplicate history entries.
 
-### LS-CONFLICT-04 — empate exato de timestamp
+### LS-CONFLICT-04 — exact timestamp tie
 
-1. Parta de um registro-base sincronizado.
-2. Offline, crie payloads divergentes em A e B.
-3. No Database Inspector, atribua o mesmo `updatedAt` às duas versões. Registre
-   o valor usado e exporte evidência das linhas, sem conteúdo sensível.
-4. Sincronize A → B e B → A.
-5. Repita a ordem começando de bancos restaurados e invertendo o primeiro envio.
-6. Execute um retry sem novas alterações.
+1. Start from a synced baseline record.
+2. While offline, create divergent payloads on A and B.
+3. In Database Inspector, assign the same `updatedAt` to both versions. Record
+   the value used and export evidence of the rows, without sensitive content.
+4. Sync A → B and B → A.
+5. Repeat the order from restored databases, reversing the first transfer.
+6. Run a retry without making new changes.
 
-**Resultado esperado:** o vencedor é igual nas duas ordens, conforme o
-tie-breaker documentado; retry é idempotente.
+**Expected result:** the winner is the same in both orders, according to the
+documented tie-breaker; retry is idempotent.
 
-### LS-LAN-01 — descoberta e sync bidirecional em foreground
+### LS-LAN-01 — discovery and bidirectional foreground sync
 
-**Cobre:** 0104; NSD, autenticação e changesets bidirecionais.
+**Covers:** 0104; NSD, authentication, and bidirectional changesets.
 
-1. Coloque A e B no mesmo Wi-Fi com isolamento de clientes desativado.
-2. Ative sync automático nos dois.
-3. Crie uma alteração exclusiva em cada dispositivo.
-4. Abra os dois apps em foreground.
-5. Observe estados de descoberta, sync e conclusão.
-6. Confira dados, histórico, peer, horário, tipo e contadores nos dois.
-7. Saia do app e confira no log que descoberta e sockets foram liberados.
+1. Put A and B on the same Wi-Fi network with client isolation disabled.
+2. Enable automatic sync on both devices.
+3. Create a unique change on each device.
+4. Open both apps in the foreground.
+5. Observe discovery, sync, and completion states.
+6. Verify data, history, peer, time, type, and counters on both devices.
+7. Leave the app and verify in the log that discovery and sockets were released.
 
-**Resultado esperado:** ambos convergem; nenhum dado clínico é enviado antes da
-autenticação; o lifecycle encerra recursos fora do foreground.
+**Expected result:** both devices converge; no clinical data is sent before
+authentication; the lifecycle releases resources outside the foreground.
 
-### LS-LAN-02 — perda e retorno do Wi-Fi
+### LS-LAN-02 — Wi-Fi loss and return
 
-1. Inicie uma sessão com alterações pendentes nos dois.
-2. Desligue o Wi-Fi durante a transferência.
-3. Confirme estado de erro/peer indisponível e ausência de persistência parcial.
-4. Religue o Wi-Fi sem abrir uma nova associação.
-5. Aguarde ou acione tentativa manual.
+1. Start a session with pending changes on both devices.
+2. Disable Wi-Fi during the transfer.
+3. Confirm an error/peer-unavailable state and no partial persistence.
+4. Re-enable Wi-Fi without creating a new association.
+5. Wait or trigger a manual attempt.
 
-**Resultado esperado:** alterações acumuladas convergem sem duplicação e o ACK
-perdido pode ser repetido com segurança.
+**Expected result:** accumulated changes converge without duplication, and a
+lost ACK can be retried safely.
 
-### LS-LAN-03 — background e WorkManager
+### LS-LAN-03 — background execution and WorkManager
 
-1. Ative sync automático e deixe alterações pendentes.
-2. Coloque os apps em background.
-3. Mantenha os dispositivos carregados e na rede pelo intervalo permitido pelo
-   Android, nunca inferior aos 15 minutos configurados.
-4. Registre o estado do WorkManager com `adb shell dumpsys jobscheduler` e logs.
-5. Reabra os apps e confira dados e histórico.
+1. Enable automatic sync and leave changes pending.
+2. Put the apps in the background.
+3. Keep the devices charged and connected to the network for the interval
+   allowed by Android, never less than the configured 15 minutes.
+4. Record WorkManager state using `adb shell dumpsys jobscheduler` and logs.
+5. Reopen the apps and verify data and history.
 
-**Resultado esperado:** existe trabalho periódico único, com rede conectada e
-backoff; não existe serviço persistente ou grupo Wi-Fi Direct contínuo.
+**Expected result:** there is one unique periodic job, with a connected-network
+constraint and backoff; there is no persistent service or continuous Wi-Fi
+Direct group.
 
-### LS-LAN-04 — toggle off e tentativa manual
+### LS-LAN-04 — toggle off and manual attempt
 
-1. Desative sync automático em A.
-2. Reabra A e aguarde além do timeout normal.
-3. Confirme por UI/log que A não anuncia nem descobre automaticamente.
-4. Crie uma alteração e use a tentativa manual.
-5. Reative o toggle e repita em foreground.
+1. Disable automatic sync on A.
+2. Reopen A and wait beyond the normal timeout.
+3. Confirm through the UI/log that A does not advertise or discover automatically.
+4. Create a change and use the manual-attempt action.
+5. Re-enable the toggle and repeat in the foreground.
 
-**Resultado esperado:** o toggle interrompe NSD e worker automáticos; a ação
-manual inicia uma tentativa nova e não reutiliza um estado `Synced` antigo.
+**Expected result:** the toggle stops automatic NSD and worker activity; the
+manual action starts a new attempt and does not reuse a stale `Synced` state.
 
-### LS-LAN-05 — chave inválida antes do payload
+### LS-LAN-05 — invalid key before payload
 
-Este caso exige uma build debug e debugger porque o fluxo normal filtra grupos
-diferentes ainda no NSD.
+This case requires a debug build and a debugger because the normal flow filters
+different groups during NSD.
 
-1. Mantenha A e B no mesmo grupo e inicie a descoberta.
-2. Em B, pause no início de `LanSessionRunner.runClient`, depois que o peer foi
-   resolvido e antes da criação de `LanHandshakeClient`.
-3. Apenas para essa sessão, substitua no debugger a chave usada pelo handshake
-   por outra chave Base64URL válida de 32 bytes, preservando o group ID já
-   anunciado. Não persista a chave alterada.
-4. Retome a execução e capture logs dos dois dispositivos.
-5. Confira que A retorna erro e fecha antes de receber `CHANGESET`.
-6. Remova a alteração do debugger e confirme que uma tentativa normal funciona.
+1. Keep A and B in the same group and start discovery.
+2. On B, pause at the beginning of `LanSessionRunner.runClient`, after the peer
+   has been resolved and before `LanHandshakeClient` is created.
+3. For this session only, use the debugger to replace the handshake key with
+   another valid 32-byte Base64URL key, preserving the advertised group ID. Do
+   not persist the changed key.
+4. Resume execution and capture logs from both devices.
+5. Confirm that A returns an error and closes before receiving `CHANGESET`.
+6. Remove the debugger change and confirm that a normal attempt succeeds.
 
-**Resultado esperado:** `AUTHENTICATION_FAILED`/`ERROR` e `CLOSE` antes de
-qualquer payload clínico; nenhum banco ou credencial persistente é alterado.
+**Expected result:** `AUTHENTICATION_FAILED`/`ERROR` and `CLOSE` occur before
+any clinical payload; no database or persistent credential is changed.
 
-Se o debugger não permitir a injeção sem alterar o APK, registre `Blocked` e
-use o teste automatizado de handshake inválido como evidência complementar; não
-marque a validação física como `Pass`.
+If the debugger cannot inject the key without changing the APK, record
+`Blocked` and use the automated invalid-handshake test as supporting evidence;
+do not mark the physical validation as `Pass`.
 
-## Regressão final
+## Final regression
 
-Depois de todos os casos:
+After all cases:
 
-1. reinicie A e B;
-2. confirme que o grupo ativo correto continua disponível;
-3. confirme que pets e histórico local não foram apagados por remove/leave;
-4. execute mais um sync sem alterações e confirme ausência de duplicação;
-5. execute novamente `./gradlew spotlessCheck` e `./gradlew test` no commit testado;
-6. confira `git status --short` antes de atualizar specs e tarefas.
+1. restart A and B;
+2. confirm that the correct active group remains available;
+3. confirm that pets and local history were not deleted by remove/leave;
+4. run another sync with no changes and confirm there is no duplication;
+5. run `./gradlew spotlessCheck` and `./gradlew test` again on the tested commit;
+6. check `git status --short` before updating specs and tasks.
 
-## Tratamento de falhas
+## Failure handling
 
-Se um resultado for `Fail` e o comportamento não estiver descrito como pendência
-da spec:
+If a result is `Fail` and the behavior is not described as pending in the spec:
 
-1. preserve logs, vídeos, commit, dispositivos e passos de reprodução;
-2. crie `docs/bugfixes/YYYY-MM-DD-<slug>.md`;
-3. documente reprodução, impacto, hipótese, regressão e proposta;
-4. respeite o bugfix approval gate antes de alterar produção;
-5. após a correção, repita o caso que falhou e a regressão final.
+1. preserve logs, videos, commit, devices, and reproduction steps;
+2. create `docs/bugfixes/YYYY-MM-DD-<slug>.md`;
+3. document reproduction, impact, hypothesis, regression, and proposal;
+4. respect the bugfix approval gate before changing production code;
+5. after the fix, repeat the failed case and the final regression.
 
-## Folha de execução
+## Execution worksheet
 
 ```text
-Data/hora:
+Date/time:
 Executor:
-Observador:
+Observer:
 Commit:
 APK SHA-256:
-Dispositivo A / Android / serial:
-Dispositivo B / Android / serial:
-Rede / roteador / isolamento de clientes:
-Internet disponível no início: sim / não
+Device A / Android / serial:
+Device B / Android / serial:
+Network / router / client isolation:
+Internet available at the start: yes / no
 
-LS-PAIR-01: Pass / Fail / Blocked — evidência:
-LS-PAIR-02: Pass / Fail / Blocked — evidência:
-LS-PAIR-03: Pass / Fail / Blocked — evidência:
-LS-XFER-01: Pass / Fail / Blocked — evidência:
-LS-XFER-02: Pass / Fail / Blocked — evidência:
-LS-XFER-03: Pass / Fail / Blocked — evidência:
-LS-GROUP-01: Pass / Fail / Blocked — evidência:
-LS-GROUP-02: Pass / Fail / Blocked — evidência:
-LS-GROUP-03: Pass / Fail / Blocked — evidência:
-LS-CONFLICT-01: Pass / Fail / Blocked — evidência:
-LS-CONFLICT-02: Pass / Fail / Blocked — evidência:
-LS-CONFLICT-03: Pass / Fail / Blocked — evidência:
-LS-CONFLICT-04: Pass / Fail / Blocked — evidência:
-LS-LAN-01: Pass / Fail / Blocked — evidência:
-LS-LAN-02: Pass / Fail / Blocked — evidência:
-LS-LAN-03: Pass / Fail / Blocked — evidência:
-LS-LAN-04: Pass / Fail / Blocked — evidência:
-LS-LAN-05: Pass / Fail / Blocked — evidência:
+LS-PAIR-01: Pass / Fail / Blocked — evidence:
+LS-PAIR-02: Pass / Fail / Blocked — evidence:
+LS-PAIR-03: Pass / Fail / Blocked — evidence:
+LS-XFER-01: Pass / Fail / Blocked — evidence:
+LS-XFER-02: Pass / Fail / Blocked — evidence:
+LS-XFER-03: Pass / Fail / Blocked — evidence:
+LS-GROUP-01: Pass / Fail / Blocked — evidence:
+LS-GROUP-02: Pass / Fail / Blocked — evidence:
+LS-GROUP-03: Pass / Fail / Blocked — evidence:
+LS-CONFLICT-01: Pass / Fail / Blocked — evidence:
+LS-CONFLICT-02: Pass / Fail / Blocked — evidence:
+LS-CONFLICT-03: Pass / Fail / Blocked — evidence:
+LS-CONFLICT-04: Pass / Fail / Blocked — evidence:
+LS-LAN-01: Pass / Fail / Blocked — evidence:
+LS-LAN-02: Pass / Fail / Blocked — evidence:
+LS-LAN-03: Pass / Fail / Blocked — evidence:
+LS-LAN-04: Pass / Fail / Blocked — evidence:
+LS-LAN-05: Pass / Fail / Blocked — evidence:
 
-Resultado geral: Pass / Fail / Blocked
-Bugfixes abertos:
-Observações:
+Overall result: Pass / Fail / Blocked
+Open bugfixes:
+Notes:
 ```

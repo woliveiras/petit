@@ -217,7 +217,7 @@ fun save() {
             repository.save(entity)
             _events.emit(Event.Saved)
         } catch (e: Exception) {
-            _events.emit(Event.Error(e.message ?: "Erro ao salvar"))
+            _events.emit(Event.Error(e.message ?: "Error while saving"))
         } finally {
             _uiState.update { it.copy(isSaving = false) }
         }
@@ -269,12 +269,12 @@ fun saveReminder() {
                 reminderScheduler.schedule(reminder)
             } catch (e: Exception) {
                 // DB saved but schedule failed — notify user
-                _events.emit(ReminderEvent.Warning("Lembrete salvo, mas notificação não agendada"))
+                _events.emit(ReminderEvent.Warning("Reminder saved, but notification was not scheduled"))
                 return@launch
             }
             _events.emit(ReminderEvent.Saved)
         } catch (e: Exception) {
-            _events.emit(ReminderEvent.Error(e.message ?: "Erro ao salvar"))
+            _events.emit(ReminderEvent.Error(e.message ?: "Error while saving"))
         } finally {
             _uiState.update { it.copy(isSaving = false) }
         }

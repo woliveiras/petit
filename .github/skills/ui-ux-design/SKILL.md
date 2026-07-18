@@ -131,9 +131,9 @@ Always convey status with **icon + text + color** (never color alone):
 @Composable
 fun HealthStatusBadge(status: HealthStatus, modifier: Modifier = Modifier) {
     val (icon, color, label) = when (status) {
-        HealthStatus.OK -> Triple(Icons.Default.CheckCircle, HealthGreen, "Em dia")
-        HealthStatus.ATTENTION -> Triple(Icons.Default.Schedule, HealthAmber, "Atenção")
-        HealthStatus.OVERDUE -> Triple(Icons.Default.Warning, HealthRed, "Atrasado")
+        HealthStatus.OK -> Triple(Icons.Default.CheckCircle, HealthGreen, "On track")
+        HealthStatus.ATTENTION -> Triple(Icons.Default.Schedule, HealthAmber, "Attention")
+        HealthStatus.OVERDUE -> Triple(Icons.Default.Warning, HealthRed, "Overdue")
     }
     Row(
         modifier = modifier
@@ -187,15 +187,15 @@ Per [M3 typography guidance](https://m3.material.io/styles/typography/applying-t
 // GOOD — clear 3-level hierarchy using M3 tokens
 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
     Text("Luna", style = MaterialTheme.typography.titleMedium)
-    Text("Fêmea • 2 anos", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    Text("Peso: 4.5 kg", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Text("Female • 2 years", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    Text("Weight: 4.5 kg", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
 // BAD — flat hierarchy, no tokens
 Column {
     Text("Luna", fontSize = 16.sp)
-    Text("Fêmea • 2 anos", fontSize = 14.sp)
-    Text("Peso: 4.5 kg", fontSize = 12.sp, color = Color.Gray)
+    Text("Female • 2 years", fontSize = 14.sp)
+    Text("Weight: 4.5 kg", fontSize = 12.sp, color = Color.Gray)
 }
 ```
 
@@ -288,10 +288,10 @@ val FABShape = RoundedCornerShape(16.dp)           // M3 FAB default
 
 | Component                      | Role                                            | Usage Rule                                    |
 | ------------------------------ | ----------------------------------------------- | --------------------------------------------- |
-| `Button` (Filled)              | **Highest emphasis** — final action on screen   | Max 1 per visible area. "Salvar", "Confirmar" |
-| `FilledTonalButton`            | **Medium emphasis** — important but not primary | "Ver todos", "Filtrar"                        |
-| `OutlinedButton`               | **Medium emphasis** — alternative/back action   | "Cancelar", "Voltar"                          |
-| `TextButton`                   | **Lowest emphasis** — tertiary, inline          | Dialog dismiss, "Pular", "Saiba mais"         |
+| `Button` (Filled)              | **Highest emphasis** — final action on screen   | Max 1 per visible area. "Save", "Confirm"     |
+| `FilledTonalButton`            | **Medium emphasis** — important but not primary | "View all", "Filter"                          |
+| `OutlinedButton`               | **Medium emphasis** — alternative/back action   | "Cancel", "Back"                              |
+| `TextButton`                   | **Lowest emphasis** — tertiary, inline          | Dialog dismiss, "Skip", "Learn more"           |
 | `IconButton`                   | **Icon-only** action                            | Toolbar buttons, inline row actions           |
 | `FloatingActionButton`         | **Primary creation/action** for the screen      | 1 per screen maximum                          |
 | `ExtendedFloatingActionButton` | FAB with label when action isn't obvious        | Use if icon alone is ambiguous                |
@@ -300,10 +300,10 @@ val FABShape = RoundedCornerShape(16.dp)           // M3 FAB default
 // GOOD — clear visual hierarchy per M3 guidelines
 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
     OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
-        Text("Cancelar")
+        Text("Cancel")
     }
     Button(onClick = onSave, modifier = Modifier.weight(1f)) {
-        Text("Salvar")
+        Text("Save")
     }
 }
 ```
@@ -332,7 +332,7 @@ Scaffold(
     topBar = {
         MediumTopAppBar(
             title = { Text("Luna") },
-            navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Voltar") } },
+            navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
             scrollBehavior = scrollBehavior,
         )
     },
@@ -356,16 +356,16 @@ Rules:
 AlertDialog(
     onDismissRequest = onDismiss,
     icon = { Icon(Icons.Default.DeleteForever, contentDescription = null) },
-    title = { Text("Excluir ${catName}?") },
-    text = { Text("Esta ação é irreversível. Todos os registros de saúde serão removidos.") },
+    title = { Text("Delete ${catName}?") },
+    text = { Text("This action is irreversible. All health records will be removed.") },
     confirmButton = {
         TextButton(
             onClick = onConfirm,
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-        ) { Text("Excluir") }
+        ) { Text("Delete") }
     },
     dismissButton = {
-        TextButton(onClick = onDismiss) { Text("Cancelar") }
+        TextButton(onClick = onDismiss) { Text("Cancel") }
     },
 )
 ```
@@ -383,12 +383,12 @@ Rules per M3:
 val snackbarHostState = remember { SnackbarHostState() }
 
 // Success feedback
-snackbarHostState.showSnackbar("Pet salvo com sucesso", duration = SnackbarDuration.Short)
+snackbarHostState.showSnackbar("Pet saved successfully", duration = SnackbarDuration.Short)
 
 // Delete with undo
 val result = snackbarHostState.showSnackbar(
-    message = "Registro excluído",
-    actionLabel = "Desfazer",
+    message = "Record deleted",
+    actionLabel = "Undo",
     duration = SnackbarDuration.Long,
 )
 if (result == SnackbarResult.ActionPerformed) { viewModel.undoDelete() }
@@ -396,8 +396,8 @@ if (result == SnackbarResult.ActionPerformed) { viewModel.undoDelete() }
 
 Rules:
 
-- **Short** (4s) for confirmations: "Salvo", "Enviado"
-- **Long** (10s) for actions with undo: "Excluído" + "Desfazer"
+- **Short** (4s) for confirmations: "Saved", "Sent"
+- **Long** (10s) for actions with undo: "Deleted" + "Undo"
 - **Never** Snackbar for errors — use inline error or full-screen error state
 - **Max 1 Snackbar** at a time — they queue automatically
 
@@ -411,9 +411,9 @@ Per [M3 Lists guidance](https://m3.material.io/components/lists/guidelines):
 
 ```kotlin
 Scaffold(
-    topBar = { TopAppBar(title = { Text("Meus Pets") }) },
+    topBar = { TopAppBar(title = { Text("My Pets") }) },
     floatingActionButton = {
-        ExtendedFloatingActionButton(onClick = onAdd, icon = { Icon(Icons.Default.Add, null) }, text = { Text("Novo Pet") })
+        ExtendedFloatingActionButton(onClick = onAdd, icon = { Icon(Icons.Default.Add, null) }, text = { Text("New Pet") })
     }
 ) { padding ->
     when {
@@ -439,8 +439,8 @@ Scaffold(
     topBar = {
         MediumTopAppBar(
             title = { Text(pet.name) },
-            navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Voltar") } },
-            actions = { IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Editar") } },
+            navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+            actions = { IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Edit") } },
             scrollBehavior = scrollBehavior,
         )
     }
@@ -465,9 +465,9 @@ Per [M3 text field guidelines](https://m3.material.io/components/text-fields/gui
 Scaffold(
     topBar = {
         TopAppBar(
-            title = { Text(if (isEditing) "Editar Pet" else "Novo Pet") },
-            navigationIcon = { IconButton(onClick = onClose) { Icon(Icons.Default.Close, "Fechar") } },
-            actions = { TextButton(onClick = onSave, enabled = isValid) { Text("Salvar") } },
+            title = { Text(if (isEditing) "Edit Pet" else "New Pet") },
+            navigationIcon = { IconButton(onClick = onClose) { Icon(Icons.Default.Close, "Close") } },
+            actions = { TextButton(onClick = onSave, enabled = isValid) { Text("Save") } },
         )
     }
 ) { padding ->
@@ -476,10 +476,10 @@ Scaffold(
         verticalArrangement = Arrangement.spacedBy(24.dp), // 24dp between SECTIONS
     ) {
         // Group fields by topic with 16dp spacing within groups
-        FormSection("Informações Básicas") { /* name, birthdate, sex */ }
-        FormSection("Aparência") { /* breed, color */ }
-        FormSection("Identificação") { /* microchip, passport */ }
-        FormSection("Observações") { /* notes multiline */ }
+        FormSection("Basic Information") { /* name, birthdate, sex */ }
+        FormSection("Appearance") { /* breed, color */ }
+        FormSection("Identification") { /* microchip, passport */ }
+        FormSection("Notes") { /* notes multiline */ }
     }
 }
 ```
@@ -710,7 +710,7 @@ Per [M3 FAB guidelines](https://m3.material.io/components/floating-action-button
 val rotation by animateFloatAsState(if (expanded) 45f else 0f, animationSpec = tween(200))
 
 FloatingActionButton(onClick = { expanded = !expanded }) {
-    Icon(Icons.Default.Add, contentDescription = "Ações rápidas", modifier = Modifier.rotate(rotation))
+    Icon(Icons.Default.Add, contentDescription = "Quick actions", modifier = Modifier.rotate(rotation))
 }
 ```
 
@@ -772,8 +772,8 @@ Per [M3 text field states](https://m3.material.io/components/text-fields/guideli
 OutlinedTextField(
     value = name,
     onValueChange = { onNameChange(it) },
-    label = { Text("Nome do gato") },
-    placeholder = { Text("Ex: Luna") },
+    label = { Text("Cat name") },
+    placeholder = { Text("E.g., Luna") },
     isError = nameError != null,
     supportingText = {
         if (nameError != null) {
