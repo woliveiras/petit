@@ -2,7 +2,7 @@
 spec: "0204"
 title: "Petit Cloud Gate"
 family: identity-access
-status: Draft
+status: Approved
 owner: woliveiras
 depends_on: ["0201"]
 ---
@@ -26,11 +26,11 @@ not a Petit Cloud account, and the capability remains free.
 
 ## Service models
 
-| Service model | Identity requirement | Cost to the user | Examples |
-| --- | --- | --- | --- |
-| Petit Local | No account | Free | Pet care, reminders, JSON/PDF export, local sharing |
-| User-owned cloud | Authorization for the selected provider | Free | Google Drive backup, restore, and backup management |
-| Petit Cloud | Persistent Petit identity | Paid | Hosted real-time sync, multi-device sync, remote family collaboration |
+| Service model    | Identity requirement                    | Cost to the user | Examples                                                              |
+| ---------------- | --------------------------------------- | ---------------- | --------------------------------------------------------------------- |
+| Petit Local      | No account                              | Free             | Pet care, reminders, JSON/PDF export, local sharing                   |
+| User-owned cloud | Authorization for the selected provider | Free             | Google Drive backup, restore, and backup management                   |
+| Petit Cloud      | Persistent Petit identity               | Paid             | Hosted real-time sync, multi-device sync, remote family collaboration |
 
 The Google account used to authorize Drive may also be offered as a way to
 authenticate a Petit Cloud account. These are distinct grants and must be
@@ -131,22 +131,22 @@ AND continuous remote collaboration through Petit-managed infrastructure require
 
 ## Capability classification
 
-| Capability | Account or authorization | Offering |
-| --- | --- | --- |
-| Pet registration and health history | None | Petit Local — free |
-| Weight tracking and charts | None | Petit Local — free |
-| Vaccination and deworming records | None | Petit Local — free |
-| Local reminders | None | Petit Local — free |
-| JSON import and export | None | Petit Local — free |
-| PDF export | None | Petit Local — free |
-| Nearby and local-network transfer | None | Petit Local — free |
-| Local family group | None | Petit Local — free |
-| Manual Google Drive backup | Google Drive authorization | User-owned cloud — free |
-| Automatic Google Drive backup | Google Drive authorization | User-owned cloud — free |
-| Restore and manage Google Drive backups | Google Drive authorization | User-owned cloud — free |
-| Real-time sync hosted by Petit | Petit Cloud account | Petit Cloud — paid |
-| Automatic multi-device sync hosted by Petit | Petit Cloud account | Petit Cloud — paid |
-| Remote family collaboration hosted by Petit | Petit Cloud account for each participant | Petit Cloud — paid |
+| Capability                                  | Account or authorization                 | Offering                |
+| ------------------------------------------- | ---------------------------------------- | ----------------------- |
+| Pet registration and health history         | None                                     | Petit Local — free      |
+| Weight tracking and charts                  | None                                     | Petit Local — free      |
+| Vaccination and deworming records           | None                                     | Petit Local — free      |
+| Local reminders                             | None                                     | Petit Local — free      |
+| JSON import and export                      | None                                     | Petit Local — free      |
+| PDF export                                  | None                                     | Petit Local — free      |
+| Nearby and local-network transfer           | None                                     | Petit Local — free      |
+| Local family group                          | None                                     | Petit Local — free      |
+| Manual Google Drive backup                  | Google Drive authorization               | User-owned cloud — free |
+| Automatic Google Drive backup               | Google Drive authorization               | User-owned cloud — free |
+| Restore and manage Google Drive backups     | Google Drive authorization               | User-owned cloud — free |
+| Real-time sync hosted by Petit              | Petit Cloud account                      | Petit Cloud — paid      |
+| Automatic multi-device sync hosted by Petit | Petit Cloud account                      | Petit Cloud — paid      |
+| Remote family collaboration hosted by Petit | Petit Cloud account for each participant | Petit Cloud — paid      |
 
 ## Entitlement rules
 
@@ -171,11 +171,11 @@ AND continuous remote collaboration through Petit-managed infrastructure require
 
 ## Test strategy
 
-| Scope | Expected coverage |
-| --- | --- |
-| Unit | Capability classification, authorization state, entitlement state, and gate rules. |
+| Scope       | Expected coverage                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| Unit        | Capability classification, authorization state, entitlement state, and gate rules.          |
 | Integration | Google Drive authorization remains independent from Petit Cloud authentication and billing. |
-| UI/E2E | Local, Drive-connected, inactive-cloud, active-cloud, and expired-cloud journeys. |
+| UI/E2E      | Local, Drive-connected, inactive-cloud, active-cloud, and expired-cloud journeys.           |
 
 ## Acceptance criteria
 
@@ -206,17 +206,17 @@ logging in to Petit Cloud.
 
 ## Decisions
 
-| Decision | Current choice | Rationale |
-| --- | --- | --- |
-| Proposal status | Draft | The service model is defined and awaits explicit approval. |
-| Charging principle | Charge only for Petit-managed infrastructure with ongoing cost | Login and convenience alone do not justify payment. |
-| Local capabilities | Free without a Petit account | Petit remains useful offline and local-first. |
-| Google Drive backup | Free with separate Google authorization | Storage belongs to the user and is not hosted by Petit. |
-| Hosted synchronization and collaboration | Petit Cloud, paid | Petit operates the remote infrastructure and bears its cost. |
-| PDF export | Free and local | It does not require Petit-managed infrastructure. |
-| Family sharing | Local sharing is free; remote continuous collaboration is paid | The transport and operating cost differ. |
-| External technology | Undecided | Firebase and other providers remain implementation options, not product requirements. |
-| Local source of truth | Room | Entitlement or connectivity changes must not compromise local access. |
+| Decision                                 | Current choice                                                 | Rationale                                                                             |
+| ---------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Proposal status                          | Draft                                                          | The service model is defined and awaits explicit approval.                            |
+| Charging principle                       | Charge only for Petit-managed infrastructure with ongoing cost | Login and convenience alone do not justify payment.                                   |
+| Local capabilities                       | Free without a Petit account                                   | Petit remains useful offline and local-first.                                         |
+| Google Drive backup                      | Free with separate Google authorization                        | Storage belongs to the user and is not hosted by Petit.                               |
+| Hosted synchronization and collaboration | Petit Cloud, paid                                              | Petit operates the remote infrastructure and bears its cost.                          |
+| PDF export                               | Free and local                                                 | It does not require Petit-managed infrastructure.                                     |
+| Family sharing                           | Local sharing is free; remote continuous collaboration is paid | The transport and operating cost differ.                                              |
+| External technology                      | Undecided                                                      | Firebase and other providers remain implementation options, not product requirements. |
+| Local source of truth                    | Room                                                           | Entitlement or connectivity changes must not compromise local access.                 |
 
 ## Out of scope
 

@@ -2,7 +2,7 @@
 spec: "0104"
 title: Local network sync
 family: local-sharing
-status: Draft
+status: Approved
 owner: woliveiras
 depends_on: ["0101", "0103"]
 ---
@@ -71,14 +71,14 @@ recovery. See the [protocol research](../../docs/local-sharing-protocols.md).
 
 ## Decisions
 
-| Decision | Choice | Rationale |
-| --- | --- | --- |
-| Discovery | Android NSD / DNS-SD `_petit._tcp` | Works on the local network without Google Play Services. |
-| Continuous transport | TCP over infrastructure Wi-Fi | Uses the already active radio and avoids the cost of a Wi-Fi Direct group. |
-| Background | Unique periodic work, minimum 15 minutes | Respects Android restrictions and optimizations. |
-| Lifecycle | NSD in the foreground; limited attempt in the background | Reduces battery use and resources retained by the process. |
-| Transfer unit | Batched changeset since the last ACK | Avoids syncing every write and allows retries. |
-| Security | Authenticated handshake and protected channel | The local network alone is not a trust boundary. |
+| Decision             | Choice                                                   | Rationale                                                                  |
+| -------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Discovery            | Android NSD / DNS-SD `_petit._tcp`                       | Works on the local network without Google Play Services.                   |
+| Continuous transport | TCP over infrastructure Wi-Fi                            | Uses the already active radio and avoids the cost of a Wi-Fi Direct group. |
+| Background           | Unique periodic work, minimum 15 minutes                 | Respects Android restrictions and optimizations.                           |
+| Lifecycle            | NSD in the foreground; limited attempt in the background | Reduces battery use and resources retained by the process.                 |
+| Transfer unit        | Batched changeset since the last ACK                     | Avoids syncing every write and allows retries.                             |
+| Security             | Authenticated handshake and protected channel            | The local network alone is not a trust boundary.                           |
 
 ## Out of scope
 
