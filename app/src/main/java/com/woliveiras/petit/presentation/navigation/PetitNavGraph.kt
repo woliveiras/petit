@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.woliveiras.petit.presentation.feature.backup.BackupHistoryRoute
 import com.woliveiras.petit.presentation.feature.backup.BackupSettingsRoute
 import com.woliveiras.petit.presentation.feature.backup.RestoreBackupRoute
 import com.woliveiras.petit.presentation.feature.backup.SavedBackupsRoute
@@ -315,7 +316,14 @@ fun PetitNavGraph(
     }
 
     composable(Screen.BackupSettings.route) {
-      BackupSettingsRoute(onNavigateBack = { navController.popBackStack() })
+      BackupSettingsRoute(
+        onNavigateBack = { navController.popBackStack() },
+        onNavigateToHistory = { navController.navigate(Screen.BackupHistory.route) },
+      )
+    }
+
+    composable(Screen.BackupHistory.route) {
+      BackupHistoryRoute(onNavigateBack = { navController.popBackStack() })
     }
 
     composable(Screen.SavedBackups.route) {

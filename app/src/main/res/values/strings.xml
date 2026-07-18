@@ -923,6 +923,10 @@
     <string name="backup_preferences_notify_description">Show a silent notification after a successful automatic backup</string>
     <string name="backup_preferences_history">Backup history</string>
     <string name="backup_preferences_no_history">No backup attempts have been recorded.</string>
+    <string name="backup_preferences_view_all_history">View all history</string>
+    <string name="backup_history_loading">Loading backup history</string>
+    <string name="backup_history_load_failed">Backup history could not be loaded.</string>
+    <string name="backup_history_load_more">Load more</string>
     <string name="backup_preferences_attempt">%1$s · started %2$s · completed %3$s · %4$s · %5$s · %6$d pets · %7$d tasks</string>
     <string name="backup_preferences_disconnect">Disconnect storage</string>
     <string name="backup_preferences_disconnect_title">Disconnect storage?</string>

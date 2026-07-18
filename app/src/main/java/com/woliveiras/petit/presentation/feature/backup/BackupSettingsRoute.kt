@@ -18,6 +18,7 @@ import java.util.Date
 @Composable
 fun BackupSettingsRoute(
   onNavigateBack: () -> Unit,
+  onNavigateToHistory: () -> Unit,
   viewModel: BackupSettingsViewModel = hiltViewModel(),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -30,12 +31,13 @@ fun BackupSettingsRoute(
     onNetworkChanged = viewModel::setNetworkRequirement,
     onNotifyChanged = viewModel::setNotifyAfterSuccess,
     onBackUpNow = viewModel::backUpNow,
+    onViewAllHistory = onNavigateToHistory,
     onDisconnect = viewModel::disconnect,
   )
 }
 
 @Composable
-private fun backupSettingsCopy(): BackupSettingsCopy {
+internal fun backupSettingsCopy(): BackupSettingsCopy {
   val context = LocalContext.current
   fun status(status: BackupAttemptStatus): String =
     context.getString(
@@ -98,6 +100,7 @@ private fun backupSettingsCopy(): BackupSettingsCopy {
     backUpNow = stringResource(R.string.backup_now),
     history = stringResource(R.string.backup_preferences_history),
     noHistory = stringResource(R.string.backup_preferences_no_history),
+    viewAllHistory = stringResource(R.string.backup_preferences_view_all_history),
     attemptSummary = ::attempt,
     manualStatus = ::status,
     disconnect = stringResource(R.string.backup_preferences_disconnect),

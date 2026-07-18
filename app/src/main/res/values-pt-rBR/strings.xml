@@ -839,6 +839,23 @@
   <string name="color_golden">Dourado</string>
   <string name="color_brindle">Malhado</string>
 
+    <string name="backup_preferences_history">Histórico de backups</string>
+    <string name="backup_preferences_no_history">Nenhuma tentativa de backup foi registrada.</string>
+    <string name="backup_preferences_view_all_history">Ver todo o histórico</string>
+    <string name="backup_preferences_attempt">%1$s · iniciado em %2$s · concluído em %3$s · %4$s · %5$s · %6$d pets · %7$d tarefas</string>
+    <string name="backup_history_loading">Carregando o histórico de backups</string>
+    <string name="backup_history_load_failed">Não foi possível carregar o histórico de backups.</string>
+    <string name="backup_history_load_more">Carregar mais</string>
+    <string name="backup_status_running">Em andamento</string>
+    <string name="backup_status_succeeded">Concluído</string>
+    <string name="backup_status_retrying">Tentando novamente</string>
+    <string name="backup_status_failed">Falhou</string>
+    <string name="backup_status_cancelled">Cancelado</string>
+    <string name="backup_status_authorization_required">Autorização necessária</string>
+    <string name="backup_trigger_manual">Manual</string>
+    <string name="backup_trigger_automatic">Automático</string>
+    <string name="backup_trigger_data_change">Alteração de dados</string>
+
     <string name="lan_sync_title">Sincronização na rede local</string>
     <string name="lan_sync_try_now">Sincronizar agora</string>
     <string name="lan_sync_idle">A sincronização local automática está ociosa</string>

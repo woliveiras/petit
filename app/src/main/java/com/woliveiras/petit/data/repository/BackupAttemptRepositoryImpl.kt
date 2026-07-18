@@ -26,7 +26,7 @@ internal constructor(private val dataStore: DataStore<Preferences>) : BackupAtte
 
   override val attempts: Flow<List<BackupAttempt>> =
     dataStore.data.map { preferences ->
-      preferences[ATTEMPTS].orEmpty().mapNotNull(::decode).sortedByDescending { it.startedAt }
+      preferences[ATTEMPTS].orEmpty().mapNotNull(::decode).sortedWith(BACKUP_ATTEMPT_ORDER)
     }
 
   override suspend fun getAttempt(id: String): BackupAttempt? =

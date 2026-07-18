@@ -20,6 +20,50 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class BackupAttemptRepositoryTest {
   @Test
+  fun historyPagesAreBoundedStableAndDoNotRepeatAttempts() = runTest {
+    val file = File.createTempFile("backup-attempt-pages-", ".preferences_pb").also { it.delete() }
+    val job = SupervisorJob()
+    val scope = CoroutineScope(StandardTestDispatcher(testScheduler) + job)
+    try {
+      val repository =
+        BackupAttemptRepositoryImpl(
+          PreferenceDataStoreFactory.create(scope = scope, produceFile = { file })
+        )
+      val newest = Instant.parse("2026-07-18T09:00:00Z")
+      (1..12).forEach { index ->
+        repository.upsert(
+          BackupAttempt(
+            id = "attempt-${index.toString().padStart(2, '0')}",
+            trigger = BackupTrigger.AUTOMATIC,
+            startedAt = if (index <= 2) newest else newest.minusSeconds(index.toLong()),
+            status = BackupAttemptStatus.SUCCEEDED,
+          )
+        )
+      }
+
+      val first = repository.getPage(limit = 5)
+      val second = repository.getPage(after = first.nextCursor, limit = 5)
+      val last = repository.getPage(after = second.nextCursor, limit = 5)
+
+      assertThat(first.items.map { it.id })
+        .containsExactly("attempt-01", "attempt-02", "attempt-03", "attempt-04", "attempt-05")
+        .inOrder()
+      assertThat(second.items.map { it.id })
+        .containsExactly("attempt-06", "attempt-07", "attempt-08", "attempt-09", "attempt-10")
+        .inOrder()
+      assertThat(last.items.map { it.id }).containsExactly("attempt-11", "attempt-12").inOrder()
+      assertThat((first.items + second.items + last.items).map { it.id }).containsNoDuplicates()
+      assertThat(first.nextCursor).isNotNull()
+      assertThat(second.nextCursor).isNotNull()
+      assertThat(last.nextCursor).isNull()
+    } finally {
+      job.cancelAndJoin()
+      scope.cancel()
+      file.delete()
+    }
+  }
+
+  @Test
   fun upsertedNonClinicalHistoryPersistsAcrossRepositoryInstances() = runTest {
     val file = File.createTempFile("backup-attempts-", ".preferences_pb").also { it.delete() }
     val firstJob = SupervisorJob()

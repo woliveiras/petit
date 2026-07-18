@@ -793,6 +793,23 @@
   <string name="action_continue">Continuar</string>
   <string name="action_done">Listo</string>
 
+    <string name="backup_preferences_history">Historial de copias de seguridad</string>
+    <string name="backup_preferences_no_history">No se ha registrado ningún intento de copia de seguridad.</string>
+    <string name="backup_preferences_view_all_history">Ver todo el historial</string>
+    <string name="backup_preferences_attempt">%1$s · iniciada %2$s · completada %3$s · %4$s · %5$s · %6$d mascotas · %7$d tareas</string>
+    <string name="backup_history_loading">Cargando el historial de copias de seguridad</string>
+    <string name="backup_history_load_failed">No se pudo cargar el historial de copias de seguridad.</string>
+    <string name="backup_history_load_more">Cargar más</string>
+    <string name="backup_status_running">En curso</string>
+    <string name="backup_status_succeeded">Completada</string>
+    <string name="backup_status_retrying">Reintentando</string>
+    <string name="backup_status_failed">Fallida</string>
+    <string name="backup_status_cancelled">Cancelada</string>
+    <string name="backup_status_authorization_required">Autorización requerida</string>
+    <string name="backup_trigger_manual">Manual</string>
+    <string name="backup_trigger_automatic">Automática</string>
+    <string name="backup_trigger_data_change">Cambio de datos</string>
+
     <string name="lan_sync_title">Sincronización en la red local</string>
     <string name="lan_sync_try_now">Sincronizar ahora</string>
     <string name="lan_sync_idle">La sincronización local automática está inactiva</string>

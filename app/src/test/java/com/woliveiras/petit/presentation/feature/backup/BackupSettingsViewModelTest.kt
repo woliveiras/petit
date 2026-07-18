@@ -67,6 +67,27 @@ class BackupSettingsViewModelTest {
     }
 
   @Test
+  fun settingsHistoryContainsOnlyTheThreeMostRecentAttempts() =
+    runTest(dispatcher) {
+      val fixture = fixture()
+      (1..4).forEach { index ->
+        fixture.history.upsert(
+          attempt(
+            id = "attempt-$index",
+            status = BackupAttemptStatus.SUCCEEDED,
+            startedAt = Instant.EPOCH.plusSeconds(index.toLong()),
+          )
+        )
+      }
+
+      advanceUntilIdle()
+
+      assertThat(fixture.viewModel.uiState.value.attempts.map { it.id })
+        .containsExactly("attempt-4", "attempt-3", "attempt-2")
+        .inOrder()
+    }
+
+  @Test
   fun manualBackupRecordsHistoryWithoutReplacingOrCancellingPeriodicWork() =
     runTest(dispatcher) {
       val fixture = fixture()
@@ -161,7 +182,10 @@ class BackupSettingsViewModelTest {
       state.value.firstOrNull { it.id == id }
 
     override suspend fun upsert(attempt: BackupAttempt) {
-      state.value = state.value.filterNot { it.id == attempt.id } + attempt
+      state.value =
+        (state.value.filterNot { it.id == attempt.id } + attempt).sortedWith(
+          compareByDescending<BackupAttempt> { it.startedAt }.thenBy { it.id }
+        )
     }
   }
 
@@ -179,12 +203,16 @@ class BackupSettingsViewModelTest {
   }
 
   companion object {
-    private fun attempt(id: String, status: BackupAttemptStatus) =
+    private fun attempt(
+      id: String,
+      status: BackupAttemptStatus,
+      startedAt: Instant = Instant.EPOCH,
+    ) =
       BackupAttempt(
         id = id,
         trigger = BackupTrigger.AUTOMATIC,
-        startedAt = Instant.EPOCH,
-        completedAt = Instant.EPOCH,
+        startedAt = startedAt,
+        completedAt = startedAt,
         status = status,
       )
 

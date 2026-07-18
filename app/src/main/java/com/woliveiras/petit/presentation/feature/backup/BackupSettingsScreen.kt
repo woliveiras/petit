@@ -51,6 +51,7 @@ data class BackupSettingsCopy(
   val backUpNow: String,
   val history: String,
   val noHistory: String,
+  val viewAllHistory: String,
   val attemptSummary: (BackupAttempt) -> String,
   val manualStatus: (BackupAttemptStatus) -> String,
   val disconnect: String,
@@ -71,6 +72,7 @@ fun BackupSettingsScreen(
   onNetworkChanged: (BackupNetworkRequirement) -> Unit,
   onNotifyChanged: (Boolean) -> Unit,
   onBackUpNow: () -> Unit,
+  onViewAllHistory: () -> Unit,
   onDisconnect: () -> Unit,
 ) {
   Scaffold(
@@ -85,6 +87,7 @@ fun BackupSettingsScreen(
       onNetworkChanged = onNetworkChanged,
       onNotifyChanged = onNotifyChanged,
       onBackUpNow = onBackUpNow,
+      onViewAllHistory = onViewAllHistory,
       onDisconnect = onDisconnect,
     )
   }
@@ -100,6 +103,7 @@ fun BackupSettingsContent(
   onNetworkChanged: (BackupNetworkRequirement) -> Unit,
   onNotifyChanged: (Boolean) -> Unit,
   onBackUpNow: () -> Unit,
+  onViewAllHistory: () -> Unit,
   onDisconnect: () -> Unit,
 ) {
   var showDisconnectConfirmation by rememberSaveable { mutableStateOf(false) }
@@ -171,6 +175,11 @@ fun BackupSettingsContent(
       items(state.attempts, key = { it.id }) { attempt ->
         Card(Modifier.fillMaxWidth()) {
           Text(copy.attemptSummary(attempt), Modifier.padding(12.dp))
+        }
+      }
+      item {
+        TextButton(onClick = onViewAllHistory, modifier = Modifier.fillMaxWidth()) {
+          Text(copy.viewAllHistory)
         }
       }
     }

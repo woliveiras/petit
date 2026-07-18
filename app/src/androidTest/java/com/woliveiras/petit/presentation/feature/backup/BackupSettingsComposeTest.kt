@@ -26,6 +26,7 @@ class BackupSettingsComposeTest {
     val networks = mutableListOf<BackupNetworkRequirement>()
     val notifications = mutableListOf<Boolean>()
     var manualCalls = 0
+    var historyCalls = 0
     var disconnectCalls = 0
     val copy = copy()
     compose.setContent {
@@ -43,6 +44,7 @@ class BackupSettingsComposeTest {
           onNetworkChanged = { networks += it },
           onNotifyChanged = { notifications += it },
           onBackUpNow = { manualCalls += 1 },
+          onViewAllHistory = { historyCalls += 1 },
           onDisconnect = { disconnectCalls += 1 },
         )
       }
@@ -55,6 +57,7 @@ class BackupSettingsComposeTest {
     compose.onNodeWithContentDescription(copy.unmeteredOnly).performClick()
     compose.onNodeWithContentDescription(copy.notifyAfterSuccess).performClick()
     compose.onNodeWithText(copy.backUpNow).performClick()
+    compose.onNodeWithText(copy.viewAllHistory).performClick()
     compose.onNodeWithText(copy.disconnect).performClick()
     compose.onNodeWithText(copy.disconnectConfirmationMessage).assertIsDisplayed()
     compose.onNodeWithText(copy.confirmDisconnect).performClick()
@@ -63,6 +66,7 @@ class BackupSettingsComposeTest {
     assertThat(networks).containsExactly(BackupNetworkRequirement.CONNECTED)
     assertThat(notifications).containsExactly(true)
     assertThat(manualCalls).isEqualTo(1)
+    assertThat(historyCalls).isEqualTo(1)
     assertThat(disconnectCalls).isEqualTo(1)
   }
 
@@ -93,6 +97,7 @@ class BackupSettingsComposeTest {
       backUpNow = "Back up now",
       history = "History",
       noHistory = "No backup attempts",
+      viewAllHistory = "View all history",
       attemptSummary = { "Automatic attempt succeeded" },
       manualStatus = { it.name },
       disconnect = "Disconnect",

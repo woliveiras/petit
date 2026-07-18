@@ -83,7 +83,11 @@ internal constructor(
         }
         .collect { (settings, authorization, attempts) ->
           mutableUiState.update {
-            it.copy(settings = settings, authorization = authorization, attempts = attempts)
+            it.copy(
+              settings = settings,
+              authorization = authorization,
+              attempts = attempts.take(HISTORY_PREVIEW_SIZE),
+            )
           }
         }
     }
@@ -148,5 +152,9 @@ internal constructor(
         mutableUiState.update { it.copy(isUpdatingSettings = false) }
       }
     }
+  }
+
+  private companion object {
+    const val HISTORY_PREVIEW_SIZE = 3
   }
 }
